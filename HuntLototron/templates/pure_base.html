@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Roulette: Showdown</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <style>
+      .body {
+        width: var(display);
+        position: relative;  
+        top: 0px; 
+        left: 0px;
+      }
+      .header_bar {
+        background-color: #dfdede;
+        display: flex;
+        justify-self: center;
+        align-items: center;
+        height: 5em;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        
+      }
+      .header_bar > h1 {
+        font: 2em "Fira Sans", sans-serif;
+        padding-left: 50px;
+      }
+
+    </style>
+
+  </head>
+  <body>
+
+    
+    <div class="header_bar">
+      <h1>
+        Roulette: Showdown
+      </h1>
+      
+    </div>
+
+    {% block content %}
+    {% endblock  %}
+    
+    
+
+    
+  </body>
+</html>

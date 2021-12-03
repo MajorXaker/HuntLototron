@@ -36,6 +36,40 @@ dictionary = {"primary_gun": "primary", "secondary_gun": "secondary", "Price": "
 # except NameError:
 #     print("No qq")
 
-a = "primary"
+# a = "primary"
+# 
+# print(dictionary[a+"_gun"])
 
-print(dictionary[a+"_gun"])
+
+def multiget(iterable, keys, default_value = 0):
+    """Function for getting a lot of values at ones by their keys
+
+    This function raises TypeError if you try to access iterable with strings instead of numerical keys. Strings are only for dicts!
+    Parameters
+    ---
+    iterable 
+        any iterable object with get method - will use get(key)
+        or other iterable - tries to work positionally iterable[key]
+    keys
+        iterable with keys to access
+    default_value 
+        a value to give when needed value does not exist
+        
+    Returns
+    -----
+        list of values accessed in order of keys given    
+    """
+    output = []
+    if isinstance(iterable, dict) or isinstance(iterable, list):
+        for key in keys:
+            output.append(iterable.get(key, default_value))
+    else:
+        output.append(iterable[key])
+    return output
+
+multikey = "primary_gun", "secondary_gun", "Price"
+
+a = multiget(dictionary, multikey)
+
+a = "alphabet"
+print(a["a"])

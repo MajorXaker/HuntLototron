@@ -1,5 +1,5 @@
-from roulette import Weapon_Type
-from roulette import RandomCore
+from logic_core import Weapon_Type
+from logic_core import RandomCore
 
 
 shotguns = Weapon_Type("shotguns")

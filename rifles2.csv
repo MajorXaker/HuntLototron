@@ -1,0 +1,45 @@
+﻿Name;Player_Name;Core_gun;Sights;Muzzle;Melee;Size_num;Weight;Price
+Lebel 1886;Лебель;Lebel 1886;Ironsights;None;None;3;1;397
+Lebel 1886 Marksman;Лебель марксман;Lebel 1886;Marksman;None;None;3;1;437
+Lebel 1886 Aperture;Лебель апертура;Lebel 1886;Aperture;None;None;3;1;425
+Lebel 1886 Talon;Лебель талон;Lebel 1886;Ironsights;None;Talon;3;1;422
+Mosin-Nagant M1891;Мосин;Mosin-Nagant M1891;Ironsights;None;None;3;1;490
+Mosin-Nagant M1891 Bayonet;Мосин штык;Mosin-Nagant M1892;Sniper;None;Bayonet;3;1;540
+Mosin-Nagant M1891 Sniper;Мосин снайпер;Mosin-Nagant M1893;Ironsights;None;None;3;1;550
+Mosin-Nagant M1891 Obrez;Мосин обрез;Mosin-Nagant M1894;Ironsights;None;None;2;1;290
+Mosin-Nagant M1891 Obrez Mace;Мосин обрез дубина;Mosin-Nagant M1895;Ironsights;None;Mace;2;1;310
+Mosin-Nagant M1891 Obrez Drum;Мосин обрез барабан;Mosin-Nagant M1896;Ironsights;None;None;2;1;350
+Mosin-Nagant M1891 Avtomat;Автомат;Mosin-Nagant M1897;Ironsights;None;None;3;1;1250
+Berthier Mle 1892;Бертье;Berthier Mle 1892;Ironsights;None;None;3;1;356
+Sparks LRR;Спаркс;Sparks LRR;Ironsights;None;None;3;1;130
+Sparks LRR Sniper;Спаркс снайпер;Sparks LRR;Sniper;None;None;3;1;199
+Sparks LRR Silencer;Спаркс глушитель;Sparks LRR;Ironsights;Silencer;None;3;1;150
+Martini-Henry IC1;Мартини;Martini-Henry IC1;Ironsights;None;None;3;1;122
+Martini-Henry IC1 Riposte;Мартини сабля;Martini-Henry IC1;Ironsights;None;Bayonet;3;1;164
+Martini-Henry IC1 Deadeye;Мартини дедай;Martini-Henry IC1;Deadeye;None;None;3;1;145
+Martini-Henry IC1 Marksman;Мартини марксман;Martini-Henry IC1;Marksman;None;None;3;1;173
+Vetterli 71 Karabiner;Ветерли;Vetterli 71 Karabiner;Ironsights;None;None;3;1;105
+Vetterli 71 Karabiner Bayonet;Ветерли штык;Vetterli 71 Karabiner;Ironsights;None;Bayonet;3;1;155
+Vetterli 71 Karabiner Deadeye;Ветерли дедай;Vetterli 71 Karabiner;Deadeye;None;None;3;1;130
+Vetterli 71 Karabiner Marksman;Ветерли марксман;Vetterli 71 Karabiner;Marksman;None;None;3;1;190
+Vetterli 71 Karabiner Silencer;Ветерли глушитель;Vetterli 71 Karabiner;Ironsights;Silencer;None;3;1;150
+Springfield 1866;Спрингфилд;Springfield 1866;Ironsights;None;None;3;1;38
+Springfield 1866 Marksman;Спрингфилд марксман;Springfield 1866;Ironsights;None;None;3;1;73
+Springfield 1866 Compact;Спрингфилд обрез;Springfield 1866;Ironsights;None;None;2;1;33
+Springfield 1866 Compact Striker;Спрингфилд обрез штык;Springfield 1866;Ironsights;None;Bayonet;2;1;56
+Springfield 1866 Compact Deadeye;Спрингфилд обрез дедай;Springfield 1866;Deadeye;None;None;2;1;46
+Winfield M1876 Centennial;Сентинель;Winfield M1876 Centennial;Ironsights;None;None;3;1;157
+Winfield M1876 Centennial Sniper;Сентинель снайпер;Winfield M1876 Centennial;Sniper;None;None;3;1;229
+Winfield M1873C;Винфилд С;Winfield M1873C;Ironsights;None;None;3;1;41
+Winfield M1873C Marksman;Винфилд С марксман;Winfield M1873C;Marksman;None;None;3;1;56
+Winfield M1873C Silencer;Винфилд глушитель;Winfield M1873C;Ironsights;Silencer;None;3;1;55
+Winfield M1873C Vandal;Винфилд вандал;Winfield M1873C;Ironsights;None;None;2;1;35
+Winfield M1873C Vandal Deadeye;Винфилд вандал дедай;Winfield M1873C;Deadeye;None;None;2;1;45
+Winfield M1873C Vandal Striker;Винфилд вандал штык;Winfield M1873C;Ironsights;None;Bayonet;2;1;39
+Winfield M1873;Винфилд;Winfield M1873;Ironsights;None;None;3;1;75
+Winfield M1873 Musket Bayonet;Винфилд штык;Winfield M1873;Ironsights;None;Bayonet;3;1;137
+Winfield M1873 Swift;Винфилд свифт;Winfield M1873;Ironsights;None;None;3;1;128
+Winfield M1873 Talon;Винфилд талон;Winfield M1873;Ironsights;None;None;3;1;100
+Winfield M1873 Aperture;Винфилд апертура;Winfield M1873;Aperture;None;None;3;1;80
+Nagant M1895 Officer Carbine;Наган карабин;Nagant M1895 Officer Carbine;Ironsights;None;None;3;1;155
+Nagant M1895 Officer Carbine Deadeye;Наган карабин дедай;Nagant M1895 Officer Carbine;Deadeye;None;None;3;1;211
