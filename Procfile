@@ -1,1 +1,1 @@
-web: gunicorn huntlototron.wsgi
+web: gunicorn --pythonpath HuntLototron\HuntLototron HuntLototron.wsgi
