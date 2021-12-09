@@ -1,1 +1,1 @@
-web: gunicorn huntlototron.wsgi
+web: gunicorn HuntLototron.wsgi
