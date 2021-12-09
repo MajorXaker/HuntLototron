@@ -9,4 +9,5 @@ app_name = "roulette"
 
 urlpatterns = [
     path('', views.index, name = "index"),
+
 ]
