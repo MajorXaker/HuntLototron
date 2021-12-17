@@ -1,0 +1,38 @@
+{% extends 'pure_base.html' %}
+{% block content %}
+
+<head>
+    <title>Roulette</title>
+
+    <script>
+
+
+        
+        function showCoords(event, element) {
+            var x = event.offsetX;
+            var y = event.offsetY;
+            // var coords = "X coords: " + x + ", Y coords: " + y;
+            var coords = x + " " + y;
+            document.getElementById("demo").innerHTML = coords
+        };
+
+        
+
+    </script>
+
+</head>
+
+<body>
+
+    <img onclick=" get_alert(event, 'map')" onload="" id="map"
+    src="https://sun9-5.userapi.com/impf/OiEi1hEIA7_vInVmJNX_LiFh3uF6QgdIOhib3w/VLmwl_Rzelk.jpg?size=726x726&quality=95&sign=aced35a0fc970cd4b3f61070b4ea04c2&type=album" 
+    alt="lawson_delta map"> 
+    
+    <p id="demo"></p>
+
+
+
+
+</body>
+
+{% endblock %}

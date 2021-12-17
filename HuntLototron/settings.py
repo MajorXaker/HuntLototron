@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'roulette.apps.RouletteConfig'
+    'roulette.apps.RouletteConfig',
+    'stats.apps.StatsConfig'
 ]
 
 MIDDLEWARE = [

@@ -88,18 +88,6 @@ class Weapon(models.Model):
         return self.name
 
 class Slots(models.Model):
-    # layout_list = [
-    #     ("3+2","3+2"),
-    #     ("2+2","2+2"),
-    #     ("3+1","3+1"),
-    #     ("2+1","2+1"),
-    #     ("1+1","1+1")
-    #     ]
-    # layout_type = CharField(
-    #     max_length=4,
-    #     choices=layout_list,
-    #     blank=False
-    # )
     primary_size = models.IntegerField(blank=False)
     secondary_size = models.IntegerField(blank=False)
     weight = models.FloatField(blank=False, default=1.0)
@@ -140,10 +128,3 @@ class Layout(models.Model):
             'chance': self.chance ,
             'name': str(self.primary_type) + ' + ' + str(self.secondary_type) 
         }
-
-    
-
-
-
-
-
