@@ -10,6 +10,7 @@ beautifulsoup4 = "*"
 requests = "*"
 gunicorn = "*"
 whitenoise = "*"
+typing-extensions = "*"
 
 [dev-packages]
 

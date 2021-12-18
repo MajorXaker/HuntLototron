@@ -1,3 +1,4 @@
+from typing_extensions import Required
 from django.core import validators
 from django.db import models
 from roulette.models import Weapon
@@ -17,7 +18,8 @@ class Player(models.Model):
     username = models.OneToOneField(
         User,
         on_delete=models.SET("Unknown player"),
-        validators=[username_validator],)
+        validators=[username_validator],
+        related_name="player_username",)
     use_alternative_name = models.BooleanField(default=False)
     also_known_as = models.CharField(
         max_length=50, 
@@ -30,17 +32,32 @@ class Player(models.Model):
     asissts_count = models.IntegerField(blank=False, default=0)
     deaths_count = models.IntegerField(blank=False, default=0)
 
+    def service_name(self):
+        if self.use_alternative_name:
+            return 'a.' + self.also_known_as
+        else:
+            return 'u.' + self.username.username
+
     def get_kda_ratio(self):
         return (self.kills_count + self.asissts_count) / self.deaths_count
 
     def get_kd_ratio(self):
         return self.kills_count / self.deaths_count
 
+    #this methods ruins form use, try to find another way
     def __str__(self) -> str:
         if self.use_alternative_name:
             return self.also_known_as
         else:
             return self.username.username
+
+    def get_name(self):
+        # if self.use_alternative_name:
+        #     return self.also_known_as
+        # else:
+        #     return self.username.username
+        return str(self)
+    
 
 class AmmoType(models.Model):
     name = models.CharField(max_length=50, blank=False)
@@ -70,6 +87,8 @@ class Compound(models.Model):
     def __str__(self) -> str:
         return self.from_map.name + " - " + self.name
 
+    
+
 
 
 class Kit(models.Model):
@@ -83,10 +102,8 @@ class Kit(models.Model):
 
     popularity = models.IntegerField(default=0)
 
-    #this part may be redundant, kit may de accessed and count from match class
-    # uses = models.IntegerField() #how many times this kit was used 
-    # wins = models.IntegerField() #won matches
-    # losses = models.IntegerField() #and lost matches
+    
+
 
     
     def __str__(self) -> str:
@@ -130,21 +147,77 @@ class Match(models.Model):
 
         )
 
+    kills_validators = [NonNegativeValidator(_('kills')),]
+    assists_validators = [NonNegativeValidator(_("assists")),]
+    deaths_validators = [NonNegativeValidator(_("deaths")),]
+    
     #each player have it's own data fields
     #player 1 is mandatory - he creates a match class instance
     player_1 = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='player_1_name')
-    player_1_kit = models.ForeignKey(
-        Kit, 
-        verbose_name="Player eqipment", 
+
+    player_1_primary_weapon = models.ForeignKey(
+        Weapon, 
         on_delete=models.PROTECT, 
-        related_name='player_1_equipment', 
-        null=True, 
-    )
-    kills_validators = [NonNegativeValidator(_('kills')),]
+        related_name='player_1_primary_weapon',
+        null=True,
+        )
+    player_1_primary_ammo_A = models.ForeignKey(
+        AmmoType, 
+        on_delete=models.PROTECT, 
+        related_name='player_1_primary_weapon_ammo_A', 
+        default=AmmoType.objects.get(name="Standard").id,
+        null=True,
+        )
+    player_1_primary_ammo_B = models.ForeignKey(
+        AmmoType, 
+        on_delete=models.PROTECT, 
+        related_name='player_1_primary_weapon_ammo_B', 
+        default=AmmoType.objects.get(name="None").id,
+        null=True,
+        blank=True,
+        )
+
+    player_1_secondary_weapon = models.ForeignKey(
+        Weapon, 
+        on_delete=models.PROTECT, 
+        related_name='player_1_secondary_weapon',
+        null=True,
+
+        )
+    player_1_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, 
+        related_name='player_1_secondary_weapon_ammo_A', 
+        default=AmmoType.objects.get(name="Standard").id,
+        null=True,
+
+        )
+    player_1_secondary_ammo_B = models.ForeignKey(AmmoType, 
+        on_delete=models.PROTECT, 
+        related_name='player_1_secondary_weapon_ammo_B', 
+        default=AmmoType.objects.get(name="None").id,
+        null=True,
+        blank=True,
+        )
+
     player_1_kills = models.IntegerField(
         default=0,
         validators=kills_validators,
         )
+    player_1_assists = models.IntegerField(
+        default=0,
+        validators=assists_validators,
+        )
+    player_1_deaths = models.IntegerField(
+        default=0,
+        validators=deaths_validators,
+        )
+    player_1_signature = models.BooleanField(
+        _("player 1 signature"),
+        default=False,
+        blank=True,
+        ) #this fiels certifies that player 1 privided his side of data
+        #it is needed when we try to calculate the data for a player
+        #so only the matches he gave info for would be taken into account
+
 
     #other players info may be also given
     player_2 = models.ForeignKey(Player, 
@@ -153,35 +226,138 @@ class Match(models.Model):
         null=True, 
         blank=True
     )
-    player_2_kit = models.ForeignKey(
-        Kit, 
-        verbose_name="Player eqipment", 
+    player_2_primary_weapon = models.ForeignKey(
+        Weapon, 
         on_delete=models.PROTECT, 
-        related_name='player_2_equipment', 
-        null=True, 
-        blank= True
-    )
+        related_name='player_2_primary_weapon',
+        null=True,
+        blank=True,
+       
+        )
+    player_2_primary_ammo_A = models.ForeignKey(
+        AmmoType, 
+        on_delete=models.PROTECT, 
+        related_name='player_2_primary_weapon_ammo_A', 
+        default=AmmoType.objects.get(name="Standard").id,
+        null=True,
+        blank=True,
+        )
+    player_2_primary_ammo_B = models.ForeignKey(
+        AmmoType, 
+        on_delete=models.PROTECT, 
+        related_name='player_2_primary_weapon_ammo_B', 
+        default=AmmoType.objects.get(name="None").id,
+        null=True,
+        blank=True,
+        )
+
+    player_2_secondary_weapon = models.ForeignKey(
+        Weapon, 
+        on_delete=models.PROTECT, 
+        related_name='player_2_secondary_weapon',
+        null=True,
+        blank=True,
+        )
+    player_2_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, 
+        related_name='player_2_secondary_weapon_ammo_A', 
+        default=AmmoType.objects.get(name="Standard").id,
+        null=True,
+        blank=True,
+        )
+    player_2_secondary_ammo_B = models.ForeignKey(AmmoType, 
+        on_delete=models.PROTECT, 
+        related_name='player_2_secondary_weapon_ammo_B', 
+        default=AmmoType.objects.get(name="None").id,
+        null=True,
+        blank=True,
+        )
+
     player_2_kills = models.IntegerField(
         default=0,
         validators=kills_validators,
         )
+    player_2_assists = models.IntegerField(
+        default=0,
+        validators=assists_validators,
+        )
+    player_2_deaths = models.IntegerField(
+        default=0,
+        validators=deaths_validators,
+        )
+    player_2_signature = models.BooleanField(
+        _("player 2 signature"),
+        default=False,
+        blank=True,
+        )
+
 
     player_3 = models.ForeignKey(Player, 
         on_delete=models.PROTECT, 
         related_name='player_3_name', 
         null=True, 
         blank=True)
-    player_3_kit = models.ForeignKey(
-        Kit, 
-        verbose_name="Player eqipment", 
+
+    player_3_primary_weapon = models.ForeignKey(
+        Weapon, 
         on_delete=models.PROTECT, 
-        related_name='player_3_equipment', 
-        null=True, 
-        blank= True
-    )
+        related_name='player_3_primary_weapon',
+        null=True,
+        blank=True,
+        )
+    player_3_primary_ammo_A = models.ForeignKey(
+        AmmoType, 
+        on_delete=models.PROTECT, 
+        related_name='player_3_primary_weapon_ammo_A', 
+        default=AmmoType.objects.get(name="Standard").id,
+        null=True,
+        blank=True,
+        )
+    player_3_primary_ammo_B = models.ForeignKey(
+        AmmoType, 
+        on_delete=models.PROTECT, 
+        related_name='player_3_primary_weapon_ammo_B', 
+        default=AmmoType.objects.get(name="None").id,
+        null=True,
+        blank=True,
+        )
+
+    player_3_secondary_weapon = models.ForeignKey(
+        Weapon, 
+        on_delete=models.PROTECT, 
+        related_name='player_3_secondary_weapon',
+        null=True,
+        blank=True,
+        )
+    player_3_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, 
+        related_name='player_3_secondary_weapon_ammo_A', 
+        default=AmmoType.objects.get(name="Standard").id,
+        null=True,
+        blank=True,
+        )
+    player_3_secondary_ammo_B = models.ForeignKey(AmmoType, 
+        on_delete=models.PROTECT, 
+        related_name='player_3_secondary_weapon_ammo_B', 
+        default=AmmoType.objects.get(name="None").id,
+        null=True,
+        blank=True,
+        )
+
     player_3_kills = models.IntegerField(
         default=0,
         validators=kills_validators,
+        )
+    player_3_assists = models.IntegerField(
+        default=0,
+        validators=assists_validators,
+        )
+    player_3_deaths = models.IntegerField(
+        default=0,
+        validators=deaths_validators,
+        )
+    player_3_signature = models.BooleanField(
+        _("player 2 signature"),
+        default=False,
+        blank=True,
         )
 
     fights_locations = models.ManyToManyField(Compound, verbose_name="Place of a firefight")

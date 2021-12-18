@@ -28,12 +28,18 @@ class UnicodeUsernameValidator(validators.RegexValidator):
 
 @deconstructible
 class NonNegativeValidator(validators.MinValueValidator):
-
+    '''Checks whether value is not negative
+    Parameters
+    ---
+    input_type : str - What kind of value cannot be negative
+    it is used here: Value of {input_type} cannot be negative
+    '''
     def __init__(self, input_type):
 
         super().__init__(limit_value = 0, message='')
         self.limiting_type = input_type
         self.message =_( f'Value of {input_type} cannot be negative')
+
 
     limit_value = 0
 
@@ -76,6 +82,9 @@ class InRangeValidator(validators.BaseValidator):
         )
 
         
+
+
+    
 @deconstructible
 class ListedValueValidator(validators.BaseValidator):
     def compare(self, value, compare_with):
@@ -110,3 +119,8 @@ class SumValidator(validators.BaseValidator):
         if message == None:   
             message = _(f'Given number doesnt match the sum of {type_to_sum}. Please correct.')
         super().__init__(limit_value, message=message)
+
+@deconstructible
+class WeaponsValidator(validators.BaseValidator):
+    '''This validator checks that you have not taken 3+3 weapons and unsupported ammo'''
+    pass

@@ -1,5 +1,8 @@
+def aaa(arg1 = None, arg2 = None):
+    values = (arg1, arg2)
+    if None in values:
+        print('None was given')
+    else:
+        print('Good values were given')
 
-b = 5
-
-b = [b]
-print(sum(b))
+aaa(arg1='kek')

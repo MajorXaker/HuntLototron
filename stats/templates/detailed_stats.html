@@ -31,25 +31,9 @@
     <p id="demo"></p> -->
     <div>
         <p style="height: 20px; font-size: 15px; ">
-            This is stats page
+            This is page for match ID#{{match.id}}
         </p>
-        <a href="{% url 'stats:add' %}">Add new match</a>
-        <table>
-
-            {% for match in matches %}
-            <tr>
-                
-                    <td>
-                        <a href="{% url 'stats:match_details' match.id %}">{{ match.id }}</a>
-                    </td>
-                    <td>{{ match.wl_status }}</td>
-                    <td>{{ match.player_1 }}</td>
-                    <td>{{ match.player_2 }}</td>
-                    <td>{{  match.player_3 }}</td>
-                
-            </tr>
-            {% endfor%}
-        </table>
+        div
         
     </div>
 
