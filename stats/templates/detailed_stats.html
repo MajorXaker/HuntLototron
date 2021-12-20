@@ -30,10 +30,69 @@
     
     <p id="demo"></p> -->
     <div>
+        {% include "registration/user_bar.html" %}
         <p style="height: 20px; font-size: 15px; ">
             This is page for match ID#{{match.id}}
         </p>
-        div
+
+        <!-- wl_status
+        assists_validators
+        bounty
+        date
+        deaths_validators
+        fights_locations
+        kills_total
+        kills_validators
+        player_1
+        player_1_assists
+        player_1_deaths
+        player_1_kills
+        player_1_primary_ammo_A
+        player_1_primary_ammo_B
+        player_1_primary_weapon
+        player_1_secondary_ammo_A
+        player_1_secondary_ammo_B
+        player_1_secondary_weapon
+        player_1_signature
+        player_2
+        player_2_assists
+        player_2_deaths
+        player_2_kills
+        player_2_primary_ammo_A
+        player_2_primary_ammo_B
+        player_2_primary_weapon
+        player_2_secondary_ammo_A
+        player_2_secondary_ammo_B
+        player_2_secondary_weapon
+        player_2_signature
+        player_3
+        player_3_assists
+        player_3_deaths
+        player_3_kills
+        player_3_primary_ammo_A
+        player_3_primary_ammo_B
+        player_3_primary_weapon
+        player_3_secondary_ammo_A
+        player_3_secondary_ammo_B
+        player_3_secondary_weapon
+        player_3_signature
+        playtime -->
+
+        <p> {{additional.player_3_here}} <b>{{ match.date }}</b>  {{ match.player_1 }}
+            {% if match.player_2 != 'None' %}, {{ match.player_2 }}{% endif %}
+            {% if additional.player_3_here == True %} and {{ match.player_3 }}{% endif %}
+            {% if  match.wl_status  == 1 %}won{% endif %}
+            {% if  match.wl_status  == 0 %}lost{% endif %}
+            {% if  match.wl_status  == 0.5 %}escaped from{% endif %}
+             on {{ match.map }}
+         </p>
+
+        {% comment %} <p>{{ match. }}</p>
+        <p>{{ match. }}</p>
+        <p>{{ match. }}</p>
+        <p>{{ match. }}</p>
+        <p>{{ match. }}</p> {% endcomment %}
+
         
     </div>
 

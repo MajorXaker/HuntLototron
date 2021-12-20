@@ -30,6 +30,7 @@
     
     <p id="demo"></p> -->
     <div>
+        {% include "registration/user_bar.html" %}
         <p style="height: 20px; font-size: 15px; ">
             This is stats page
         </p>
@@ -42,7 +43,11 @@
                     <td>
                         <a href="{% url 'stats:match_details' match.id %}">{{ match.id }}</a>
                     </td>
-                    <td>{{ match.wl_status }}</td>
+                    <td>
+                        {% if match.wl_status == 1 %}Win{% endif %}
+                        {% if match.wl_status == 0 %}Loss{% endif %}
+                        {% if match.wl_status == 0.5 %}Escape{% endif %}
+                    </td>
                     <td>{{ match.player_1 }}</td>
                     <td>{{ match.player_2 }}</td>
                     <td>{{  match.player_3 }}</td>

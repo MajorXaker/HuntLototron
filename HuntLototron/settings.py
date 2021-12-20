@@ -54,11 +54,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'HuntLototron.urls'
+LOGIN_REDIRECT_URL = 'stats:table' #might need to be changed
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], #this is a directory for html templates
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),], #this is a directory for html templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

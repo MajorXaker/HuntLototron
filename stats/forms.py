@@ -1,7 +1,7 @@
 from django import forms
 
 from roulette.models import Weapon
-from stats.models import AmmoType, Compound, Player
+from stats.models import AmmoType, Compound, Player, Map
 from .validators import InRangeValidator, ListedValueValidator, NonNegativeValidator
 from django.utils.translation import gettext_lazy as _
 
@@ -26,6 +26,14 @@ class FormAddMatch_simple(forms.Form):
         label = _('Win\Loss status'), 
         validators=[ListedValueValidator((0,0.5,1))], 
         required=True,
+        )
+
+    maps = [(map,map.name) for map in Map.objects.all()]
+    map = forms.ChoiceField(
+        label = _('Map of the match'), 
+        choices=maps, 
+        required=True,
+        
         )
 
     teammate_1 = forms.ChoiceField(
@@ -126,3 +134,5 @@ class FormAddMatch_simple(forms.Form):
         label = 'Fight locations',
         )
 
+class FormRegisterPlayer(forms.Form):
+    pass

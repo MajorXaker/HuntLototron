@@ -19,7 +19,7 @@ class Player(models.Model):
         User,
         on_delete=models.SET("Unknown player"),
         validators=[username_validator],
-        related_name="player_username",)
+        related_name="username_of_player",)
     use_alternative_name = models.BooleanField(default=False)
     also_known_as = models.CharField(
         max_length=50, 
@@ -92,6 +92,7 @@ class Compound(models.Model):
 
 
 class Kit(models.Model):
+    # TODO delete kit model
     #if kit does not exist - create it, if exists - increase its popularity
     primary_weapon = models.ForeignKey(Weapon, on_delete=models.PROTECT, related_name='primary_weapon')
     primary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, related_name='primary_weapon_ammo_A', default=AmmoType.objects.get(name="Standard").id)
@@ -144,6 +145,15 @@ class Match(models.Model):
         null=False,
         default=0,
         validators=[NonNegativeValidator('bounty'),],
+
+        )
+    map = models.ForeignKey(
+        Map, 
+        verbose_name=_("Map of the match"), 
+        on_delete=models.PROTECT,
+        related_name="map_of_match",
+        blank=True,
+        null=True
 
         )
 
@@ -365,3 +375,22 @@ class Match(models.Model):
 
     def __str__(self) -> str:
         return "Match #"+ str(self.id)
+
+    def players(self):
+        players_credentials = []
+        all_players = (self.player_1, self.player_2, self. player_3)
+
+
+        for player in all_players:
+            try:
+                username = player.username.username
+            except AttributeError:
+                username = ''
+            try:
+                playername = player.also_known_as
+            except AttributeError:
+                playername = ''
+            players_credentials.append((username, playername))
+
+        
+        return players_credentials
