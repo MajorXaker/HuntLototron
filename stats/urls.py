@@ -9,12 +9,12 @@ app_name = "stats"
 
 urlpatterns = [
     path('', views.show_stats_table, name = "table"),
-    # path('', login_required(ShowStats.as_view(template_name="secret.html")), name = "table"),
     path('<int:match_id>', views.show_match_detail, name = "match_details"),
-    # path('add', views.add_match_simple, name = "add"),
+    path('edit/<int:match_id>', views.EditMatch.as_view(), name = "edit"),
     path('add', views.AddMatch.as_view(), name = "add"),
-    # path('add_details', views.add_match_detailed, name = "add_details"),
     path('sample', views.sample, name = "add_details"),
+    
+    # path('', login_required(ShowStats.as_view(template_name="secret.html")), name = "table"),
     
     
 ]

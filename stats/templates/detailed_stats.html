@@ -1,12 +1,10 @@
-{% extends 'pure_base.html' %}
-{% block content %}
 
 <head>
-    <title>Roulette</title>
-
+    <title>Stats: Details</title>
+    
     <script>
-
-
+        
+        
         
         function showCoords(event, element) {
             var x = event.offsetX;
@@ -15,12 +13,14 @@
             var coords = x + " " + y;
             document.getElementById("demo").innerHTML = coords
         };
-
         
-
-    </script>
+        
+        
+        </script>
 
 </head>
+{% extends 'pure_base.html' %}
+{% block content %}
 
 <body>
 
@@ -35,6 +35,9 @@
             This is page for match ID#{{match.id}}
         </p>
 
+        <p>
+            <a href="{% url 'stats:edit' match.id %}">Edit this match</a>
+        </p>
         <!-- wl_status
         assists_validators
         bounty

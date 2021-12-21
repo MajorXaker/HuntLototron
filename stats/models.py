@@ -394,3 +394,6 @@ class Match(models.Model):
 
         
         return players_credentials
+
+    def get_player_slot(self, credentials):
+        return self.players().index(credentials) + 1

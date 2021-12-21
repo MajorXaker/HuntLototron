@@ -8,7 +8,7 @@ class AuthShowdown():
 
         try:
             playername = url_request.user.username_of_player.also_known_as
-            has_aka = True
+            has_aka = True if playername != '' else False
             
         except AttributeError:
             playername = None
