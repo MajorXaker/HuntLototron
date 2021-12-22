@@ -285,14 +285,17 @@ class Match(models.Model):
     player_2_kills = models.IntegerField(
         default=0,
         validators=kills_validators,
+        blank=True,
         )
     player_2_assists = models.IntegerField(
         default=0,
         validators=assists_validators,
+        blank=True,
         )
     player_2_deaths = models.IntegerField(
         default=0,
         validators=deaths_validators,
+        blank=True,
         )
     player_2_signature = models.BooleanField(
         _("player 2 signature"),
@@ -355,14 +358,17 @@ class Match(models.Model):
     player_3_kills = models.IntegerField(
         default=0,
         validators=kills_validators,
+        blank=True,
         )
     player_3_assists = models.IntegerField(
         default=0,
         validators=assists_validators,
+        blank=True,
         )
     player_3_deaths = models.IntegerField(
         default=0,
         validators=deaths_validators,
+        blank=True,
         )
     player_3_signature = models.BooleanField(
         _("player 2 signature"),
@@ -370,7 +376,10 @@ class Match(models.Model):
         blank=True,
         )
 
-    fights_locations = models.ManyToManyField(Compound, verbose_name="Place of a firefight")
+    fights_locations = models.ManyToManyField(
+        Compound, 
+        verbose_name="Place of a firefight"
+        )
 
 
     def __str__(self) -> str:
@@ -396,4 +405,15 @@ class Match(models.Model):
         return players_credentials
 
     def get_player_slot(self, credentials):
-        return self.players().index(credentials) + 1
+        if credentials in self.players():
+            return self.players().index(credentials) + 1
+        else:
+            return 0
+
+    def mark_incomplete(self):
+        '''marks match as being incomplete or faulty
+        '''
+        if self.player_1_kills + self.player_2_kills + self.player_3_kills != self.kills_total:
+            return True
+        else:
+            return False

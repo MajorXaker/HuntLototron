@@ -1,31 +1,78 @@
 
+{% extends 'pure_base.html' %}
+{% block content %}
 <head>
     <title>Stats: Edit</title>
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js">
-        
-        function onLoadAlert() {
-            alert('aaaaa');
-        }
-        
-        $(document).ready(onLoadAlert);
 
-        document.addEventListener("DOMContentLoaded", function(event) { 
-        alert('Hey');
+    <script type="text/javascript" 
+    src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+    
+
+    <script type="text/javascript">
+    $(document).ready(function() {
+        // alert("I am an alert box!");
+        var common_fields = ['id_date', 'id_wl_status', 'id_player_1', 'id_player_2', 'id_player_3', 'id_bounty', 'id_playtime', 'id_kills_total', 'id_fights_locations']
+        var player_fields = ['null'];
+        for (player = 1; player < 4; player++) {
+            let fields = ['kills', 'assists', 'deaths', 'primary_weapon', 'secondary_weapon', 'primary_ammo_A', 'primary_ammo_B', 'secondary_ammo_A', 'secondary_ammo_B'];
+            let commands_for_player = [];
+            for (field_id = 0; field_id < fields.length; field_id++) {
+                let command = 'id_player_' + player + '_' + fields[field_id];
+                commands_for_player.push(command);
+            }
+            player_fields.push(commands_for_player);
+        }
+        console.log(common_fields);
+        console.log(player_fields);
+        if ( {{ user.position }} == 1) { //disabling all fields for players 2 and 3
+            for (command_id = 0; command_id < player_fields[2].length; command_id++) {
+                document.getElementById(player_fields[2][command_id]).disabled = true;
+            }
+            for (command_id = 0; command_id < player_fields[3].length; command_id++) {
+                document.getElementById(player_fields[3][command_id]).disabled = true;
+            }
+        }
+        if ( {{ user.position }} == 2) { //disabling all fields for players 1 and 3, as well as general fields only for p1
+            for (command_id = 0; command_id < player_fields[1].length; command_id++) {
+                document.getElementById(player_fields[1][command_id]).disabled = true;
+            }
+            for (command_id = 0; command_id < player_fields[3].length; command_id++) {
+                document.getElementById(player_fields[3][command_id]).disabled = true;
+            }
+            for (command_id = 0; command_id < common_fields.length; command_id++) {
+                document.getElementById(common_fields[command_id]).disabled = true;
+            }
+        }
+        if ( {{ user.position }} == 3) {//disabling all fields for players 1 and 2, as well as general fields only for p1
+            for (command_id = 0; command_id < player_fields[2].length; command_id++) {
+                document.getElementById(player_fields[2][command_id]).disabled = true;
+            }
+            for (command_id = 0; command_id < player_fields[1].length; command_id++) {
+                document.getElementById(player_fields[1][command_id]).disabled = true;
+            }
+            for (command_id = 0; command_id < common_fields.length; command_id++) {
+                document.getElementById(common_fields[command_id]).disabled = true;
+            }
+        }
+    });
+
+    function enable() {
+        $('input:disabled, select:disabled').each(function () {
+            $(this).removeAttr('disabled');
         });
+    }
     </script>
         
         
 </head>
-{% extends 'pure_base.html' %}
-{% block content %}
 
 <body>
 
     <div>
         {% include 'registration/user_bar_passive.html' %}
         <p style="height: 20px; font-size: 15px; ">
-            This is page where you add matches
+            This is page where you edit and extend matches.
         </p>
         <form action="" method="post">
             {% csrf_token %}
@@ -35,26 +82,10 @@
             </table>
             
 
-            {% comment %} {{ form.date }}
-            {{ form.wl_status }}
-            {{ form.teammate_1 }}
-            {{ form.teammate_2 }}
-            {{ form.teammate_3 }}
-            {{ form.bounty }}
-            {{ form.duration }}
-            {{ form.total_kills }}
-            {{ form.kills }}
-            {{ form.deaths }}
-            {{ form.assists }}
-            {{ form.primary_weapon }}
-            {{ form.primary_ammo_A }}
-            {{ form.primary_ammo_B }}
-            {{ form.secondary_weapon }}
-            {{ form.secondary_ammo_A }}
-            {{ form.secondary_ammo_B }} {% endcomment %}
 
 
-            <input type="submit" value="Submit">
+
+            <input type="submit" value="Submit" onclick="enable()">
           </form>
         
     </div>

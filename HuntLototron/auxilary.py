@@ -1,6 +1,15 @@
-class AuthShowdown():
+class AuxClass():
 
     def credentials_to_dict(url_request, debug=False):
+        '''Exports usable data on current logged user
+
+        'anonymous': is_anon,
+        'has_aka': has_aka,
+        'username': username,
+        'playername': playername,
+        'credentials': (username, playername),
+        'name' : aka or username
+        '''
         username = url_request.user.username
         user = {
         'username': username,
@@ -33,3 +42,6 @@ class AuthShowdown():
             print (user)
 
         return user
+        
+
+
