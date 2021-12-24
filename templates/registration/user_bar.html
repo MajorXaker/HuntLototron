@@ -14,9 +14,9 @@
 <div id="user_bar">
     <p style="margin: 0px;">
         {% if user.anonymous %} Not logged in.
-        {% else %}Logged as: {{user.name}}
+        {% else %}Logged as: <a href="{% url 'profile' %}">{{user.name}}</a>
     </p>
-    <a href="{% url 'logout' %}">Logout page</a>
+    <a href="{% url 'logout' %}">Logout</a>
     {% endif %}
 
 </div>

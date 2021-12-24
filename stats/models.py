@@ -4,33 +4,57 @@ from django.db import models
 from roulette.models import Weapon
 from django.contrib.auth.models import User
 import datetime
-from .validators import InRangeValidator, ListedValueValidator, SumValidator, UnicodeUsernameValidator, NonNegativeValidator
+from .validators import InRangeValidator, ListedValueValidator, SumValidator, UnicodeUsernameValidator, NonNegativeValidator, UnicodeAndSpaceValidator
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 
 
-
 class Player(models.Model):
 
     username_validator = UnicodeUsernameValidator()
+    
 
     username = models.OneToOneField(
         User,
-        on_delete=models.SET("Unknown player"),
+        on_delete=models.SET( User.objects.get(username='UnknownHunter').pk),
         validators=[username_validator],
-        related_name="username_of_player",)
+        related_name="username_of_player",
+        null=True,
+        blank=True,
+        unique=False,
+        )
     use_alternative_name = models.BooleanField(default=False)
     also_known_as = models.CharField(
         max_length=50, 
         verbose_name="Also known as", 
         blank=True,
-        validators = [username_validator,]
+        validators = [UnicodeAndSpaceValidator(),]
+        )
+    allow_see_mathes = models.BooleanField(
+        _("Allow other users see your matches."),
+        default=False,
+        )
+    allow_see_name = models.BooleanField(
+        _("Allow other users see your matches and your name."),
+        default=False,
+        )
+    show_only_my_matches = models.BooleanField(
+        _("Display only matches, where you have participated."),
+        default=True,
+        )
+    verified_user = models.BooleanField(
+        _("Allow stats of this player be used in common statistics."),
+        default=False,
         )
 
-    kills_count = models.IntegerField(blank=False, default=0)
-    asissts_count = models.IntegerField(blank=False, default=0)
-    deaths_count = models.IntegerField(blank=False, default=0)
+    def update(self, user):
+        
+        self.also_known_as = ''
+        self.use_alternative_name = False
+        self.username = user
+        
+
 
     def service_name(self):
         if self.use_alternative_name:
@@ -38,24 +62,19 @@ class Player(models.Model):
         else:
             return 'u.' + self.username.username
 
-    def get_kda_ratio(self):
-        return (self.kills_count + self.asissts_count) / self.deaths_count
 
-    def get_kd_ratio(self):
-        return self.kills_count / self.deaths_count
 
-    #this methods ruins form use, try to find another way
     def __str__(self) -> str:
         if self.use_alternative_name:
             return self.also_known_as
         else:
-            return self.username.username
+            try:
+                return self.username.username
+            except AttributeError:
+                #needed to look for players which have no 
+                return 'NOT USER - ' + self.also_known_as
 
     def get_name(self):
-        # if self.use_alternative_name:
-        #     return self.also_known_as
-        # else:
-        #     return self.username.username
         return str(self)
     
 
@@ -103,10 +122,6 @@ class Kit(models.Model):
 
     popularity = models.IntegerField(default=0)
 
-    
-
-
-    
     def __str__(self) -> str:
 
         def using_ammo(ammo_a, ammo_b):
@@ -379,7 +394,12 @@ class Match(models.Model):
     fights_locations = models.ManyToManyField(
         Compound, 
         verbose_name="Place of a firefight"
-        )
+        ) 
+
+    correct_match = models.BooleanField(
+        _("Match data is correct"),
+        default=False)
+        
 
 
     def __str__(self) -> str:
@@ -417,3 +437,12 @@ class Match(models.Model):
             return True
         else:
             return False
+
+    def display_allowed(self):
+        '''States whether participants allow to show this match'''
+        player_1_allowed = self.player_1.allow_see_mathes
+        player_2_allowed = self.player_1.allow_see_mathes
+        player_3_allowed = self.player_1.allow_see_mathes
+
+        return player_1_allowed or player_2_allowed or player_3_allowed
+        

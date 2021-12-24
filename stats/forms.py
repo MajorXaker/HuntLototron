@@ -5,6 +5,7 @@ from stats.models import AmmoType, Compound, Player, Map
 from .validators import InRangeValidator, ListedValueValidator, NonNegativeValidator
 from django.utils.translation import gettext_lazy as _
 from .models import Match
+from django.contrib.auth.models import User
 
 
 # class FormAddMatch_simple(forms.Form):
@@ -174,13 +175,4 @@ class MatchEditForm(forms.ModelForm):
             'player_3_secondary_weapon', 'player_3_secondary_ammo_A', 'player_3_secondary_ammo_B', 
         )
     
-    # def save(self, commit: bool = ...):
-    #     return super().save(commit=commit)
-
-
-        
-
-
-
-class FormRegisterPlayer(forms.Form):
-    pass
+    

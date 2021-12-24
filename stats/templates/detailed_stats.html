@@ -70,7 +70,7 @@
         player_3_signature
         playtime -->
 
-        <p> {{additional.player_3_here}} <b>{{ match.date }}</b>  {{ match.player_1 }}
+        <p> <b>{{ match.date }}</b>  {{ match.player_1 }}
             {% if match.player_2 != 'None' %}, {{ match.player_2 }}{% endif %}
             {% if additional.player_3_here == True %} and {{ match.player_3 }}{% endif %}
             {% if  match.wl_status  == 1 %}won{% endif %}

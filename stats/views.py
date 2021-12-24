@@ -19,7 +19,7 @@ from operator import attrgetter
 @login_required
 def show_stats_table(request):
     user = AuxClass.credentials_to_dict(request)
-
+    
     if not request.user.is_staff:
         #we need to know whose matches are we looking for
         if user['has_aka']:
@@ -32,15 +32,27 @@ def show_stats_table(request):
         p2_group = Match.objects.filter(player_2 = look_for_user)
         p3_group = Match.objects.filter(player_3 = look_for_user)
         
+        #other matches group
+        all_matches = Match.objects.all()
+        filtered_matches = [match for match in all_matches if match.display_allowed()]
+
         #results are sorted by their id
-        result = sorted(
-            chain(p1_group, p2_group, p3_group),
+        result_as_list = sorted(
+            chain(p1_group, p2_group, p3_group, filtered_matches),
             key=attrgetter('id'))
+
+        result_as_set = set(result_as_list)
+        result_ready = list(result_as_set)
+        result_ready.reverse()
+
+
+
+
     else:
         result = Match.objects.all()
 
 
-    response = render(request, "stats_list.html", {'matches': result, 'user':user})
+    response = render(request, "stats_list.html", {'matches': result_ready, 'user':user})
     return response
 
 def show_match_detail(request, match_id):
@@ -95,52 +107,9 @@ class AddMatch(View):
         
         if form.is_valid():
 
-            # print('ALL DATA BEGIN')
-            # print(form.cleaned_data)
-            # print('ALL DATA END')
-
-            # raw_teammates = [
-            #     form.cleaned_data['teammate_1'].split('.'),
-            #     form.cleaned_data['teammate_2'].split('.'),
-            #     form.cleaned_data['teammate_3'].split('.'),
-            # ]
-
-            # teammates = []
-            # for teammate in raw_teammates:
-
-            #     if teammate[0] == 'a':
-            #         teammates.append(Player.objects.get(also_known_as = teammate[1]))
-            #     else:
-            #         userclass = User.objects.get(username=teammate[1])
-            #         teammates.append(userclass.username_of_player) #this should return player class of this user
-
-            # match = Match(
-            #     wl_status = form.cleaned_data['wl_status'],
-            #     date = form.cleaned_data['date'],
-            #     kills_total = form.cleaned_data['kills_total'],
-            #     bounty = form.cleaned_data['bounty'],
-            #     playtime = form.cleaned_data['playtime'],
-                
-            #     player_1 = teammates[0],
-            #     player_2 = teammates[1],
-            #     player_3 = teammates[2],
-            #     map = Map.objects.get(name=form.cleaned_data['map']),
-            #     player_1_kills = form.cleaned_data['player_1_kills'],
-            #     player_1_assists = form.cleaned_data['player_1_assists'],
-            #     player_1_deaths = form.cleaned_data['player_1_deaths'],
-            #     player_1_primary_weapon = Weapon.objects.get(name=form.cleaned_data['player_1_primary_weapon']),
-            #     player_1_primary_ammo_A = AmmoType.objects.get(name=form.cleaned_data['player_1_primary_ammo_A']),
-            #     player_1_primary_ammo_B = AmmoType.objects.get(name=form.cleaned_data['player_1_primary_ammo_B']),
-            #     player_1_secondary_weapon = Weapon.objects.get(name=form.cleaned_data['player_1_secondary_weapon']),
-            #     player_1_secondary_ammo_A = AmmoType.objects.get(name=form.cleaned_data['player_1_secondary_ammo_A']),
-            #     player_1_secondary_ammo_B = AmmoType.objects.get(name=form.cleaned_data['player_1_secondary_ammo_B']),
-                
-            # ) 
+           
             form.save()
-            # for name in form.cleaned_data['fight_locations']:
-            #     match.fights_locations.add(name)
-            # match.save()
-
+           
             return HttpResponseRedirect(reverse('stats:table') )
         else:
             print('not valid form')
@@ -158,17 +127,17 @@ class AddMatch(View):
 
 class EditMatch(View):
     
-    common_fields = ['id_date', 'id_wl_status', 'id_player_1', 'id_player_2', 'id_player_3', 'id_bounty', 'id_playtime', 'id_kills_total', 'id_fights_locations']
-    player_fields = ['null']
-    for player in range(3):
-        fields = ['kills', 'assists', 'deaths', 'primary_weapon', 'secondary_weapon', 'primary_ammo_A', 'primary_ammo_B', 'secondary_ammo_A', 'secondary_ammo_B']
-        commands_for_player = []
+    # common_fields = ['id_date', 'id_wl_status', 'id_player_1', 'id_player_2', 'id_player_3', 'id_bounty', 'id_playtime', 'id_kills_total', 'id_fights_locations']
+    # player_fields = ['null']
+    # for player in range(3):
+    #     fields = ['kills', 'assists', 'deaths', 'primary_weapon', 'secondary_weapon', 'primary_ammo_A', 'primary_ammo_B', 'secondary_ammo_A', 'secondary_ammo_B']
+    #     commands_for_player = []
         
-        for command in fields:
-            full_command = 'id_player_' + str(player) + '_' + command
-            commands_for_player.append(full_command)
+    #     for command in fields:
+    #         full_command = 'id_player_' + str(player) + '_' + command
+    #         commands_for_player.append(full_command)
         
-        player_fields.append(commands_for_player)
+    #     player_fields.append(commands_for_player)
     
 
 
@@ -217,11 +186,6 @@ class EditMatch(View):
         return output
     
 
-
-
-
-
-
 def sample(request):
     #this is main page of the app
     data = {'data' : ''}
@@ -232,6 +196,3 @@ def sample(request):
     response = render(request, "sample.html", data)
     return HttpResponse(response)
 
-
-def profile(request):
-    pass

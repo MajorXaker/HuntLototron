@@ -8,15 +8,44 @@
 
 </head>
 
+<!-- <script type="text/javascript" 
+    src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        let allow_others_see = document.getElementById("id_allow_see_matches");
+        let allow_see_name = document.getElementById('id_allow_see_name');
+
+        allow_others_see.backgroundColor = "red";
+
+        // if (allow_others_see.checked) {
+        //     allow_see_name.enabled = true;
+        // } else {
+        //     allow_see_name.enabled = false;
+        // }
+
+    });
+
+
+</script> -->
+
 <body>
     
     <p id="demo"></p>
     <div>
         <p style="height: 20px; font-size: 15px; ">
-            This is your profile page
+            Hello, {{ user.name }}! This is your profile page!
         </p>
 
-        
+        {% if additional.changed %}Changes have been saved.{% endif %}
+        <form action="" method="post">
+            {% csrf_token %}
+
+            <table>
+                {{ form.as_p }}
+            </table>
+
+            <input type="submit" value="Submit">
     </div>
 
 

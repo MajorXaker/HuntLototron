@@ -27,6 +27,15 @@ class UnicodeUsernameValidator(validators.RegexValidator):
     flags = 0
 
 @deconstructible
+class UnicodeAndSpaceValidator(validators.RegexValidator):
+    regex = r'^[\w\s.@+-]+\Z'
+    message = _(
+        'Enter a valid username. This value may contain only letters, '
+        'numbers, spaces and @/./+/-/_ characters.'
+    )
+    flags = 0
+
+@deconstructible
 class NonNegativeValidator(validators.MinValueValidator):
     '''Checks whether value is not negative
     Parameters

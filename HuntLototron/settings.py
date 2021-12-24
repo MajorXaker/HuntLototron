@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 
+from HuntLototron.key import KeyHolder
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,7 +23,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-v%nomgqf^q^)v_)r(xad9nsfn6+t-jwdv!b(rt!qb99q1n@v5q'
+
+SECRET_KEY = KeyHolder.key
+# near settings.py should be a key.py file with following content
+# class KeyHolder():
+#     key = "enter_your_key_here"
+# don't forget to change KeyHolder.key to something more breakproof :)
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

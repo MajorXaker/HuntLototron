@@ -1,0 +1,36 @@
+{% extends 'pure_base.html' %}
+{% block content %}
+
+<head>
+    <title>Roulette</title>
+
+
+
+</head>
+
+<body>
+    
+    <p id="demo"></p>
+    <div>
+        <p style="height: 20px; font-size: 15px; ">
+            This is registration page
+        </p>
+
+        <form action="" method="post">
+            {% csrf_token %}
+
+            <table>
+                {{ form.as_p }}
+            </table>
+
+            <input type="submit" value="Submit">
+          </form>
+
+        
+    </div>
+
+
+
+</body>
+
+{% endblock %}
