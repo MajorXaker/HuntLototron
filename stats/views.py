@@ -16,7 +16,7 @@ from operator import attrgetter
 
 
 
-@login_required
+@login_required 
 def show_stats_table(request):
     user = AuxClass.credentials_to_dict(request)
     
@@ -95,11 +95,10 @@ class AddMatch(View):
         user = AuxClass.credentials_to_dict(request)
 
         initial_data = {
-            'teammate_1': request.user.username_of_player.service_name(),
+            'player_1': request.user.username_of_player,
             
         }
 
-        # form = FormAddMatch_simple(initial=initial_data)
         form = MatchAddForm(initial=initial_data)
 
         context = {
@@ -114,13 +113,12 @@ class AddMatch(View):
     
     def post(self, request):
         user = AuxClass.credentials_to_dict(request)
-        # form = FormAddMatch_simple(request.POST)
         form = MatchAddForm(request.POST)
 
         
         if form.is_valid():
 
-            print(form.player_1_signature)
+            
             form.save()
            
             return HttpResponseRedirect(reverse('stats:table') )
@@ -139,22 +137,7 @@ class AddMatch(View):
         return output
 
 class EditMatch(View):
-    
-    # common_fields = ['id_date', 'id_wl_status', 'id_player_1', 'id_player_2', 'id_player_3', 'id_bounty', 'id_playtime', 'id_kills_total', 'id_fights_locations']
-    # player_fields = ['null']
-    # for player in range(3):
-    #     fields = ['kills', 'assists', 'deaths', 'primary_weapon', 'secondary_weapon', 'primary_ammo_A', 'primary_ammo_B', 'secondary_ammo_A', 'secondary_ammo_B']
-    #     commands_for_player = []
-        
-    #     for command in fields:
-    #         full_command = 'id_player_' + str(player) + '_' + command
-    #         commands_for_player.append(full_command)
-        
-    #     player_fields.append(commands_for_player)
-    
-
-
-
+   
     def get(self, request, match_id):
         user = AuxClass.credentials_to_dict(request)
 
@@ -183,6 +166,9 @@ class EditMatch(View):
         
         if form.is_valid():
             
+            print(f'In match player 1 m weapon is {match_on_table.player_1_primary_weapon}, its size is {match_on_table.player_1_primary_weapon.size}')
+
+            print(match_on_table.verify_guns(user['position'])[0])
             form.save()
 
             return HttpResponseRedirect(reverse('stats:table') )

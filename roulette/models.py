@@ -2,6 +2,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.db.models.fields import CharField
+from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 
@@ -23,8 +24,8 @@ class Weapon(models.Model):
             (2, 'Medium - 2'),
             (3, 'Large - 3')
         ]
-    size = models.CharField(
-        max_length=10,
+    size = models.IntegerField(
+        # max_length=10,
         choices=sizes_types,
         blank=False
     )
@@ -67,6 +68,11 @@ class Weapon(models.Model):
     )
     weight = models.FloatField()
     price = models.IntegerField(blank=False)
+
+    has_ammo_B = models.BooleanField(
+        _("Does this weapon have 2nd ammo type?"),
+        default= False
+        )
 
     def dictate(self):
         return {

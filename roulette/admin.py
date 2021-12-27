@@ -5,7 +5,7 @@ from .models import WeaponType, Weapon, Layout, Slots
 # Register your models here.
 
 class WeaponType_admin(admin.ModelAdmin):
-    # list_display = ("name", "translated_title")
+    # list_display = ("name", "size", "has_ammo_B",)
     exclude = ("translated_title",'core_gun','size', 'sights' , 'melee','muzzle' ,'weight','price')
 
 class Layout_admin(admin.ModelAdmin):

@@ -580,4 +580,26 @@ class Match(models.Model):
         if debug:
             print(f'Swapped player {position} with {new_player}')
             print(f'Current players: {self.player_1}, {self.player_2} and {self.player_3}.')
+
+    def verify_guns(self, player_slot, debug = False):
+        weapons = {
+            1: (self.player_1_primary_weapon, self.player_1_secondary_weapon),
+            2: (self.player_2_primary_weapon, self.player_2_secondary_weapon),
+            3: (self.player_3_primary_weapon, self.player_3_secondary_weapon)
+        }
+        ammo = {
+            1: (self.player_1_primary_ammo_A, self.player_1_primary_ammo_B, self.player_1_secondary_ammo_A, self.player_1_secondary_ammo_B),
+            2: (self.player_2_primary_ammo_A, self.player_2_primary_ammo_B, self.player_2_secondary_ammo_A, self.player_2_secondary_ammo_B),
+            3: (self.player_3_primary_ammo_A, self.player_3_primary_ammo_B, self.player_3_secondary_ammo_A, self.player_3_secondary_ammo_B)
+        }
+        
+        good_check = {
+            'Correct primary ammo A' : ammo[player_slot][0] != None,
+            'Correct secondary ammo A' : ammo[player_slot][2] != None,
+            'Correct primary ammo B' : ammo[player_slot][1] != None if weapons[player_slot][0].has_ammo_B else ammo[player_slot][1] == None,
+            'Correct secondary ammo B' : ammo[player_slot][3] != None if weapons[player_slot][1].has_ammo_B else ammo[player_slot][3] == None,
+            'Guns not exceed 5 slot limit' : True if weapons[player_slot][0].size + weapons[player_slot][1].size < 6 else False
+        }
+        
+        return (False in good_check.values() , good_check)
         
