@@ -52,7 +52,7 @@ def show_stats_table(request):
 
 
     else:
-        result = Match.objects.all()
+        result_ready = Match.objects.all()
 
 
     response = render(request, "stats_list.html", {'matches': result_ready, 'user':user})
