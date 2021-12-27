@@ -64,6 +64,11 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'HuntLototron.urls'
 LOGIN_REDIRECT_URL = 'stats:table' #might need to be changed
 
+EMAIL_HOST = 'localhost'
+EMAIL_HOST_USER = KeyHolder.email_user
+EMAIL_HOST_PASSWORD = KeyHolder.email_password
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

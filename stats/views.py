@@ -63,17 +63,27 @@ def show_match_detail(request, match_id):
         user = AuxClass.credentials_to_dict(request)
         match = Match.objects.get(pk=match_id)
 
-        if not request.user.is_staff:
-            if not user['credentials'] in match.players():
+        open_for_browsing = (
+            request.user.is_staff,
+            request.user.username_of_player in match.players(is_class = True),
+            match.display_allowed()
+        ) # one TRUE result lets us to see the match
 
-                return render(request, "404_or_403_match.html", status=403)
+        if not request.user.username_of_player in match.players(is_class = True):
+            match.set_encoding()
+           
 
         additional = {}
         additional["player_2_here"] = False if match.player_2 == 'None' else True
         additional["player_3_here"] = False if match.player_3 == 'None' else True
-        # print(additional['player_2_here'])
+        
        
-        response = render(request, "detailed_stats.html", {'match': match, 'additional': additional, 'user':user})
+        if True in open_for_browsing:
+            response = render(request, "detailed_stats.html", {'match': match, 'additional': additional, 'user':user})
+        else:
+            response = render(request, "404_or_403_match.html", status=403)
+        
+        return response
     except Match.DoesNotExist:
         return render(request, "404_or_403_match.html", status=403)
         

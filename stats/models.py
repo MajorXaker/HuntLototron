@@ -119,7 +119,7 @@ class Player(models.Model):
                 result = self.also_known_as
 
         if encode:
-            return AuxClass.encode_md5(result)[:6]
+            return 'Player '+AuxClass.encode_md5(result)[:6]
         else:
             return result
 
