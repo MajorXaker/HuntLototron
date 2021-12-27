@@ -4,7 +4,9 @@ from typing import Type
 from django.core import validators
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
+
+
 
 
 @deconstructible
@@ -133,3 +135,39 @@ class SumValidator(validators.BaseValidator):
 class WeaponsValidator(validators.BaseValidator):
     '''This validator checks that you have not taken 3+3 weapons and unsupported ammo'''
     pass
+
+@deconstructible
+class UniqueAKAValidator(validators.BaseValidator):
+    def __init__(self, class_to_val = None, message = None) -> None:
+        limit_value = class_to_val
+        super().__init__(limit_value, message=message)
+
+    def __call__(self, value):
+        cleaned = self.clean(value)
+        params = {'limit_value': self.limit_value, 'show_value': cleaned, 'value': value}
+        if self.compare(cleaned, self.limit_value):
+            raise ValidationError(self.message, code=self.code, params=params)
+        
+
+    def compare(self, value, limit_value) -> bool:
+        try:
+            limit_value.objects.get(also_known_as = value)
+        except limit_value.DoesNotExist:
+            check = False
+        else:
+            check = True
+
+        return check
+
+@deconstructible
+class HashkeyExists(UniqueAKAValidator):   
+
+    def compare(self, value, limit_value) -> bool:
+        try:
+            limit_value.objects.get(hash_key = value)
+        except limit_value.DoesNotExist:
+            check = True
+        else:
+            check = False
+
+        return check

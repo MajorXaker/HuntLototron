@@ -1,13 +1,16 @@
 from typing_extensions import Required
 from django.core import validators
 from django.db import models
+from HuntLototron.auxilary import AuxClass
 from roulette.models import Weapon
 from django.contrib.auth.models import User
 import datetime
 from .validators import InRangeValidator, ListedValueValidator, SumValidator, UnicodeUsernameValidator, NonNegativeValidator, UnicodeAndSpaceValidator
 from django.utils.translation import gettext_lazy as _
 
+
 # Create your models here.
+
 
 
 class Player(models.Model):
@@ -29,7 +32,8 @@ class Player(models.Model):
         max_length=50, 
         verbose_name="Also known as", 
         blank=True,
-        validators = [UnicodeAndSpaceValidator(),]
+        validators = [UnicodeAndSpaceValidator(),],
+        
         )
     allow_see_mathes = models.BooleanField(
         _("Allow other users see your matches."),
@@ -48,6 +52,43 @@ class Player(models.Model):
         default=False,
         )
 
+    hash_key = models.CharField(
+        # It is used to bind non user profile to real user profile. So registred players could create accouts of their friends.
+        # Because it's impossible to use anonymous player in matches.
+        _("Hash key of this user."), 
+        max_length=32,
+        null=True,
+        blank=True,
+        )
+
+    hash_redeemable = models.BooleanField(
+        # Restriction. No one should be able to bind a real account.
+        _("May be redeemed by a user"),
+        default=False,
+        )
+
+    show_tooltips = models.BooleanField(
+        _("States whether tooltips and usage hints are visible."),
+        # TODO Tooltips
+        default=True
+        )
+    
+    created_by = models.ForeignKey(
+        User, 
+        verbose_name=_("Showss who is the creator of this player. It's used only while player is not assigned to a user."), 
+        on_delete=models.SET( User.objects.get(username='UnknownHunter').pk),
+        related_name= 'creator', # do I even need this if 'Player.objects.filter(created_by = active_user)' 
+        blank = True,
+        null = True,
+        )
+
+    may_be_duplicate = models.BooleanField(
+        _("Allows this player to have duplicate in match. Service field."),
+        default = False
+        )
+
+    
+
     def update(self, user):
         
         self.also_known_as = ''
@@ -56,26 +97,34 @@ class Player(models.Model):
         
 
 
-    def service_name(self):
-        if self.use_alternative_name:
-            return 'a.' + self.also_known_as
-        else:
-            return 'u.' + self.username.username
+    # def service_name(self):
+    #     if self.use_alternative_name:
+    #         return 'a.' + self.also_known_as
+    #     else:
+    #         return 'u.' + self.username.username
 
 
+    encode = False
 
     def __str__(self) -> str:
+        encode = self.encode
         if self.use_alternative_name:
-            return self.also_known_as
+            
+            result =  self.also_known_as
         else:
             try:
-                return self.username.username
+                result =  self.username.username
             except AttributeError:
-                #needed to look for players which have no 
-                return 'NOT USER - ' + self.also_known_as
+                #needed to look for players which have no username
+                result = self.also_known_as
 
-    def get_name(self):
-        return str(self)
+        if encode:
+            return AuxClass.encode_md5(result)[:6]
+        else:
+            return result
+
+    # def get_name(self):
+    #     return str(self)
     
 
 class AmmoType(models.Model):
@@ -400,12 +449,30 @@ class Match(models.Model):
         _("Match data is correct"),
         default=False)
         
+    class PlayerDuplicationError(Exception):
+        '''Exception is raised when we try to assign several players which cannot have duplicates. 
+        The only players which could have its own duplicates should be Unknown Hunter (aka deleted one), Random Hunter, and maybe some other.
+
+        Atributes
+            player - name\class of a player duplicate
+            message (optional) - in case you'd like to change this
+        '''
+        def __init__(self, player, message = None, *args: object) -> None:
+            
+            if message == None:
+                self.message = f'Player {player} does not allow duplicates!'
+            else:
+                self.message = message
+            super().__init__(*args)
 
 
     def __str__(self) -> str:
         return "Match #"+ str(self.id)
 
-    def players(self):
+    def players(self, is_class = False):
+        '''This func puts player credentials into a list. If is_class is True then puts whole classes.
+        Credentials is a bit outdated logic, use is_class instead.
+        '''
         players_credentials = []
         all_players = (self.player_1, self.player_2, self. player_3)
 
@@ -421,22 +488,27 @@ class Match(models.Model):
                 playername = ''
             players_credentials.append((username, playername))
 
-        
-        return players_credentials
-
-    def get_player_slot(self, credentials):
-        if credentials in self.players():
-            return self.players().index(credentials) + 1
+        if not is_class:
+            return players_credentials
         else:
+            return all_players
+
+    def get_player_slot(self, credentials, is_class = False, debug = False):
+        '''Gets number of player's slot - 1,2 or 3 on given class of credentials
+        '''
+        if debug:
+            print(f'Looking for {credentials} in {self}.')
+        if credentials in self.players(is_class=is_class):
+            position = self.players(is_class=is_class).index(credentials) + 1
+            if debug:
+                print(f'{credentials} found on position {position}')
+            return position
+        else:
+            if debug:
+                print(f'{credentials} not found')
             return 0
 
-    def mark_incomplete(self):
-        '''marks match as being incomplete or faulty
-        '''
-        if self.player_1_kills + self.player_2_kills + self.player_3_kills != self.kills_total:
-            return True
-        else:
-            return False
+
 
     def display_allowed(self):
         '''States whether participants allow to show this match'''
@@ -445,4 +517,67 @@ class Match(models.Model):
         player_3_allowed = self.player_1.allow_see_mathes
 
         return player_1_allowed or player_2_allowed or player_3_allowed
+    
+    def set_encoding(self):
+        '''Enables encoding of players' names if they have not allowed others to see their names
+        '''
+        if not self.player_1.allow_see_name:
+            self.player_1.encode = True
+        try:
+            if not self.player_2.allow_see_name:
+                self.player_2.encode = True
+        except AttributeError:
+            pass
+        try:
+            if not self.player_3.allow_see_name:
+                self.player_3.encode = True
+        except AttributeError:
+            pass
+    
+    def check_players_duplication(self, new_player, debug = False):
+        '''Checks whether new player will cause player duplication. In most cases duplication is restricted
+
+        Parameters
+            new_player - class of new player
+
+        Output
+            False - if everything is OK, or raises a PlayerDuplicationError
+        '''
+        if new_player.may_be_duplicate:
+            if debug:
+                print('Player duplication allowed')
+            return False
+        else:
+            players = self.players(is_class=True)
+            if debug:
+                print(f'Current players in {self}: {players}')
+            if new_player in players:
+                raise self.PlayerDuplicationError(new_player)
+            else:
+                if debug:
+                    print('No duplication')
+                return False
+
+    def swap_players(self, old_player, new_player, debug = False):
+        '''Swaps old and new players. In its course of work checks for duplication and raises a PlayerDuplicationError if necessary.
+        
+        Atributes
+        ---
+        1st - Old player class
+        2nd - New player class
+        
+        '''
+        position = self.get_player_slot(old_player, is_class=True, debug = True)
+        
+        self.check_players_duplication(new_player, debug=debug)
+
+        if position == 1:
+            self.player_1 = new_player
+        elif position == 2:
+            self.player_2 = new_player
+        elif position == 3:
+            self.player_3 = new_player
+        if debug:
+            print(f'Swapped player {position} with {new_player}')
+            print(f'Current players: {self.player_1}, {self.player_2} and {self.player_3}.')
         

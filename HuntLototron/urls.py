@@ -25,6 +25,7 @@ urlpatterns = [
     path('roulette/', include('roulette.urls')),
     path('stats/', include('stats.urls')),
     path('accounts/profile', views.ProfilePage.as_view(), name='profile'),
+    path('accounts/profile/edit', views.ProfileSettings.as_view(), name='profile_settings'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register', views.RegistrationPage.as_view(), name='register'),
 ]

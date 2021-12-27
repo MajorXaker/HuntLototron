@@ -32,9 +32,13 @@ def show_stats_table(request):
         p2_group = Match.objects.filter(player_2 = look_for_user)
         p3_group = Match.objects.filter(player_3 = look_for_user)
         
-        #other matches group
-        all_matches = Match.objects.all()
-        filtered_matches = [match for match in all_matches if match.display_allowed()]
+        if request.user.username_of_player.show_only_my_matches:
+            filtered_matches = []
+        else:
+            #other matches group
+            all_matches = Match.objects.all()
+            filtered_matches = [match for match in all_matches if match.display_allowed()]
+            hashed_matches = [match.set_encoding() for match in filtered_matches]
 
         #results are sorted by their id
         result_as_list = sorted(
@@ -44,7 +48,6 @@ def show_stats_table(request):
         result_as_set = set(result_as_list)
         result_ready = list(result_as_set)
         result_ready.reverse()
-
 
 
 
@@ -107,7 +110,7 @@ class AddMatch(View):
         
         if form.is_valid():
 
-           
+            print(form.player_1_signature)
             form.save()
            
             return HttpResponseRedirect(reverse('stats:table') )
@@ -189,8 +192,8 @@ class EditMatch(View):
 def sample(request):
     #this is main page of the app
     data = {'data' : ''}
-
-
+        
+    print(request.GET.keys())
 
     
     response = render(request, "sample.html", data)

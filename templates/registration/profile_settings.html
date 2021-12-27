@@ -1,0 +1,75 @@
+{% extends 'pure_base.html' %}
+{% block content %}
+
+<head>
+    <title>Stats:Edit</title>
+</head>
+
+
+
+<body>
+    
+    
+    <div>
+        <p style="height: 20px; font-size: 15px; ">
+            Hello, <a href="{% url 'profile' %}">{{user.name}}</a>! This is your profile edit page! For now works only with hash-invites.
+        </p>
+
+        <p>Friends you have invited:</p>
+        <table>
+        {% for invite in invites %}
+            <tr>
+                
+                <td>
+                    {{ invite.also_known_as}}
+                </td>
+                <td>
+                    {{ invite.hash_key }}
+                </td>
+
+                <td>
+                    Delete link (inactive)
+                </td>
+
+                
+            </tr>
+            {% endfor%}
+        </table>
+        
+        <form action="" method="post">
+            {% csrf_token %}
+
+            
+            {{ form_invites.player_name }} <input type="submit" value="Create" name="hash_create">
+            
+        
+        
+
+            <p>
+                Redeem hash-invite:
+            </p>
+        
+        
+
+            
+
+            {% if additional.is_redeem_message %}
+            <p>{{additional.redeem_message}}</p>
+            {% endif %}
+            {{ form_redeem.hash_key }} <input type="submit" value="Redeem" name="hash_redeem">
+            
+        
+        </form>
+            
+    </div>
+           
+    
+
+
+</body>
+
+
+
+
+
+{% endblock %}

@@ -31,7 +31,7 @@
 
 <body>
     
-    <p id="demo"></p>
+    
     <div>
         <p style="height: 20px; font-size: 15px; ">
             Hello, {{ user.name }}! This is your profile page!
@@ -48,7 +48,9 @@
             <input type="submit" value="Submit">
     </div>
 
-
+    <p>
+        <a href="{%url 'profile_settings'%}">Profile settings (Friends Invite)</a>
+    </p>
 
 </body>
 

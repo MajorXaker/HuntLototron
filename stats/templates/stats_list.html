@@ -34,8 +34,8 @@
                         {% if match.wl_status == 0.5 %}Escape{% endif %}
                     </td>
                     <td>{{ match.player_1 }}</td>
-                    <td>{{ match.player_2 }}</td>
-                    <td>{{  match.player_3 }}</td>
+                    <td>{% if match.player_2 != 'None' %}{{ match.player_2 }}{% endif %}</td>
+                    <td>{% if match.player_3 == 'None' %} {% else %}{{ match.player_3 }}{% endif %}</td>
                 
             </tr>
             {% endfor%}
