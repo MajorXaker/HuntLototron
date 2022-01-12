@@ -187,11 +187,16 @@ class EditMatch(View):
 
 def sample(request):
     #this is main page of the app
-    data = {'data' : ''}
+    user = AuxClass.credentials_to_dict(request)
+
+    context = {
+
+            'user': user
+        }
         
-    print(request.GET.keys())
+    # print(request.GET.keys())
 
     
-    response = render(request, "sample.html", data)
+    response = render(request, "sample.html", context)
     return HttpResponse(response)
 

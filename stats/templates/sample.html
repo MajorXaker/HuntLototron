@@ -4,32 +4,78 @@
 <head>
     <title>Roulette</title>
 
-    <script>
+    
+    <style>
+        :root{
+            --dark-fill: #a0a0a0;
+            --dark-fill-pressed: #7c7c7c;
+            --light-fill: #DCDCDC;
+            --border-color: #A9A9A9;
+        }
+    
+        
+        main {
+            display: flex; 
+            flex: 1; 
+            flex-flow: row; 
+        }
+
+        core { 
+            display: flex;
+            order: 2;  
+            flex: 50 90; 
+            background-color: darkkhaki;
+            flex-flow: column;
+            font: 1.2em "Fira Sans", sans-serif;
+        }
+        main > core > row {
+            display: flex;
+
+            margin: 5px;
+            padding: 0.1em;
+            border-radius: 5px;
+            min-width: 500px;
+            
+        }
+
+
 
 
         
-        function showCoords(event, element) {
-            var x = event.offsetX;
-            var y = event.offsetY;
-            // var coords = "X coords: " + x + ", Y coords: " + y;
-            var coords = x + " " + y;
-            document.getElementById("demo").innerHTML = coords
-        };
+
+        main > spaceleft { 
+            min-width: 150px;
+            order: 1;  
+            flex: 25 5 ; 
+
+        }
+        main > spaceright { 
+            min-width: 20px;
+            order: 3;   
+            flex: 25 5 ; 
+
+        }
 
         
 
-    </script>
+    </style>
 
 </head>
 
 <body>
-    <form action = "" >
-        <input class="weapon_interactive_label" name="hash_redeem" value="Redeem" type="submit">
-        <input class="weapon_interactive_label" name="hash_create" value="Create" type="submit">
+    
+    <main>
+        <spaceleft >
+            {% include 'registration/user_bar_2.html' %}
+            aaaab
+        </spaceleft>
+        <core>
+            aaaa
+        </core>
+        <spaceright>
 
-        </input>
-    </form>
-
+        </spaceright>
+    </main>
 
 </body>
 
