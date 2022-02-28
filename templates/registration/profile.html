@@ -1,9 +1,9 @@
-{% extends 'pure_base.html' %}
+{% extends 'base.html' %}
 {% block content %}
 
 <head>
     <title>Roulette</title>
-
+    <link rel="stylesheet" href="/static/styles/account/account_page.css?{% now "U" %}">
 
 
 </head>
@@ -31,26 +31,31 @@
 
 <body>
     
+    <main>
+        <div id="spaceleft"></div>
+        <div id="spaceright"></div>
+        <div id="core">
+            <p style="height: 20px; font-size: 15px; ">
+                Hello, {{ user.name }}! This is your profile page!
+            </p>
+
+            <p>
+                <a href="{%url 'profile_settings'%}">Profile settings.</a> It currently contains your profile settings, standing invites and invitees' names, and redeem invite functionality.
+            </p>
+
+            <p>
+                <a href="{%url 'export_csv' %}">Export your matches as CSV file.</a>
+            </p>
+
+            <form action="" method="post" enctype= multipart/form-data>
+                {% csrf_token %}
+                <label for="your_name">CSV Import </label>
+                <input type="file" id="file" name="file" accept=".csv">
+                <input type="submit" value="OK">
+            </form>
+        </div>
+    </main>
     
-    <div>
-        <p style="height: 20px; font-size: 15px; ">
-            Hello, {{ user.name }}! This is your profile page!
-        </p>
-
-        {% if additional.changed %}Changes have been saved.{% endif %}
-        <form action="" method="post">
-            {% csrf_token %}
-
-            <table>
-                {{ form.as_p }}
-            </table>
-
-            <input type="submit" value="Submit">
-    </div>
-
-    <p>
-        <a href="{%url 'profile_settings'%}">Profile settings (Friends Invite)</a>
-    </p>
 
 </body>
 

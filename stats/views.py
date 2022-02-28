@@ -59,9 +59,10 @@ def show_stats_table(request):
     return response
 
 def show_match_detail(request, match_id):
+    
     try:
-        user = AuxClass.credentials_to_dict(request)
         match = Match.objects.get(pk=match_id)
+        user = AuxClass.credentials_to_dict(request)
 
         open_for_browsing = (
             request.user.is_staff,
@@ -74,8 +75,16 @@ def show_match_detail(request, match_id):
            
 
         additional = {}
-        additional["player_2_here"] = False if match.player_2 == 'None' else True
-        additional["player_3_here"] = False if match.player_3 == 'None' else True
+        additional["player_2_here"] = False if str(type(match.player_2)) == "<class 'NoneType'>" else True
+        additional["player_3_here"] = False if str(type(match.player_3)) == "<class 'NoneType'>" else True
+        
+        
+        
+
+        # temporary placeholder, as bounty for now is only 4 match, not for person
+        # additional['player_1_bounty'] =  match.bounty
+        # additional['player_2_bounty'] =  match.bounty
+        # additional['player_3_bounty'] =  match.bounty
         
        
         if True in open_for_browsing:
@@ -87,7 +96,7 @@ def show_match_detail(request, match_id):
     except Match.DoesNotExist:
         return render(request, "404_or_403_match.html", status=403)
         
-    return response
+    
 
 
 class AddMatch(View):
@@ -188,6 +197,12 @@ class EditMatch(View):
 def sample(request):
     #this is main page of the app
     user = AuxClass.credentials_to_dict(request)
+
+    # aaa = Player.objects.get(also_known_as = "None")
+    em = Match.objects.get(pk = 12)
+    mathes_hashed = [match.get_md5() for match in Match.objects.all()]
+
+    print(mathes_hashed)
 
     context = {
 

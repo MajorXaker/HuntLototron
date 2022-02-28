@@ -20,7 +20,7 @@ from . import views
 # app_name = 'core'
 
 urlpatterns = [
-    path('', views.home),
+    path('', views.home, name="home"),
     path('admin/', admin.site.urls),
     path('roulette/', include('roulette.urls')),
     path('stats/', include('stats.urls')),
@@ -28,5 +28,8 @@ urlpatterns = [
     path('accounts/profile/edit', views.ProfileSettings.as_view(), name='profile_settings'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register', views.RegistrationPage.as_view(), name='register'),
+    path('accounts/profile/edit/delete/<str:hash_key>', views.HashDelete, name = "hash_delete"),
+    path('accounts/profile/csv', views.export_Matches, name='export_csv'),
+
 ]
 

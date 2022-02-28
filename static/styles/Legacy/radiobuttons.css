@@ -1,0 +1,119 @@
+@font-face {
+  font-family: "Sahitya-Regular";
+  src: url("/static/fonts/Sahitya-Regular.ttf") format("opentype");
+}
+
+@font-face {
+  font-family: "Sahitya-Bold";
+  src: url("/static/fonts/Sahitya-Bold.ttf") format("opentype");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'Sansation';
+  src: url(/static/fonts/Sansation_regular.ttf) format("opentype");
+}
+
+@font-face {
+  font-family: 'Sansation Light';
+  src: url(/static/fonts/Sansation_Light.ttf) format("opentype");
+}
+
+@font-face {
+  font-family: 'Sansation Bold';
+  src: url(/static/fonts/Sansation_Bold.ttf) format("opentype");
+}
+
+@font-face {
+  font-family: 'Sansation Italic';
+  src: url(/static/fonts/Sansation_Italic.ttf) format("opentype");
+}
+
+@font-face {
+  font-family: 'Sansation Bold Italic';
+  src: url(/static/fonts/Sansation_Bold_Italic.ttf) format("opentype");
+}
+
+@font-face {
+  font-family: 'Sansation Light Italic';
+  src: url(/static/fonts/Sansation_Light_Italic.ttf) format("opentype");
+}
+
+.button-common, .radio-group label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  font-family: "Sahitya Regular";
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  color: #929292;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button-common:active, .radio-group label:active {
+  font-family: "Sahitya Bold";
+  color: #F0B385;
+}
+
+.button-common:active:hover, .radio-group label:active:hover {
+  text-shadow: 0px 0px 10px #F0B385;
+}
+
+.button-common, .radio-group label {
+  height: 34px;
+  width: 96px;
+  background-image: url("/static/images/buttons/common.png");
+  font-size: 18px;
+}
+
+.button-common:hover, .radio-group label:hover {
+  background-image: url("/static/images/buttons/common-p.png");
+}
+
+.button-common:active, .radio-group label:active {
+  background-image: url("/static/images/buttons/common-p.png");
+}
+
+.radio-group {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  list-style-type: none;
+  margin: 25px 0 0 0;
+  padding: 0;
+}
+
+.radio-group input[type="radio"] {
+  visibility: hidden;
+  margin: 5px 5px 5px 10px;
+}
+
+.radio-group label {
+  position: relative;
+  top: -35px;
+  margin: 0px 0px -35px 0px;
+}
+
+.radio-group label:checked {
+  font-family: "Sahitya-Bold";
+}
+
+.radio-group input[type="radio"]:checked + label {
+  color: #F0B385;
+  background-image: url("/static/images/buttons/common-p.png");
+}
+/*# sourceMappingURL=radiobuttons.css.map */

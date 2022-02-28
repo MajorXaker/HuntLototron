@@ -6,10 +6,12 @@ from django.shortcuts import redirect, render
 from django.views.generic.base import View
 from stats.models import Match, Player
 from django.contrib.auth.mixins import LoginRequiredMixin
-from HuntLototron.auxilary import AuxClass
+from HuntLototron.auxilary import AuxClass, MatchesDecoder
 from itertools import chain
 from operator import attrgetter
-from .forms import RedeemHashInvite, RegistrationFormA, UserSettingsForm, CreateHashInvite
+from .forms import RedeemHashInvite, RegistrationFormA, UserSettingsForm, CreateHashInvite, CSVUploadForm
+import csv
+from stats.models import Map
 
 
 from HuntLototron.base_constructs import ViewBaseConstruct
@@ -33,15 +35,13 @@ class ProfilePage(LoginRequiredMixin, View):
     def get(self, request):
         user = AuxClass.credentials_to_dict(request)
 
-        player = User.objects.get(username = user['username']).username_of_player
-
-        form = UserSettingsForm(instance=player)
+        csv_form = CSVUploadForm()
 
         additional = {}
         context = {
                 'user': user,
-                'form': form,
-                'additional':additional
+                'additional': additional,
+                'csv_form': csv_form
             }
 
 
@@ -51,34 +51,49 @@ class ProfilePage(LoginRequiredMixin, View):
     
     def post(self, request):
         user = AuxClass.credentials_to_dict(request)
+        csv_form = CSVUploadForm(request.POST, request.FILES)
+        player = request.user.username_of_player
 
-        player = User.objects.get(username = user['username']).username_of_player
+        if csv_form.is_valid():
+            print('Form valid')
+            filename = request.FILES['file'].name
+            file_as_text  = open(filename, "r")
+            
+            decoder = MatchesDecoder(file_as_text, player)
 
-        form = UserSettingsForm(request.POST)
-        
-        if form.is_valid():
-            player.also_known_as = form.cleaned_data['also_known_as']
-            player.allow_see_mathes = form.cleaned_data['allow_see_mathes']        
-            player.allow_see_name = form.cleaned_data['allow_see_name']                
-            player.show_only_my_matches = form.cleaned_data['show_only_my_matches']
-            player.use_alternative_name = True
+            decoder.normalise()
 
-            player.save()
+            
+            
+            decoder.transfer()
+            
+            response = HttpResponse(
+                content_type='text/txt',
+                headers={'Content-Disposition': 'attachment; filename="log.txt"'},
+            )
+            for message in decoder.messages:
+                response.write(message)
+                response.write('\n')
+                response.write('----')
+                response.write('\n')
+            return response
+            
+            # with open("log.txt", 'wt') as file:
+            #     for message in messages:
+            #         file.write(message)
 
-        
-            user['name'] = form.cleaned_data['also_known_as']
+        else:
+            print('Form invalid')
+            print(csv_form.errors)
 
-        additional = {'changed':True}
-        
+        additional = {}
         context = {
-                'user': user,
-                'form': form,
-                'additional':additional
-            }
+            'user': user,
+            'additional': additional,
+            'csv_form': csv_form
+        }
 
-
-        return render (request, "registration/profile.html", context)
-
+        return render(request, "registration/profile.html", context)
 
 class RegistrationPage(View):
 
@@ -126,24 +141,106 @@ class RegistrationPage(View):
             output = render (request, "registration/registration.html", context)
             return output
 
+def HashDelete(request, hash_key):
+
+    hashed_player = Player.objects.get(hash_key = hash_key)
+
+    # look if this player participated in any matches
+    matches_p1 = Match.objects.filter(player_1 = hashed_player)
+    matches_p2 = Match.objects.filter(player_2 = hashed_player)
+    matches_p3 = Match.objects.filter(player_3 = hashed_player)
+
+    matches_as_list = sorted(
+        chain(matches_p1, matches_p2, matches_p3),
+        key=attrgetter('id'))
+
+    if len(matches_as_list) > 0:
+        # do smth if mathes are found TBD
+        # for example change with unknown player
+        
+        unknown_player = User.objects.get(username='UnknownHunter').username_of_player
+        for match in matches_as_list:
+            match.swap_players(hashed_player, unknown_player)
+        hashed_player.delete()
+        return redirect('profile_settings', permanent=True)
+    else:
+        # delete this hash if mathes are not found
+        hashed_player.delete()
+        return redirect('profile_settings', permanent=True)
+
+
+def export_Matches(request):
+     # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="matches.csv"'},
+    )
+ 
+    player = request.user.username_of_player
+
+    #3 queries with the name of active player
+    p1_group = Match.objects.filter(player_1 = player)
+    p2_group = Match.objects.filter(player_2 = player)
+    p3_group = Match.objects.filter(player_3 = player)
+    
+    #results are sorted by their id
+    result_as_list = sorted(
+        chain(p1_group, p2_group, p3_group),
+        key=attrgetter('id'))
+
+    model_fields_names = []
+    fields = Match._meta.get_fields()
+    for field in fields:
+        field_data = field.name
+        model_fields_names.append(field_data)
+
+    writer = csv.writer(response)
+    writer.writerow(model_fields_names)
+
+
+    for match in result_as_list:
+        fields = match._meta.get_fields()
+        pure_values = []
+        for field in fields:
+            if field.many_to_one:
+                # decodes foreing field relation, as value to string returns only an ID
+                id = field.value_to_string(match)
+                try:
+                    a_value = field.related_model.objects.get(pk=id)
+                except (ValueError):
+                    a_value = 'None'
+                except Map.DoesNotExist:
+                    a_value = 'Undefined'
+            elif field.many_to_many:
+                a_value = '+'.join([item.name for item in field.value_from_object(match)])  
+            else:
+                a_value = field.value_to_string(match)
+            pure_values.append(a_value)
+        writer.writerow(pure_values)
+
+
+
+    return response
+
 class ProfileSettings(View):
-    # now only logic for hash creation
-    # later POST should distinguish between two-three submit buttons: hash create \ hash redeem \ settings update
+
     def get(self, request):
         user = AuxClass.credentials_to_dict(request)
-
+        player = User.objects.get(username = user['username']).username_of_player
         
         active_user = user['user']
         active_user_invited = Player.objects.filter(created_by = active_user)
 
         form_create_hash = CreateHashInvite()
         form_redeem_invite = RedeemHashInvite()
+        form_settings = UserSettingsForm(instance=player)
         
         context = {
             'user':user,
+            'form_settings':form_settings,
             'form_invites':form_create_hash,
+            'form_redeem': form_redeem_invite,
             'invites':active_user_invited,
-            'form_redeem': form_redeem_invite
         }
         return render(request, 'registration/profile_settings.html', context)
 
@@ -157,6 +254,32 @@ class ProfileSettings(View):
 
         form_create_hash = CreateHashInvite(request.POST)
         form_redeem_invite = RedeemHashInvite(request.POST)
+        form_settings = UserSettingsForm(request.POST)
+
+        if 'settings_update' in request.POST.keys():
+            user = AuxClass.credentials_to_dict(request)
+
+            player = User.objects.get(username = user['username']).username_of_player
+
+            
+            
+            if form_settings.is_valid():
+                player.also_known_as = form_settings.cleaned_data['also_known_as']
+                player.allow_see_mathes = form_settings.cleaned_data['allow_see_mathes']        
+                player.allow_see_name = form_settings.cleaned_data['allow_see_name']                
+                player.show_only_my_matches = form_settings.cleaned_data['show_only_my_matches']
+                player.use_alternative_name = True
+
+                player.save()
+
+            
+                user['name'] = form_settings.cleaned_data['also_known_as']
+
+            additional = {'changed':True}
+            
+
+        
+
 
         if 'hash_create' in request.POST.keys():
             if form_create_hash.is_valid():
@@ -209,14 +332,18 @@ class ProfileSettings(View):
                 form_redeem_invite = RedeemHashInvite()
 
 
+
                     
         context = {
             'user':user,
             'form_invites':form_create_hash,
+            'form_settings':form_settings,
             'invites':active_user_invited,
             'form_redeem': form_redeem_invite,
             'additional':additional
         }
+
+        # return render (request, "registration/profile.html", context)
         return render(request, 'registration/profile_settings.html', context)
 
 # def account_activation_sent(request):

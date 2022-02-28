@@ -1,12 +1,14 @@
+from email.policy import default
 from typing_extensions import Required
 from django.core import validators
+import hashlib
 from django.db import models
-from HuntLototron.auxilary import AuxClass
 from roulette.models import Weapon
 from django.contrib.auth.models import User
 import datetime
 from .validators import InRangeValidator, ListedValueValidator, SumValidator, UnicodeUsernameValidator, NonNegativeValidator, UnicodeAndSpaceValidator
 from django.utils.translation import gettext_lazy as _
+import hashlib
 
 
 # Create your models here.
@@ -14,6 +16,18 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Player(models.Model):
+    def encode_md5(*strings):
+        '''Connects any number of values into a single string, then MD5es it.
+        Returns 32 char hex string. Truncate it if you need.
+        '''
+        s_combined = ''.join(strings)
+        s_unspaced = [char for char in s_combined if char != ' ']
+        s_bytes = bytes(''.join(s_unspaced), encoding='utf-8')
+        code = hashlib.md5()
+        code.update(s_bytes)
+        encoded = code.hexdigest()
+        return encoded
+
 
     username_validator = UnicodeUsernameValidator()
     
@@ -119,7 +133,7 @@ class Player(models.Model):
                 result = self.also_known_as
 
         if encode:
-            return 'Player '+AuxClass.encode_md5(result)[:6]
+            return 'Player '+ self.encode_md5(result)[:6]
         else:
             return result
 
@@ -153,7 +167,7 @@ class Compound(models.Model):
     y_relative = models.FloatField(default= -2)
 
     def __str__(self) -> str:
-        return self.from_map.name + " - " + self.name
+        return self.name
 
     
 
@@ -161,7 +175,7 @@ class Compound(models.Model):
 
 class Kit(models.Model):
     # TODO delete kit model
-    #if kit does not exist - create it, if exists - increase its popularity
+    
     primary_weapon = models.ForeignKey(Weapon, on_delete=models.PROTECT, related_name='primary_weapon')
     primary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, related_name='primary_weapon_ammo_A', default=AmmoType.objects.get(name="Standard").id)
     primary_ammo_B = models.ForeignKey(AmmoType, on_delete=models.PROTECT, related_name='primary_weapon_ammo_B', default=AmmoType.objects.get(name="None").id)
@@ -204,13 +218,7 @@ class Match(models.Model):
         
         )
     playtime = models.DurationField(blank=False)
-    bounty = models.IntegerField(
-        _("bounty"), 
-        null=False,
-        default=0,
-        validators=[NonNegativeValidator('bounty'),],
 
-        )
     map = models.ForeignKey(
         Map, 
         verbose_name=_("Map of the match"), 
@@ -224,6 +232,8 @@ class Match(models.Model):
     kills_validators = [NonNegativeValidator(_('kills')),]
     assists_validators = [NonNegativeValidator(_("assists")),]
     deaths_validators = [NonNegativeValidator(_("deaths")),]
+    bounty_validators = [NonNegativeValidator(_('bounty')),]
+
     
     #each player have it's own data fields
     #player 1 is mandatory - he creates a match class instance
@@ -283,6 +293,13 @@ class Match(models.Model):
     player_1_deaths = models.IntegerField(
         default=0,
         validators=deaths_validators,
+        )
+    player_1_bounty = models.IntegerField(
+        _("player 1 bounty"),
+        default=0,
+        validators=bounty_validators,
+        null=False,
+        blank=True,
         )
     player_1_signature = models.BooleanField(
         _("player 1 signature"),
@@ -361,6 +378,13 @@ class Match(models.Model):
         validators=deaths_validators,
         blank=True,
         )
+    player_2_bounty = models.IntegerField(
+        _("player 2 bounty"),
+        default=0,
+        validators=bounty_validators,
+        null=False,
+        blank=True,
+        )
     player_2_signature = models.BooleanField(
         _("player 2 signature"),
         default=False,
@@ -434,6 +458,13 @@ class Match(models.Model):
         validators=deaths_validators,
         blank=True,
         )
+    player_3_bounty = models.IntegerField(
+        _("player 3 bounty"),
+        default=0,
+        validators=bounty_validators,
+        null=False,
+        blank=True,
+        )
     player_3_signature = models.BooleanField(
         _("player 2 signature"),
         default=False,
@@ -442,13 +473,18 @@ class Match(models.Model):
 
     fights_locations = models.ManyToManyField(
         Compound, 
-        verbose_name="Place of a firefight"
+        verbose_name=_("Place of a firefight")
         ) 
 
     correct_match = models.BooleanField(
         _("Match data is correct"),
         default=False)
-        
+    
+    external = models.BooleanField(
+        _("Externally added match"),
+        default = False
+        )
+
     class PlayerDuplicationError(Exception):
         '''Exception is raised when we try to assign several players which cannot have duplicates. 
         The only players which could have its own duplicates should be Unknown Hunter (aka deleted one), Random Hunter, and maybe some other.
@@ -468,6 +504,29 @@ class Match(models.Model):
 
     def __str__(self) -> str:
         return "Match #"+ str(self.id)
+
+    def get_md5(self) -> str:
+        values = [
+            self.date ,
+            self.playtime,
+            self.map,
+            self.player_1,
+            self.player_2,
+            self.player_3,
+            self.player_1_bounty,
+            self.player_2_bounty,
+            self.player_3_bounty,
+            self.player_1_primary_weapon,
+            self.player_1_secondary_weapon,
+            self.fights_locations,
+        ]
+        str_values = [str(val) for val in values]
+        hashable_str = bytes(''.join(str_values), encoding='utf-8')
+        hashed = hashlib.md5()
+        hashed.update(hashable_str)
+        encoded = hashed.hexdigest()
+        return encoded
+
 
     def players(self, is_class = False):
         '''This func puts player credentials into a list. If is_class is True then puts whole classes.

@@ -1,0 +1,73 @@
+$goldfont: #F0B385 //2be deleted!
+$greyfont: #929292
+$gold-bright: #F0B385
+$gold-dark: #7F634C
+
+
+    
+@font-face 
+    font-family: "Sahitya-Regular"
+    src: url("/static/fonts/Sahitya-Regular.ttf") format("opentype")
+    
+    
+
+@font-face 
+    font-family: "Sahitya-Bold"
+    src: url("/static/fonts/Sahitya-Bold.ttf") format("opentype")
+    font-weight: bold
+    
+
+@font-face 
+    font-family: 'Sansation'
+    src: url(/static/fonts/Sansation_regular.ttf) format("opentype")
+
+@font-face 
+    font-family: 'Sansation Light'
+    src: url(/static/fonts/Sansation_Light.ttf) format("opentype")
+
+@font-face 
+    font-family: 'Sansation Bold'
+    src: url(/static/fonts/Sansation_Bold.ttf) format("opentype")
+
+
+@font-face 
+    font-family: 'Sansation Italic'
+    src: url(/static/fonts/Sansation_Italic.ttf) format("opentype")
+
+@font-face 
+    font-family: 'Sansation Bold Italic'
+    src: url(/static/fonts/Sansation_Bold_Italic.ttf) format("opentype")
+
+@font-face 
+    font-family: 'Sansation Light Italic'
+    src: url(/static/fonts/Sansation_Light_Italic.ttf) format("opentype")
+
+%button
+    display: flex
+    align-items: center
+    justify-content: center
+    font-family: "Sahitya Regular"
+    background-size: 100% 100%
+    background-repeat: no-repeat
+    color: $greyfont
+    text-decoration: none
+    cursor: pointer
+    &:active
+        font-family: "Sahitya Bold"
+        color: $goldfont
+        &:hover
+            text-shadow:  0px 0px 10px $goldfont
+    
+    
+.button-common
+    @extend %button
+    height: 34px
+    width: 96px
+    background-image: url("/static/images/buttons/common.png")
+    font-size: 18px
+    &:hover
+        background-image: url('/static/images/buttons/common-p.png')
+    &:active
+        background-image: url('/static/images/buttons/common-p.png')
+
+

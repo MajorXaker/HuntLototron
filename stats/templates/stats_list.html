@@ -1,30 +1,51 @@
 
+{% extends 'base.html' %}
+{% block content %}
 <head>
     <title>Stats: Overview</title>
-    
+    <link rel="stylesheet" href="/static/styles/statsList.css?{% now "U" %}">
 
 </head>
-{% extends 'pure_base.html' %}
-{% block content %}
 
 <body>
-
-    <!-- <img onclick=" get_alert(event, 'map')" onload="" id="map"
-    src="https://sun9-5.userapi.com/impf/OiEi1hEIA7_vInVmJNX_LiFh3uF6QgdIOhib3w/VLmwl_Rzelk.jpg?size=726x726&quality=95&sign=aced35a0fc970cd4b3f61070b4ea04c2&type=album" 
-    alt="lawson_delta map"> 
     
-    <p id="demo"></p> -->
-    <div>
-        {% include "registration/user_bar.html" %}
-        <p style="height: 20px; font-size: 15px; ">
-            This is stats page
-        </p>
-        <a href="{% url 'stats:add' %}">Add new match</a>
-        <table>
+    <main>
 
-            {% for match in matches %}
-            <tr>
+        <div id="spaceleft"></div>
+        
+        
+        <div id="core">
+
+            <h1 class="heading-big">
+                Stats table page
+            </h1>
+            <div id="table-header">
+                <div id="description">
+        
+                    <p style="max-width: 570px">
+                        All matches, where you have participated, will be displayed here. 
+                    </p><p>
+                        Additionaly, some other mathes may be shown as well, 
+                        this depends on your  <a href="{% url 'profile_settings' %}">settings</a>. Still, if people have not allowed to show their names, they will be encoded.
+                    </p>
+
+                </div>
+                <div id="add">
+
+                    <a href="{% url 'stats:add' %}" id="add-match">Add new match</a>
+                </div>
+            </div>
+            
+            <table>
+                <th>ID</th>
+                <th>Result</th>
+                <th>Player 1</th>
+                <th>Player 2</th>
+                <th>Player 3</th>
                 
+                {% for match in matches %}
+                <tr>
+                    
                     <td>
                         <a href="{% url 'stats:match_details' match.id %}">{{ match.id }}</a>
                     </td>
@@ -36,13 +57,15 @@
                     <td>{{ match.player_1 }}</td>
                     <td>{% if match.player_2 != 'None' %}{{ match.player_2 }}{% endif %}</td>
                     <td>{% if match.player_3 == 'None' %} {% else %}{{ match.player_3 }}{% endif %}</td>
-                
-            </tr>
-            {% endfor%}
-        </table>
-        
-    </div>
-
+                    
+                </tr>
+                {% endfor%}
+            </table>
+            
+        </div>
+    </main>
+    
+    <div id="spaceright"></div>
 
 
 </body>

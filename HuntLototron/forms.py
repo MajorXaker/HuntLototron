@@ -47,3 +47,6 @@ class RedeemHashInvite(forms.Form):
         validators = [HashkeyExists(Player, 'Hash invite is not found or already redeemed.'),],
         
         )
+
+class CSVUploadForm(forms.Form):
+    file = forms.FileField()

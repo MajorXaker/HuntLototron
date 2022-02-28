@@ -1,8 +1,9 @@
 
-{% extends 'pure_base.html' %}
+{% extends 'base.html' %}
 {% block content %}
 <head>
     <title>Stats: Edit</title>
+    <link rel="stylesheet" href="/static/styles/matchEdit.css?{% now "U" %}">
 
     <script type="text/javascript" 
     src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
@@ -68,27 +69,32 @@
 </head>
 
 <body>
+    <main>
 
-    <div>
-        {% include 'registration/user_bar_passive.html' %}
-        <p style="height: 20px; font-size: 15px; ">
-            This is page where you edit and extend matches.
-        </p>
-        <form action="" method="post">
-            {% csrf_token %}
+        <div id="spaceleft"></div>
+        <div id="spaceright"></div>
 
-            <table>
-                {{ form.as_p }}
-            </table>
+        <div id="core">
             
-
-
-
-
-            <input type="submit" value="Submit" onclick="enable()">
-          </form>
-        
-    </div>
+            <p class="heading">
+                This is page where you edit and extend matches.
+            </p>
+            <form action="" method="post">
+                {% csrf_token %}
+                
+                <table>
+                    {{ form.as_table }}
+                </table>
+                
+                
+                
+                
+                
+                <input type="submit" value="Submit" class="button-redcore-w" onclick="enable()">
+            </form>
+            
+        </div>
+    </main>
 
 
 

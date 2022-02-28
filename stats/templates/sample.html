@@ -1,80 +1,238 @@
-{% extends 'pure_base.html' %}
+{% extends 'base.html' %}
 {% block content %}
+{% load static %}
 
 <head>
-    <title>Roulette</title>
-
     
+
+    <link rel="stylesheet" href="/static/styles/sample.css?{% now "U" %}">
+
     <style>
-        :root{
-            --dark-fill: #a0a0a0;
-            --dark-fill-pressed: #7c7c7c;
-            --light-fill: #DCDCDC;
-            --border-color: #A9A9A9;
-        }
-    
-        
-        main {
-            display: flex; 
-            flex: 1; 
-            flex-flow: row; 
-        }
-
-        core { 
-            display: flex;
-            order: 2;  
-            flex: 50 90; 
-            background-color: darkkhaki;
-            flex-flow: column;
-            font: 1.2em "Fira Sans", sans-serif;
-        }
-        main > core > row {
-            display: flex;
-
-            margin: 5px;
-            padding: 0.1em;
-            border-radius: 5px;
-            min-width: 500px;
-            
-        }
-
-
-
-
-        
-
-        main > spaceleft { 
-            min-width: 150px;
-            order: 1;  
-            flex: 25 5 ; 
-
-        }
-        main > spaceright { 
-            min-width: 20px;
-            order: 3;   
-            flex: 25 5 ; 
-
-        }
-
         
 
     </style>
+	<script src="/static/scripts/jquery.js?{% now "U" %}"></script>
+    <link rel="stylesheet" href="/static/styles/x-calendar.css?{% now "U" %}" />
+    <script src="/static/scripts/x-calendar.js?{% now "U" %}"></script>
+    <script src="/static/scripts/sample.js?{% now "U" %}"></script>
 
 </head>
 
 <body>
     
     <main>
-        <spaceleft >
-            {% include 'registration/user_bar_2.html' %}
-            aaaab
-        </spaceleft>
-        <core>
-            aaaa
-        </core>
-        <spaceright>
+        <div id="spaceleft">
+        </div>
+        <div id="core">
+           
+            <div style="max-width: 510px;">
+                <div id="game-id">Game ID (PUT YOUR ID HERE)</div>
+                <div id="comment" style="visibility:collapse;">AAAAA noone should see this</div>
 
-        </spaceright>
+                <div id="group1">
+                    <div id="date-heading-data">
+                        <div id="match-date">
+                            <div>
+                                <label for="match-date_i">Match date</label>
+                                <input type="text" name="" id="match-date-i">
+                            </div>
+                            <icon id="calendar-icon"></icon>
+                        </div>
+    
+                        <div id="win-loss">
+                            <p>Heading</p>
+                            <ul>
+                                <li>
+                                    <input type="radio" name="heading" id="win" >
+                                    <label for="win"  >Win</label>
+                                </li>
+                                <li>
+                                    <input type="radio" name="heading" id="loss" >
+                                    <label for="loss"  >Loss</label>
+                                </li>
+                                <li>
+                                    <input type="radio" name="heading" id="survival" >
+                                    <label for="survival" >Escape</label>
+                                </li>
+                            </ul>
+
+
+                        </div>
+
+                        <div id="match-info">
+                            <div id="kills" >
+                                <label for="kills">Kills</label>
+                                <input type="text" name="kills" id="kills" minlength="1" maxlength="4">
+                            </div>
+                            <div id="deaths">
+                                <label for="deaths">Deaths</label>
+                                <input type="text" name="deaths" id="deaths">
+                            </div>
+                            <div id="assists">
+                                <label for="assists">Assists</label>
+                                <input type="text" name="assists" id="assists">
+                            </div>
+                            <div id="duration">
+                                <label for="duration">Duration</label>
+                                <input type="text" name="duration" id="duration">
+                            </div>
+                            <div id="bounty">
+                                <label for="bounty">Bounty</label>
+                                <input type="text" name="bounty" id="bounty">
+                            </div>
+                            <div id="total-kills">
+                                <label for="total-kills">Total kills</label>
+                                <input type="text" name="total-kills" id="total-kills">
+                            </div>                            
+                        </div>
+
+                       
+
+                    </div>
+
+                    <div id="calendar-area">
+                        <div class="myCalendar">
+
+                        </div>
+                        <script>
+                            $('.myCalendar').x_calendar({
+                                viewDay: new Date(),
+                                
+                            }).on('changeDate', function(e){
+                                for (let index = 1; index < 32; index++) {
+                                    let elem = document.getElementById(index);
+                                        if (elem != null) {
+                                            elem.classList.remove('selected');
+                                            console.log('Element_id ' + index + ' removed');
+                                        }
+                                }
+
+                                e.elem.classList.add('selected');
+                                document.getElementById("match-date-i").value = e.date +'.'+ e.month +'.'+ e.year;
+
+
+                            })
+                        </script>
+                       
+                    </div>
+
+                </div>
+                <div id="weapons-block">
+                    <div id="primary">
+                        <label>Primary weapon</label>
+                        <div>
+                            <input type="text" name="primary-weapon" id="weapon" 
+                                placeholder="Primary weapon">
+                            <input type="text" name="primary-weapon-ammo" id="weapon-ammo"
+                                placeholder="Primary ammo">
+                        </div>
+                    </div>
+
+                    <div id="secondary">
+                        <label>Secondary weapon</label>
+                        <div>
+                            <input type="text" name="secondary-weapon" id="weapon" 
+                                placeholder="Secondary weapon">
+                            <input type="text" name="secondary-weapon-ammo" id="weapon-ammo"
+                                placeholder="Secondary ammo">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="group2">
+
+                    <div id='players'>
+                          <div id="player-fields-1">
+
+                            
+                            <label for="player-2">Teammate 1</label>
+                            <div id="teammate-area">
+                                <div id="remove-button" onclick="alert('remove teammate action')">
+                                    <div></div>
+                                </div>
+                                <input type="text" id="player-2">
+                                <div id="last-game-player" 
+                                 onclick="alert('Ajax request for last game of this person. Then a dropdown to choose. Then button disappears')">
+                                    <div>
+                                        From last game
+                                    </div>   
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div id="player-fields-2">
+
+                            
+                            <label for="player-3">Teammate 2</label>
+                            <div id="teammate-area">
+                                <div id="remove-button" onclick="alert('remove teammate action')">
+                                    <div></div>
+                                </div>
+                                <input type="text" id="player-3">
+                                <div id="last-game-player" 
+                                 onclick="alert('Ajax request for last game of this person. Then a dropdown to choose. Then button disappears')">
+                                    <div>
+                                        From last game
+                                    </div>   
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        
+
+                        <div id="add-teammate" onclick="alert('add teammate action')">
+                            <div id="add-button">
+
+                            </div>
+                            <p>Add teammate</p>
+    
+                        </div>
+                    </div>
+
+                    <div id="compounds">
+                        <div id="control-group">
+                            <p class="heading">
+                                Compounds
+                            </p>
+                            
+                            <div>
+                                <label for="cars">Map played:</label>
+                                <select id="map" name="map">
+                                    <option value="DeSalle">DeSalle</option>
+                                    <option value="Lawson Delta">Lawson Delta</option>
+                                    <option value="Stillwater Bayou">Stillwater Bayou</option>
+                                    
+                                </select>
+                            </div>
+                            
+                        </div>
+                        <div id="map-group">
+                            <div id="map-and-compounds">
+                                <img src="/static/images/maps/DeSalle.jpg" alt="" id="map"
+                                onclick="function clk() {
+                                    let coords = getCoords()
+                                    alert(coords)
+                                }">
+                                <p>Lower DeSalle</p>
+                            </div>
+                            
+                            <div id="buttons">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+ 
+
+
+            </div>
+        </div>
+        <div id="spaceright">
+
+        </div id="spaceright">
     </main>
 
 </body>

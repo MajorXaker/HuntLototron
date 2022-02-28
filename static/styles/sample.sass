@@ -1,0 +1,231 @@
+@import BasicStyle
+
+
+
+body
+    height: 2000px
+    background-color: #575757
+    main
+        background-image: url('/static/images/back-1.png')
+        background-size: 100% 100%
+        background-repeat: no-repeat
+        display: flex
+        #spaceleft
+            flex: 8
+        #core
+            flex-direction: column
+            flex: 84
+            display: flex
+            flex-wrap: wrap
+            #game-id
+                @extend .heading-big
+                
+
+                #comment
+                
+            #group1
+                display: flex
+                flex-direction: row
+                flex-wrap: wrap
+                flex: 60%
+
+          
+
+                max-width: 500px
+                #date-heading-data
+                    width: 60%
+                    #match-date
+                        
+                        display: flex
+                        flex-direction: row
+                        align-items: flex-end
+                        padding-bottom: 20px
+                        justify-content: space-between
+
+                        div
+                            
+                            width: 100%
+                            @extend .labeled-dark-input
+                            input
+                                margin-right: 0px
+                                width: 100%
+                        icon
+                            @extend .calendar-icon
+
+                            margin-bottom: 10px
+                                            
+
+                    #win-loss
+                        width: 100%
+                        padding-bottom: 20px
+                        p
+                            @extend .heading
+
+                        ul
+                            @extend .radio-group
+
+
+                                                                        
+
+                    #match-info
+                        padding-bottom: 20px
+                        width: 100%
+                        max-width: 388px
+                        display: flex
+                        gap: 2%
+                        flex-wrap: wrap
+                        
+                    
+                        
+                        div
+                            flex: 1 1 calc((100% / 3) - 5px)
+                            display: flex
+                            flex-direction: column
+                            min-width: 50px
+                            label
+                                @extend .heading
+                                
+                            input
+                                @extend .dark-input
+                                
+
+                #calendar-area
+                
+                    width: 193px
+                    height: 193px
+                    background-image: url("/static/images/calendar-back.png")
+                    background-size: 100% 100%
+                    background-repeat: no-repeat
+                    position: absolute
+                    top: 185px
+                    left: 410px
+
+                    display: flex
+                    flex-direction: column
+                    padding: 5px
+                    padding-top: 15px
+
+                    justify-content: flex-start
+
+                    
+
+                        
+
+
+                    
+
+                            
+
+            #weapons-block
+                div
+                    width: 100%
+                    label
+                        @extend .heading
+
+                    div
+                        display: grid
+                        grid-template-columns: 60% 1fr
+                        justify-content: space-between
+                        gap: 5px
+                        
+                        
+
+                        #weapon
+                            
+                            
+                            @extend .dark-input
+
+                        #weapon-ammo
+                            
+                            @extend .dark-input
+
+                                                                
+
+                                                                            
+            #group2
+                flex: 40%
+                #players
+                    display: flex
+                    flex-direction: column
+                    .heading-big
+                    
+
+                    #player-fields-1, #player-fields-2
+                        @extend .f-column
+
+                        #remove-button
+                            @extend .button-remove
+
+                                                
+
+                        label
+                            @extend .heading
+                            padding-bottom: 3px
+                            padding-top: 3px
+                        #teammate-area
+                            display: flex
+                            flex-direction: row
+                            align-items: center
+                            column-gap: 5px
+                            input 
+                                @extend .dark-input
+
+                        #last-game-player
+                            @extend .button-common
+                            padding-left: 15px
+                            padding-right: 15px
+                            
+
+                    #add-teammate
+                        @extend .f-row
+                        align-items: center
+                        #add-button
+                            @extend .button-add
+                            height: 21px
+                            width: 21px
+                            margin-right: 10px
+                           
+                            
+                        p
+                            @extend .heading
+                        &:hover
+                            cursor: pointer
+                            p
+                                color: #fff
+                            #add-button
+                                @extend .button-add:hover
+
+
+                                                                            
+
+                #compounds
+                    display: flex
+                    flex-direction: row
+                    max-width: 510px
+                    #control-group
+                        width: 35%
+                        flex: 1 1 35
+                        @extend .labeled-dark-input
+                        select
+                            @extend .dark-input
+                    #map-group
+                        width: 65%
+                        flex: 1 1 65
+                        display: flex
+                        flex-direction: column
+                        #map-and-compounds
+                            width: 100%
+                            #map
+                                max-width: 100%
+                                @extend .image-container
+                                object-fit: contain
+                            p
+                                @extend .name-on-map
+                        #buttons
+                
+
+
+                                            
+
+        #spaceright
+            flex: 8

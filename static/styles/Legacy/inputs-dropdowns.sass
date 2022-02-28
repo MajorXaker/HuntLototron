@@ -1,0 +1,81 @@
+@import "Basics"
+
+.dark-input
+    background-image: url('/static/images/grey-input.png')
+    background-size: 100% 100%
+    font: "Sansation-Italic" 14px
+    background-repeat: no-repeat
+    color: $goldfont
+    border: 0px solid
+    margin: 3px
+    margin-left: 0px
+    max-width: 300px
+
+    padding: 10px
+
+    &::placeholder
+        font: "Sansation-Italic" 14px
+    
+    &:focus
+        border: none
+        color: white
+        
+    
+.dropdown-menu
+    background-color: #2F3136
+    display: flex
+    flex-direction: column
+    width: 150px
+    position: absolute
+    visibility: hidden
+    font-family: "Sahitya-Regular"
+    font-size: 10px
+
+.menu-item
+    background-image: url('/static/images/menu-item.png')
+    
+    background-repeat: no-repeat 
+    color: $greyfont
+    font-family: "Sahitya-Regular"
+    font-size: 14px
+    text-decoration: none
+    margin: 3px
+    padding: 2px
+    padding-left: 10px
+
+    background-size: 100% 100%
+    &:hover
+        background-image: url('/static/images/menu-item-h.png')
+        background-size: 100% 100%
+        color: #fff
+        &:active
+            color: $goldfont
+
+.labeled-dark-input
+    @extend .f-column
+    input
+        @extend .dark-input
+    label
+        @extend .heading
+
+.beautiful-text
+    color: $goldfont
+    font-size: 26px
+    background-color: #fff
+
+.input-groups
+    @extend .f-row
+    > div
+        margin-bottom: 5px
+        margin-top: 5px
+        @extend .f-column
+        > label
+            @extend .heading
+            
+        > input
+            @extend .dark-input
+            margin: 0px
+    
+
+
+ 

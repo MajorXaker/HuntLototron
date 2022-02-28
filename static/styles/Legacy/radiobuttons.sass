@@ -1,0 +1,31 @@
+@import "Basics"
+
+    
+.radio-group
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    list-style-type: none
+    margin: 25px 0 0 0
+    padding: 0
+
+
+    input[type="radio"]
+        visibility: hidden
+        margin: 5px 5px 5px 10px
+        
+    label
+        @extend .button-common
+        position: relative
+        top: -35px
+        margin: 0px 0px -35px 0px
+
+        &:checked
+            font-family: "Sahitya-Bold"
+            cursor:pointer
+    label, input
+
+
+    input[type="radio"]:checked + label
+        color: $goldfont
+        background-image: url('/static/images/buttons/common-p.png')

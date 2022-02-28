@@ -11,6 +11,7 @@ requests = "*"
 gunicorn = "*"
 whitenoise = "*"
 typing-extensions = "*"
+django-adaptors = "*"
 
 [dev-packages]
 autopep8 = "*"

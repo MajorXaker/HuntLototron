@@ -1,0 +1,55 @@
+@import "../BasicStyle"
+
+body
+    background-color: $back-color
+    main
+        height: 800px
+        background-image: url('/static/images/back-1.png')
+        background-size: 100% 100%
+        background-repeat: no-repeat
+        display: flex
+        color: #fff
+        font-family: "sahitya-regular"
+        #spaceleft
+            order: 1
+            flex: 8
+            
+        #core
+            flex-direction: column
+            order: 2
+            flex: 84
+            display: flex
+            flex-wrap: no-wrap
+            flex-direction: column
+            justify-content: flex-start
+
+
+            #invites
+                table-layout:fixed
+                max-width: 600px
+                th
+                    text-align: left
+
+            #id_player_name, #id_hash_key, #id_also_known_as
+                @extend .dark-input
+        
+
+            .submit-btn
+                border: 0px
+                box-shadow: 0px
+                width: 150px
+                @extend .button-common
+
+            .controls
+                display: flex
+                flex-direction: row
+                gap: 10px
+
+                align-items: stretch
+                
+
+        
+        #spaceright
+            order: 3
+            flex: 8
+            

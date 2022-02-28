@@ -1,0 +1,61 @@
+@import "BasicStyle"
+
+body
+    background-color: $back-color
+    main
+        height: 800px
+        background-image: url('/static/images/back-1.png')
+        background-size: 100% 100%
+        background-repeat: no-repeat
+        display: flex
+        color: #fff
+        font-family: "sahitya-regular"
+        #spaceleft
+            flex: 8
+            
+        #core
+            flex-direction: column
+            flex: 84
+            display: flex
+            flex-wrap: no-wrap
+            flex-direction: column
+            justify-content: flex-start
+
+            #table-header
+                display: flex
+                flex-direction: row
+
+                #description
+                    flex: 1 1 80
+                    p
+                        max-width: 500px
+                        min-width: 300px
+                #add
+                    flex: 1 1 20
+                    min-width: 200px
+                    display: flex
+                    justify-content: center
+                    align-items: center
+                    margin: 10px
+
+                    #add-match
+                        max-width: 180px
+                        min-width: 150px
+                        @extend .button-common
+                        
+            p
+                margin-top: 4px
+                margin-bottom: 4px
+            
+            table
+                margin-top: 20px
+                th
+                    @extend .heading
+                    font-size: 1.25em
+                td
+                    text-align: center
+
+        
+        #spaceright
+            flex: 8
+            
