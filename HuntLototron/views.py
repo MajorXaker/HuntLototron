@@ -14,7 +14,7 @@ import csv
 from stats.models import Map
 
 
-from HuntLototron.base_constructs import ViewBaseConstruct
+# from HuntLototron.base_constructs import ViewBaseConstruct
 # try to use base base constructs of views, so reducing a need to duplicate code
 
 # Create your views here.
@@ -24,6 +24,7 @@ from HuntLototron.base_constructs import ViewBaseConstruct
 def home(request):
     user = AuxClass.credentials_to_dict(request)
 
+    # output = render (request, "landing.html") #temporary! delete
     output = render (request, "landing.html", {"user":user})
     return HttpResponse(output)
 
@@ -345,6 +346,9 @@ class ProfileSettings(View):
 
         # return render (request, "registration/profile.html", context)
         return render(request, 'registration/profile_settings.html', context)
+
+
+
 
 # def account_activation_sent(request):
 #     return render(request, 'account_activation_sent.html')

@@ -172,37 +172,6 @@ class Compound(models.Model):
     
 
 
-
-class Kit(models.Model):
-    # TODO delete kit model
-    
-    primary_weapon = models.ForeignKey(Weapon, on_delete=models.PROTECT, related_name='primary_weapon')
-    primary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, related_name='primary_weapon_ammo_A', default=AmmoType.objects.get(name="Standard").id)
-    primary_ammo_B = models.ForeignKey(AmmoType, on_delete=models.PROTECT, related_name='primary_weapon_ammo_B', default=AmmoType.objects.get(name="None").id)
-    secondary_weapon = models.ForeignKey(Weapon, on_delete=models.PROTECT, related_name='secondary_weapon')
-    secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, related_name='secondary_weapon_ammo_A', default=AmmoType.objects.get(name="Standard").id)
-    secondary_ammo_B = models.ForeignKey(AmmoType, on_delete=models.PROTECT, related_name='secondary_weapon_ammo_B', default=AmmoType.objects.get(name="None").id)
-
-    popularity = models.IntegerField(default=0)
-
-    def __str__(self) -> str:
-
-        def using_ammo(ammo_a, ammo_b):
-            ammos = [ammo_a, ammo_b]
-            ammo_2_ignore = [
-                AmmoType.objects.get(name="Standard"),
-                AmmoType.objects.get(name="None")
-            ]
-            ammos = [ammo.name for ammo in ammos if ammo not in ammo_2_ignore]
-
-            if len(ammos) == 0:
-                return ""
-            else:
-                return " ("+"+".join(ammos)+")"    
-        return self.primary_weapon.name + using_ammo(self.primary_ammo_A, self.primary_ammo_B) + " + " + self.secondary_weapon.name + using_ammo(self.secondary_ammo_A, self.secondary_ammo_B)
-    
-
-
 class Match(models.Model):
     #TODO validator for winloss
 
@@ -256,7 +225,7 @@ class Match(models.Model):
         AmmoType, 
         on_delete=models.PROTECT, 
         related_name='player_1_primary_weapon_ammo_B', 
-        default=AmmoType.objects.get(name="None").id,
+        default=None,
         null=True,
         blank=True,
         )
@@ -277,7 +246,7 @@ class Match(models.Model):
     player_1_secondary_ammo_B = models.ForeignKey(AmmoType, 
         on_delete=models.PROTECT, 
         related_name='player_1_secondary_weapon_ammo_B', 
-        default=AmmoType.objects.get(name="None").id,
+        default=None,
         null=True,
         blank=True,
         )
@@ -337,7 +306,7 @@ class Match(models.Model):
         AmmoType, 
         on_delete=models.PROTECT, 
         related_name='player_2_primary_weapon_ammo_B', 
-        default=AmmoType.objects.get(name="None").id,
+        default=None,
         null=True,
         blank=True,
         )
@@ -358,7 +327,7 @@ class Match(models.Model):
     player_2_secondary_ammo_B = models.ForeignKey(AmmoType, 
         on_delete=models.PROTECT, 
         related_name='player_2_secondary_weapon_ammo_B', 
-        default=AmmoType.objects.get(name="None").id,
+        default=None,
         null=True,
         blank=True,
         )
@@ -409,7 +378,7 @@ class Match(models.Model):
         AmmoType, 
         on_delete=models.PROTECT, 
         related_name='player_3_primary_weapon_ammo_A', 
-        default=AmmoType.objects.get(name="Standard").id,
+        # default=AmmoType.objects.get(name="Standard").id,
         null=True,
         blank=True,
         )
@@ -417,7 +386,7 @@ class Match(models.Model):
         AmmoType, 
         on_delete=models.PROTECT, 
         related_name='player_3_primary_weapon_ammo_B', 
-        default=AmmoType.objects.get(name="None").id,
+        # default=AmmoType.objects.get(name="None").id,
         null=True,
         blank=True,
         )
@@ -431,14 +400,14 @@ class Match(models.Model):
         )
     player_3_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, 
         related_name='player_3_secondary_weapon_ammo_A', 
-        default=AmmoType.objects.get(name="Standard").id,
+        # default=AmmoType.objects.get(name="Standard").id,
         null=True,
         blank=True,
         )
     player_3_secondary_ammo_B = models.ForeignKey(AmmoType, 
         on_delete=models.PROTECT, 
         related_name='player_3_secondary_weapon_ammo_B', 
-        default=AmmoType.objects.get(name="None").id,
+        # default=AmmoType.objects.get(name="None").id,
         null=True,
         blank=True,
         )

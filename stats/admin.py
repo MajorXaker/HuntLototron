@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Kit, Player, Compound, Map, Match, AmmoType
+from .models import Player, Compound, Map, Match, AmmoType
 
 # Register your models here.
 
@@ -20,4 +20,4 @@ admin.site.register(Match, Match_admin)
 admin.site.register(Map)
 admin.site.register(Compound, Compound_admin)
 admin.site.register(AmmoType)
-admin.site.register(Kit)
+# admin.site.register(Kit) # RIP KIT, u wont be forgotten

@@ -53,7 +53,7 @@
 
         margin-left: 10px;
         margin-right: 10px;
-        width: 125px;
+        width: 180px;
 
         display: flex;
         align-items: center;
@@ -69,6 +69,7 @@
 
       .tab:hover {
         background-image: url("/static/images/division_hover.png");
+        background-size: 100% 100%;
         color: #F0B385;
       }
 
@@ -95,8 +96,8 @@
       
       <div class="tabs">
         <a href="{% url 'home' %}" class="tab">HOME</a>
-        <a href="{% url 'roulette:index' %}" class="tab">ROULETTE</a>
         <a href="{% url 'stats:table' %}" class="tab">STATS TABLE</a>
+        <a href="{% url 'roulette:index' %}" class="tab">ROULETTE</a>
       </div>
       
       <div class="user_area">

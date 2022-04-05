@@ -12,6 +12,7 @@ gunicorn = "*"
 whitenoise = "*"
 typing-extensions = "*"
 django-adaptors = "*"
+psycopg2 = "*"
 
 [dev-packages]
 autopep8 = "*"
