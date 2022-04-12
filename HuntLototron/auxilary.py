@@ -6,13 +6,16 @@ from typing_extensions import Required
 
 # from numpy import mat
 from roulette.models import Weapon
-from stats.models import Match, Compound
 
-from stats.models import AmmoType, Player, Map
+
+
 from django.contrib.auth.models import User
 import datetime
 import re
 from datetime import datetime as dt
+
+from stats.models.ammotype import AmmoType
+from stats.models.player import Player
 
 
 class AuxClass():
@@ -309,7 +312,7 @@ class MatchesDecoder():
                             self.good_data[player] = Player.objects.get(also_known_as = playername)
                         except Player.DoesNotExist:
                             try:
-                                self.good_data[player] = User.objects.get(username = playername).username_of_player
+                                self.good_data[player] = get(username = playername).username_of_player
                             except User.DoesNotExist:
                                 self.match_fail(f'Player "{playername}" of column "{player}" is not found.')
                 

@@ -1,0 +1,13 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:14-alpine
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data/pgdata
+    environment:
+      POSTGRES_USER: djangoadmins
+      POSTGRES_PASSWORD: de1213fe
+      POSTGRES_DB: huntlototron
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"

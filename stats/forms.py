@@ -1,10 +1,11 @@
 from django import forms
 
 from roulette.models import Weapon
-from stats.models import AmmoType, Compound, Player, Map
+from .models.match import Match
+
 from .validators import InRangeValidator, ListedValueValidator, NonNegativeValidator
 from django.utils.translation import gettext_lazy as _
-from .models import Match
+
 from django.contrib.auth.models import User
 
 class MatchAddForm(forms.ModelForm):

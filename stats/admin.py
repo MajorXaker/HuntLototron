@@ -1,8 +1,15 @@
 from django.contrib import admin
 
-from .models import Player, Compound, Map, Match, AmmoType
+
+
 
 # Register your models here.
+from stats.models.ammotype import AmmoType
+from stats.models.compound import Compound
+from stats.models.map import Map
+from stats.models.match import Match
+from stats.models.player import Player
+
 
 class Match_admin(admin.ModelAdmin):
     list_display = ("id",'date','wl_status', 'player_1' , 'player_2', 'player_3')

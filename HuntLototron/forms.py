@@ -1,11 +1,12 @@
 from django import forms
 
 from roulette.models import Weapon
-from stats.models import AmmoType, Compound, Player, Map
+
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from stats.models import Player
+
+from stats.models.player import Player
 from stats.validators import UniqueAKAValidator, HashkeyExists
 
 

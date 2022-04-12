@@ -4,14 +4,14 @@ from django.contrib.auth.models import User
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic.base import View
-from stats.models import Match, Player
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from HuntLototron.auxilary import AuxClass, MatchesDecoder
 from itertools import chain
 from operator import attrgetter
 from .forms import RedeemHashInvite, RegistrationFormA, UserSettingsForm, CreateHashInvite, CSVUploadForm
 import csv
-from stats.models import Map
+
 
 
 # from HuntLototron.base_constructs import ViewBaseConstruct
@@ -159,7 +159,7 @@ def HashDelete(request, hash_key):
         # do smth if mathes are found TBD
         # for example change with unknown player
         
-        unknown_player = User.objects.get(username='UnknownHunter').username_of_player
+        unknown_player = get(username='UnknownHunter').username_of_player
         for match in matches_as_list:
             match.swap_players(hashed_player, unknown_player)
         hashed_player.delete()
@@ -227,7 +227,7 @@ class ProfileSettings(View):
 
     def get(self, request):
         user = AuxClass.credentials_to_dict(request)
-        player = User.objects.get(username = user['username']).username_of_player
+        player = get(username = user['username']).username_of_player
         
         active_user = user['user']
         active_user_invited = Player.objects.filter(created_by = active_user)
@@ -260,7 +260,7 @@ class ProfileSettings(View):
         if 'settings_update' in request.POST.keys():
             user = AuxClass.credentials_to_dict(request)
 
-            player = User.objects.get(username = user['username']).username_of_player
+            player = get(username = user['username']).username_of_player
 
             
             
