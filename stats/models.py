@@ -34,7 +34,7 @@ class Player(models.Model):
 
     username = models.OneToOneField(
         User,
-        on_delete=models.SET( User.objects.get(username='UnknownHunter').pk),
+        # on_delete=models.SET( User.objects.get(username='UnknownHunter').pk),
         validators=[username_validator],
         related_name="username_of_player",
         null=True,
@@ -298,7 +298,7 @@ class Match(models.Model):
         AmmoType, 
         on_delete=models.PROTECT, 
         related_name='player_2_primary_weapon_ammo_A', 
-        default=AmmoType.objects.get(name="Standard").id,
+        # default=AmmoType.objects.get(name="Standard").id,
         null=True,
         blank=True,
         )
@@ -320,7 +320,7 @@ class Match(models.Model):
         )
     player_2_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, 
         related_name='player_2_secondary_weapon_ammo_A', 
-        default=AmmoType.objects.get(name="Standard").id,
+        # default=AmmoType.objects.get(name="Standard").id,
         null=True,
         blank=True,
         )
