@@ -112,13 +112,6 @@ class Player(models.Model):
         
 
 
-    # def service_name(self):
-    #     if self.use_alternative_name:
-    #         return 'a.' + self.also_known_as
-    #     else:
-    #         return 'u.' + self.username.username
-
-
     encode = False
 
     def __str__(self) -> str:
