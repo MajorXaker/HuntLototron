@@ -1,0 +1,2 @@
+push local database:PGUSER=djangoadmins PGPASSWORD=de1213fe heroku 
+pg:push postgres://localhost/Lototrone d7tfo8fusm9ev6
