@@ -35,6 +35,7 @@ class Player(models.Model):
     username = models.OneToOneField(
         User,
         # on_delete=models.SET( User.objects.get(username='UnknownHunter').pk),
+        on_delete=models.PROTECT,
         validators=[username_validator],
         related_name="username_of_player",
         null=True,
