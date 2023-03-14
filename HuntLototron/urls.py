@@ -15,21 +15,44 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from . import views
+
+import HuntLototron.views.home
+import HuntLototron.views.match_export
+import HuntLototron.views.profile
+import HuntLototron.views.profile_settings
+import HuntLototron.views.registration
 
 # app_name = 'core'
 
 urlpatterns = [
-    path('', views.home, name="home"),
-    path('admin/', admin.site.urls),
-    path('roulette/', include('roulette.urls')),
-    path('stats/', include('stats.urls')),
-    path('accounts/profile', views.ProfilePage.as_view(), name='profile'),
-    path('accounts/profile/edit', views.ProfileSettings.as_view(), name='profile_settings'),
-    path('accounts/', include('django.contrib.auth.urls')),
-    path('accounts/register', views.RegistrationPage.as_view(), name='register'),
-    path('accounts/profile/edit/delete/<str:hash_key>', views.HashDelete, name = "hash_delete"),
-    path('accounts/profile/csv', views.export_Matches, name='export_csv'),
-
+    path("", HuntLototron.views.home.home, name="home"),
+    path("admin/", admin.site.urls),
+    path("roulette/", include("roulette.urls")),
+    path("stats/", include("stats.urls")),
+    path(
+        "accounts/profile",
+        HuntLototron.views.profile.ProfilePage.as_view(),
+        name="profile",
+    ),
+    path(
+        "accounts/profile/edit",
+        HuntLototron.views.profile_settings.ProfileSettings.as_view(),
+        name="profile_settings",
+    ),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path(
+        "accounts/register",
+        HuntLototron.views.registration.RegistrationPage.as_view(),
+        name="register",
+    ),
+    path(
+        "accounts/profile/edit/delete/<str:hash_key>",
+        HuntLototron.views.profile.delete_hash,
+        name="delete_hash",
+    ),
+    path(
+        "accounts/profile/csv",
+        HuntLototron.views.match_export.export_Matches,
+        name="export_csv",
+    ),
 ]
-
