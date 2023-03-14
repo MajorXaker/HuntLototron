@@ -1,64 +1,62 @@
 import re
-from typing import Type
 
 from django.core import validators
+from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-
-
 
 
 @deconstructible
 class ASCIIUsernameValidator(validators.RegexValidator):
-    regex = r'^[\w.@+-]+\Z'
+    regex = r"^[\w.@+-]+\Z"
     message = _(
-        'Enter a valid username. This value may contain only English letters, '
-        'numbers, and @/./+/-/_ characters.'
+        "Enter a valid username. This value may contain only English letters, "
+        "numbers, and @/./+/-/_ characters."
     )
     flags = re.ASCII
 
 
 @deconstructible
 class UnicodeUsernameValidator(validators.RegexValidator):
-    regex = r'^[\w.@+-]+\Z'
+    regex = r"^[\w.@+-]+\Z"
     message = _(
-        'Enter a valid username. This value may contain only letters, '
-        'numbers, and @/./+/-/_ characters.'
+        "Enter a valid username. This value may contain only letters, "
+        "numbers, and @/./+/-/_ characters."
     )
     flags = 0
+
 
 @deconstructible
 class UnicodeAndSpaceValidator(validators.RegexValidator):
-    regex = r'^[\w\s.@+-]+\Z'
+    regex = r"^[\w\s.@+-]+\Z"
     message = _(
-        'Enter a valid username. This value may contain only letters, '
-        'numbers, spaces and @/./+/-/_ characters.'
+        "Enter a valid username. This value may contain only letters, "
+        "numbers, spaces and @/./+/-/_ characters."
     )
     flags = 0
 
+
 @deconstructible
 class NonNegativeValidator(validators.MinValueValidator):
-    '''Checks whether value is not negative
+    """Checks whether value is not negative
     Parameters
     ---
     input_type : str - What kind of value cannot be negative
     it is used here: Value of {input_type} cannot be negative
-    '''
+    """
+
     def __init__(self, input_type):
-
-        super().__init__(limit_value = 0, message='')
+        super().__init__(limit_value=0, message="")
         self.limiting_type = input_type
-        self.message =_( f'Value of {input_type} cannot be negative')
-
+        self.message = _(f"Value of {input_type} cannot be negative")
 
     limit_value = 0
 
 
 @deconstructible
 class InRangeValidator(validators.BaseValidator):
-    '''this validator accepts only int and float, any other value will be converted into 0'''
-    
+    """this validator accepts only int and float, any other value will be converted into 0"""
+
     def clean_compare_list(self, compare_list):
         try:
             val_1 = compare_list[0]
@@ -71,53 +69,49 @@ class InRangeValidator(validators.BaseValidator):
             except IndexError:
                 val_2 = 0
 
-        if not isinstance(val_1,(float, int)):
+        if not isinstance(val_1, (float, int)):
             val_1 = 0
-        if not isinstance(val_2,(float, int)):
+        if not isinstance(val_2, (float, int)):
             val_2 = 0
-        
+
         return (val_1, val_2)
 
-    def __init__(self, limit_value, message='') -> None:
+    def __init__(self, limit_value, message="") -> None:
         low = min(limit_value)
         high = max(limit_value)
-        message = _(f'Value should be between {low} and {high}. Please correct.')
+        message = _(f"Value should be between {low} and {high}. Please correct.")
         super().__init__(limit_value, message=message)
-        
+
     def compare(self, value, compare_with):
         list_2_compare = self.clean_compare_list(compare_with)
 
-        return (
-            value < min(list_2_compare) or
-            value > max(list_2_compare)
-        )
-
-        
+        return value < min(list_2_compare) or value > max(list_2_compare)
 
 
-    
 @deconstructible
 class ListedValueValidator(validators.BaseValidator):
     def compare(self, value, compare_with):
         return not value in compare_with
 
-    def __init__(self, limit_value, type_to_sum = '', message = None) -> None:
-        limits_readable = ''
+    def __init__(self, limit_value, type_to_sum="", message=None) -> None:
+        limits_readable = ""
         for value in limit_value:
-            limits_readable = limits_readable + str(value) + ', '
+            limits_readable = limits_readable + str(value) + ", "
         limits_readable = limits_readable[:-2]
         if message == None:
-            message = _(f'Value should be one of the following: {limits_readable}. Please correct.')
+            message = _(
+                f"Value should be one of the following: {limits_readable}. Please correct."
+            )
         super().__init__(limit_value, message=message)
+
 
 @deconstructible
 class SumValidator(validators.BaseValidator):
-
     def clean_compare_list(self, compare_list):
         try:
             compare_list = list(compare_list)
             for value in compare_list:
-                if not isinstance(value,(float, int)):
+                if not isinstance(value, (float, int)):
                     value = 0
         except TypeError:
             compare_list = [compare_list]
@@ -125,33 +119,41 @@ class SumValidator(validators.BaseValidator):
     def compare(self, value, compare_with):
         list_2_compare = self.clean_compare_list(compare_with)
         return not value == sum(compare_with)
-        
-    def __init__(self, limit_value, type_to_sum = 'parts', message=None) -> None:
-        if message == None:   
-            message = _(f'Given number doesnt match the sum of {type_to_sum}. Please correct.')
+
+    def __init__(self, limit_value, type_to_sum="parts", message=None) -> None:
+        if message == None:
+            message = _(
+                f"Given number doesnt match the sum of {type_to_sum}. Please correct."
+            )
         super().__init__(limit_value, message=message)
+
 
 @deconstructible
 class WeaponsValidator(validators.BaseValidator):
-    '''This validator checks that you have not taken 3+3 weapons and unsupported ammo'''
+    """This validator checks that you have not taken 3+3 weapons and unsupported ammo"""
+
     pass
+
 
 @deconstructible
 class UniqueAKAValidator(validators.BaseValidator):
-    def __init__(self, class_to_val = None, message = None) -> None:
+    def __init__(self, class_to_val=None, message=None) -> None:
         limit_value = class_to_val
         super().__init__(limit_value, message=message)
 
     def __call__(self, value):
         cleaned = self.clean(value)
-        params = {'limit_value': self.limit_value, 'show_value': cleaned, 'value': value}
+        params = {
+            "limit_value": self.limit_value,
+            "show_value": cleaned,
+            "value": value,
+        }
         if self.compare(cleaned, self.limit_value):
             raise ValidationError(self.message, code=self.code, params=params)
-        
 
     def compare(self, value, limit_value) -> bool:
         try:
-            limit_value.objects.get(also_known_as = value)
+            limit_value.objects.get(also_known_as=value)
         except limit_value.DoesNotExist:
             check = False
         else:
@@ -159,12 +161,12 @@ class UniqueAKAValidator(validators.BaseValidator):
 
         return check
 
-@deconstructible
-class HashkeyExists(UniqueAKAValidator):   
 
+@deconstructible
+class HashkeyExists(UniqueAKAValidator):
     def compare(self, value, limit_value) -> bool:
         try:
-            limit_value.objects.get(hash_key = value)
+            limit_value.objects.get(hash_key=value)
         except limit_value.DoesNotExist:
             check = True
         else:

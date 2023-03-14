@@ -14,9 +14,11 @@ typing-extensions = "*"
 django-adaptors = "*"
 psycopg2 = "*"
 dj-database-url = "*"
+dynaconf = "*"
+arrow = "*"
 
 [dev-packages]
-autopep8 = "*"
+black = "*"
 
 [requires]
-python_version = "3.8"
+python_version = "3.11"

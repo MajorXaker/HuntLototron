@@ -4,15 +4,17 @@ from .models import Player, Compound, Map, Match, AmmoType
 
 # Register your models here.
 
+
 class Match_admin(admin.ModelAdmin):
-    list_display = ("id",'date','wl_status', 'player_1' , 'player_2', 'player_3')
+    list_display = ("id", "date", "wl_status", "player_1", "player_2", "player_3")
 
 
 class Compound_admin(admin.ModelAdmin):
     list_display = ("name", "from_map")
 
+
 class Player_Admin(admin.ModelAdmin):
-    list_display = ('username', 'also_known_as')
+    list_display = ("username", "also_known_as")
 
 
 admin.site.register(Player, Player_Admin)
