@@ -53,7 +53,7 @@ class ProfilePage(LoginRequiredMixin, View):
     def post(self, request):
         user = AuxClass.credentials_to_dict(request)
         csv_form = CSVUploadForm(request.POST, request.FILES)
-        player = request.user.username_of_player
+        player = request.user.username
 
         if csv_form.is_valid():
             print('Form valid')
@@ -177,7 +177,7 @@ def export_Matches(request):
         headers={'Content-Disposition': 'attachment; filename="matches.csv"'},
     )
  
-    player = request.user.username_of_player
+    player = request.user.username
 
     #3 queries with the name of active player
     p1_group = Match.objects.filter(player_1 = player)
@@ -317,7 +317,7 @@ class ProfileSettings(View):
                     matches_with_hashed_player = list(chain(matches_with_hashed_player_as_1, matches_with_hashed_player_as_2, matches_with_hashed_player_as_3))
                     
                     try:
-                        [match.swap_players(hashed_player, active_user.username_of_player) for match in matches_with_hashed_player]
+                        [match.swap_players(hashed_player, active_user.username) for match in matches_with_hashed_player]
                     except Match.PlayerDuplicationError:
                         additional['is_redeem_message'] = True
                         additional['redeem_message'] = f'Redeeming this hash-invite would lead to player duplication in match. Redeem denied.'

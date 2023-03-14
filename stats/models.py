@@ -16,7 +16,7 @@ import hashlib
 
 
 class Player(models.Model):
-    def encode_md5(*strings):
+    def encode_md5(self, *strings):
         '''Connects any number of values into a single string, then MD5es it.
         Returns 32 char hex string. Truncate it if you need.
         '''

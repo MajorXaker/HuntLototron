@@ -32,7 +32,7 @@ def show_stats_table(request):
         p2_group = Match.objects.filter(player_2 = look_for_user)
         p3_group = Match.objects.filter(player_3 = look_for_user)
         
-        if request.user.username_of_player.show_only_my_matches:
+        if request.user.username.show_only_my_matches:
             filtered_matches = []
         else:
             #other matches group
@@ -66,11 +66,11 @@ def show_match_detail(request, match_id):
 
         open_for_browsing = (
             request.user.is_staff,
-            request.user.username_of_player in match.players(is_class = True),
+            request.user.username in match.players(is_class = True),
             match.display_allowed()
         ) # one TRUE result lets us to see the match
 
-        if not request.user.username_of_player in match.players(is_class = True):
+        if not request.user.username in match.players(is_class = True):
             match.set_encoding()
            
 
@@ -104,7 +104,7 @@ class AddMatch(View):
         user = AuxClass.credentials_to_dict(request)
 
         initial_data = {
-            'player_1': request.user.username_of_player,
+            'player_1': request.user.username,
             
         }
 
