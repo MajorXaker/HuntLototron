@@ -5,9 +5,8 @@ from . import views
 # movies/1/details
 
 app_name = "roulette"
-#нужно чтобы делать линки вот такого типа "movies:detail" в хтмл разметке
+# нужно чтобы делать линки вот такого типа "movies:detail" в хтмл разметке
 
 urlpatterns = [
-    path('', views.index, name = "index"),
-
+    path("", views.index, name="index"),
 ]

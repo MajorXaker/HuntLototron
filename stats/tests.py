@@ -1,6 +1,6 @@
 import csv
 
-#as always, something in my system changes the current dir to F:/Git
+# as always, something in my system changes the current dir to F:/Git
 
 
 # with open("data.csv", "w") as file:
@@ -9,7 +9,7 @@ import csv
 #     writer.writerow([1000,1,5])
 #     writer.writerow([1001,2,15])
 
-t = {'aaa': 5, 'bbb':6}
+t = {"aaa": 5, "bbb": 6}
 for key, value in t.items():
-    print(f'Key {key}')
-    print(f'Value {value}')
+    print(f"Key {key}")
+    print(f"Value {value}")

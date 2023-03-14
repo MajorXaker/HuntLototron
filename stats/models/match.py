@@ -1,190 +1,32 @@
-from email.policy import default
-from typing_extensions import Required
-from django.core import validators
-import hashlib
-from django.db import models
-from roulette.models import Weapon
-from django.contrib.auth.models import User
 import datetime
-from .validators import InRangeValidator, ListedValueValidator, SumValidator, UnicodeUsernameValidator, NonNegativeValidator, UnicodeAndSpaceValidator
-from django.utils.translation import gettext_lazy as _
 import hashlib
 
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
-
-
-
-class Player(models.Model):
-    def encode_md5(self, *strings):
-        '''Connects any number of values into a single string, then MD5es it.
-        Returns 32 char hex string. Truncate it if you need.
-        '''
-        s_combined = ''.join(strings)
-        s_unspaced = [char for char in s_combined if char != ' ']
-        s_bytes = bytes(''.join(s_unspaced), encoding='utf-8')
-        code = hashlib.md5()
-        code.update(s_bytes)
-        encoded = code.hexdigest()
-        return encoded
-
-
-    username_validator = UnicodeUsernameValidator()
-    
-
-    username = models.OneToOneField(
-        User,
-        # on_delete=models.SET( User.objects.get(username='UnknownHunter').pk),
-        on_delete=models.PROTECT,
-        validators=[username_validator],
-        related_name="username_of_player",
-        null=True,
-        blank=True,
-        unique=False,
-        )
-    use_alternative_name = models.BooleanField(default=False)
-    also_known_as = models.CharField(
-        max_length=50, 
-        verbose_name="Also known as", 
-        blank=True,
-        validators = [UnicodeAndSpaceValidator(),],
-        
-        )
-    allow_see_mathes = models.BooleanField(
-        _("Allow other users see your matches."),
-        default=False,
-        )
-    allow_see_name = models.BooleanField(
-        _("Allow other users see your matches and your name."),
-        default=False,
-        )
-    show_only_my_matches = models.BooleanField(
-        _("Display only matches, where you have participated."),
-        default=True,
-        )
-    verified_user = models.BooleanField(
-        _("Allow stats of this player be used in common statistics."),
-        default=False,
-        )
-
-    hash_key = models.CharField(
-        # It is used to bind non user profile to real user profile. So registred players could create accouts of their friends.
-        # Because it's impossible to use anonymous player in matches.
-        _("Hash key of this user."), 
-        max_length=32,
-        null=True,
-        blank=True,
-        )
-
-    hash_redeemable = models.BooleanField(
-        # Restriction. No one should be able to bind a real account.
-        _("May be redeemed by a user"),
-        default=False,
-        )
-
-    show_tooltips = models.BooleanField(
-        _("States whether tooltips and usage hints are visible."),
-        # TODO Tooltips
-        default=True
-        )
-    
-    created_by = models.ForeignKey(
-        User, 
-        verbose_name=_("Showss who is the creator of this player. It's used only while player is not assigned to a user."), 
-        on_delete=models.SET( User.objects.get(username='UnknownHunter').pk),
-        related_name= 'creator', # do I even need this if 'Player.objects.filter(created_by = active_user)' 
-        blank = True,
-        null = True,
-        )
-
-    may_be_duplicate = models.BooleanField(
-        _("Allows this player to have duplicate in match. Service field."),
-        default = False
-        )
-
-    
-
-    def update(self, user):
-        
-        self.also_known_as = ''
-        self.use_alternative_name = False
-        self.username = user
-        
-
-
-    encode = False
-
-    def __str__(self) -> str:
-        encode = self.encode
-        if self.use_alternative_name:
-            
-            result =  self.also_known_as
-        else:
-            try:
-                result =  self.username.username
-            except AttributeError:
-                #needed to look for players which have no username
-                result = self.also_known_as
-
-        if encode:
-            return 'Player '+ self.encode_md5(result)[:6]
-        else:
-            return result
-
-    # def get_name(self):
-    #     return str(self)
-    
-
-class AmmoType(models.Model):
-    name = models.CharField(max_length=50, blank=False)
-
-    def __str__(self) -> str:
-        return self.name
-
-class Map(models.Model):
-    name = models.CharField(primary_key=True, max_length=80)
-
-
-    def __str__(self) -> str:
-        return self.name
-
-
-class Compound(models.Model):
-    name = models.CharField(primary_key=True, max_length=80)
-    from_map = models.ForeignKey(Map, verbose_name="Map", on_delete=models.PROTECT, default=None)
-    double_clue = models.BooleanField()
-    #idk why i may need theese, but i create it for later
-    #atm these values are used in JS, stil i doubt that it's a good idea to pull them every time from DB
-    #yet if i need to correct them i'll just correct values in db
-    #it will require wiring frontend js to db
-    x_relative = models.FloatField(default= -2)
-    y_relative = models.FloatField(default= -2)
-
-    def __str__(self) -> str:
-        return self.name
-
-    
+from . import Map, AmmoType, Compound, Player, Weapon
+from stats.validators import ListedValueValidator, NonNegativeValidator
 
 
 class Match(models.Model):
     #TODO validator for winloss
 
     wl_status = models.FloatField(
-        blank=False, 
+        blank=False,
         default=0,
         validators=[ListedValueValidator((0,0.5,1))]
         )
     date = models.DateField(  default=datetime.date.today)
     kills_total = models.IntegerField(
-        blank=False, 
+        blank=False,
         default=0
-        
+
         )
     playtime = models.DurationField(blank=False)
 
     map = models.ForeignKey(
-        Map, 
-        verbose_name=_("Map of the match"), 
+        Map,
+        verbose_name=_("Map of the match"),
         on_delete=models.PROTECT,
         related_name="map_of_match",
         blank=True,
@@ -197,49 +39,49 @@ class Match(models.Model):
     deaths_validators = [NonNegativeValidator(_("deaths")),]
     bounty_validators = [NonNegativeValidator(_('bounty')),]
 
-    
+
     #each player have it's own data fields
     #player 1 is mandatory - he creates a match class instance
     player_1 = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='player_1_name')
 
     player_1_primary_weapon = models.ForeignKey(
-        Weapon, 
-        on_delete=models.PROTECT, 
+        Weapon,
+        on_delete=models.PROTECT,
         related_name='player_1_primary_weapon',
         null=True,
         )
     player_1_primary_ammo_A = models.ForeignKey(
-        AmmoType, 
-        on_delete=models.PROTECT, 
-        related_name='player_1_primary_weapon_ammo_A', 
+        AmmoType,
+        on_delete=models.PROTECT,
+        related_name='player_1_primary_weapon_ammo_A',
         default=AmmoType.objects.get(name="Standard").id,
         null=True,
         )
     player_1_primary_ammo_B = models.ForeignKey(
-        AmmoType, 
-        on_delete=models.PROTECT, 
-        related_name='player_1_primary_weapon_ammo_B', 
+        AmmoType,
+        on_delete=models.PROTECT,
+        related_name='player_1_primary_weapon_ammo_B',
         default=None,
         null=True,
         blank=True,
         )
 
     player_1_secondary_weapon = models.ForeignKey(
-        Weapon, 
-        on_delete=models.PROTECT, 
+        Weapon,
+        on_delete=models.PROTECT,
         related_name='player_1_secondary_weapon',
         null=True,
 
         )
-    player_1_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, 
-        related_name='player_1_secondary_weapon_ammo_A', 
+    player_1_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT,
+        related_name='player_1_secondary_weapon_ammo_A',
         default=AmmoType.objects.get(name="Standard").id,
         null=True,
 
         )
-    player_1_secondary_ammo_B = models.ForeignKey(AmmoType, 
-        on_delete=models.PROTECT, 
-        related_name='player_1_secondary_weapon_ammo_B', 
+    player_1_secondary_ammo_B = models.ForeignKey(AmmoType,
+        on_delete=models.PROTECT,
+        related_name='player_1_secondary_weapon_ammo_B',
         default=None,
         null=True,
         blank=True,
@@ -274,53 +116,53 @@ class Match(models.Model):
 
 
     #other players info may be also given
-    player_2 = models.ForeignKey(Player, 
-        on_delete=models.PROTECT, 
-        related_name='player_2_name', 
-        null=True, 
-        blank=True
-    )
+    player_2 = models.ForeignKey(Player,
+                                 on_delete=models.PROTECT,
+                                 related_name='player_2_name',
+                                 null=True,
+                                 blank=True
+                                 )
     player_2_primary_weapon = models.ForeignKey(
-        Weapon, 
-        on_delete=models.PROTECT, 
+        Weapon,
+        on_delete=models.PROTECT,
         related_name='player_2_primary_weapon',
         null=True,
         blank=True,
-       
+
         )
     player_2_primary_ammo_A = models.ForeignKey(
-        AmmoType, 
-        on_delete=models.PROTECT, 
-        related_name='player_2_primary_weapon_ammo_A', 
+        AmmoType,
+        on_delete=models.PROTECT,
+        related_name='player_2_primary_weapon_ammo_A',
         # default=AmmoType.objects.get(name="Standard").id,
         null=True,
         blank=True,
         )
     player_2_primary_ammo_B = models.ForeignKey(
-        AmmoType, 
-        on_delete=models.PROTECT, 
-        related_name='player_2_primary_weapon_ammo_B', 
+        AmmoType,
+        on_delete=models.PROTECT,
+        related_name='player_2_primary_weapon_ammo_B',
         default=None,
         null=True,
         blank=True,
         )
 
     player_2_secondary_weapon = models.ForeignKey(
-        Weapon, 
-        on_delete=models.PROTECT, 
+        Weapon,
+        on_delete=models.PROTECT,
         related_name='player_2_secondary_weapon',
         null=True,
         blank=True,
         )
-    player_2_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, 
-        related_name='player_2_secondary_weapon_ammo_A', 
+    player_2_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT,
+        related_name='player_2_secondary_weapon_ammo_A',
         # default=AmmoType.objects.get(name="Standard").id,
         null=True,
         blank=True,
         )
-    player_2_secondary_ammo_B = models.ForeignKey(AmmoType, 
-        on_delete=models.PROTECT, 
-        related_name='player_2_secondary_weapon_ammo_B', 
+    player_2_secondary_ammo_B = models.ForeignKey(AmmoType,
+        on_delete=models.PROTECT,
+        related_name='player_2_secondary_weapon_ammo_B',
         default=None,
         null=True,
         blank=True,
@@ -355,52 +197,52 @@ class Match(models.Model):
         )
 
 
-    player_3 = models.ForeignKey(Player, 
-        on_delete=models.PROTECT, 
-        related_name='player_3_name', 
-        null=True, 
-        blank=True)
+    player_3 = models.ForeignKey(Player,
+                                 on_delete=models.PROTECT,
+                                 related_name='player_3_name',
+                                 null=True,
+                                 blank=True)
 
     player_3_primary_weapon = models.ForeignKey(
-        Weapon, 
-        on_delete=models.PROTECT, 
+        Weapon,
+        on_delete=models.PROTECT,
         related_name='player_3_primary_weapon',
         null=True,
         blank=True,
         )
     player_3_primary_ammo_A = models.ForeignKey(
-        AmmoType, 
-        on_delete=models.PROTECT, 
-        related_name='player_3_primary_weapon_ammo_A', 
+        AmmoType,
+        on_delete=models.PROTECT,
+        related_name='player_3_primary_weapon_ammo_A',
         # default=AmmoType.objects.get(name="Standard").id,
         null=True,
         blank=True,
         )
     player_3_primary_ammo_B = models.ForeignKey(
-        AmmoType, 
-        on_delete=models.PROTECT, 
-        related_name='player_3_primary_weapon_ammo_B', 
+        AmmoType,
+        on_delete=models.PROTECT,
+        related_name='player_3_primary_weapon_ammo_B',
         # default=AmmoType.objects.get(name="None").id,
         null=True,
         blank=True,
         )
 
     player_3_secondary_weapon = models.ForeignKey(
-        Weapon, 
-        on_delete=models.PROTECT, 
+        Weapon,
+        on_delete=models.PROTECT,
         related_name='player_3_secondary_weapon',
         null=True,
         blank=True,
         )
-    player_3_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT, 
-        related_name='player_3_secondary_weapon_ammo_A', 
+    player_3_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT,
+        related_name='player_3_secondary_weapon_ammo_A',
         # default=AmmoType.objects.get(name="Standard").id,
         null=True,
         blank=True,
         )
-    player_3_secondary_ammo_B = models.ForeignKey(AmmoType, 
-        on_delete=models.PROTECT, 
-        related_name='player_3_secondary_weapon_ammo_B', 
+    player_3_secondary_ammo_B = models.ForeignKey(AmmoType,
+        on_delete=models.PROTECT,
+        related_name='player_3_secondary_weapon_ammo_B',
         # default=AmmoType.objects.get(name="None").id,
         null=True,
         blank=True,
@@ -435,21 +277,21 @@ class Match(models.Model):
         )
 
     fights_locations = models.ManyToManyField(
-        Compound, 
+        Compound,
         verbose_name=_("Place of a firefight")
-        ) 
+        )
 
     correct_match = models.BooleanField(
         _("Match data is correct"),
         default=False)
-    
+
     external = models.BooleanField(
         _("Externally added match"),
         default = False
         )
 
     class PlayerDuplicationError(Exception):
-        '''Exception is raised when we try to assign several players which cannot have duplicates. 
+        '''Exception is raised when we try to assign several players which cannot have duplicates.
         The only players which could have its own duplicates should be Unknown Hunter (aka deleted one), Random Hunter, and maybe some other.
 
         Atributes
@@ -457,7 +299,7 @@ class Match(models.Model):
             message (optional) - in case you'd like to change this
         '''
         def __init__(self, player, message = None, *args: object) -> None:
-            
+
             if message == None:
                 self.message = f'Player {player} does not allow duplicates!'
             else:
@@ -539,7 +381,7 @@ class Match(models.Model):
         player_3_allowed = self.player_1.allow_see_mathes
 
         return player_1_allowed or player_2_allowed or player_3_allowed
-    
+
     def set_encoding(self):
         '''Enables encoding of players' names if they have not allowed others to see their names
         '''
@@ -555,7 +397,7 @@ class Match(models.Model):
                 self.player_3.encode = True
         except AttributeError:
             pass
-    
+
     def check_players_duplication(self, new_player, debug = False):
         '''Checks whether new player will cause player duplication. In most cases duplication is restricted
 
@@ -582,15 +424,15 @@ class Match(models.Model):
 
     def swap_players(self, old_player, new_player, debug = False):
         '''Swaps old and new players. In its course of work checks for duplication and raises a PlayerDuplicationError if necessary.
-        
+
         Atributes
         ---
         1st - Old player class
         2nd - New player class
-        
+
         '''
         position = self.get_player_slot(old_player, is_class=True, debug = True)
-        
+
         self.check_players_duplication(new_player, debug=debug)
 
         if position == 1:
@@ -614,7 +456,7 @@ class Match(models.Model):
             2: (self.player_2_primary_ammo_A, self.player_2_primary_ammo_B, self.player_2_secondary_ammo_A, self.player_2_secondary_ammo_B),
             3: (self.player_3_primary_ammo_A, self.player_3_primary_ammo_B, self.player_3_secondary_ammo_A, self.player_3_secondary_ammo_B)
         }
-        
+
         good_check = {
             'Correct primary ammo A' : ammo[player_slot][0] != None,
             'Correct secondary ammo A' : ammo[player_slot][2] != None,
@@ -622,6 +464,5 @@ class Match(models.Model):
             'Correct secondary ammo B' : ammo[player_slot][3] != None if weapons[player_slot][1].has_ammo_B else ammo[player_slot][3] == None,
             'Guns not exceed 5 slot limit' : True if weapons[player_slot][0].size + weapons[player_slot][1].size < 6 else False
         }
-        
+
         return (False in good_check.values() , good_check)
-        
