@@ -29,7 +29,7 @@ class AuxClass:
         }
 
         try:
-            playername = url_request.user.username.also_known_as
+            playername = url_request.user.username_of_player.also_known_as
             has_aka = True if playername != "" else False
 
         except AttributeError:

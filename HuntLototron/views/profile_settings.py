@@ -12,7 +12,7 @@ from stats.models import Player, Match
 class ProfileSettings(View):
     def get(self, request):
         user = AuxClass.credentials_to_dict(request)
-        player = User.objects.get(username=user["username"]).username
+        player = User.objects.get(username=user["username"]).username_of_player
 
         active_user = user["user"]
         active_user_invited = Player.objects.filter(created_by=active_user)

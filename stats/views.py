@@ -9,8 +9,7 @@ from django.urls import reverse
 from django.views.generic.base import View
 
 from HuntLototron.auxilary import AuxClass
-from stats.models import Match, Player
-
+from stats import models as m
 from .forms import MatchAddForm, MatchEditForm
 
 
@@ -24,22 +23,22 @@ def show_stats_table(request):
     if not request.user.is_staff:
         # we need to know whose matches are we looking for
         if user["has_aka"]:
-            look_for_user = Player.objects.get(also_known_as=user["playername"])
+            look_for_user = m.Player.objects.get(also_known_as=user["playername"])
         else:
             look_for_user = User.objects.get(
                 username=user["username"]
-            ).username
+            ).username_of_player
 
         # 3 queries with the name of active player
-        p1_group = Match.objects.filter(player_1=look_for_user)
-        p2_group = Match.objects.filter(player_2=look_for_user)
-        p3_group = Match.objects.filter(player_3=look_for_user)
+        p1_group = m.Match.objects.filter(player_1=look_for_user)
+        p2_group = m.Match.objects.filter(player_2=look_for_user)
+        p3_group = m.Match.objects.filter(player_3=look_for_user)
 
-        if request.user.username.show_only_my_matches:
+        if request.user.username_of_player.show_only_my_matches:
             filtered_matches = []
         else:
             # other matches group
-            all_matches = Match.objects.all()
+            all_matches = m.Match.objects.all()
             filtered_matches = [
                 match for match in all_matches if match.display_allowed()
             ]
@@ -55,7 +54,7 @@ def show_stats_table(request):
         result_ready.reverse()
 
     else:
-        result_ready = Match.objects.all()
+        result_ready = m.Match.objects.all()
 
     response = render(
         request, "stats_list.html", {"matches": result_ready, "user": user}
@@ -65,16 +64,16 @@ def show_stats_table(request):
 
 def show_match_detail(request, match_id):
     try:
-        match = Match.objects.get(pk=match_id)
+        match = m.Match.objects.get(pk=match_id)
         user = AuxClass.credentials_to_dict(request)
 
         open_for_browsing = (
             request.user.is_staff,
-            request.user.username in match.players(is_class=True),
+            request.user.username_of_player in match.players(is_class=True),
             match.display_allowed(),
         )  # one TRUE result lets us to see the match
 
-        if not request.user.username in match.players(is_class=True):
+        if not request.user.username_of_player in match.players(is_class=True):
             match.set_encoding()
 
         additional = {}
@@ -100,7 +99,7 @@ def show_match_detail(request, match_id):
             response = render(request, "404_or_403_match.html", status=403)
 
         return response
-    except Match.DoesNotExist:
+    except m.Match.DoesNotExist:
         return render(request, "404_or_403_match.html", status=403)
 
 
@@ -109,7 +108,7 @@ class AddMatch(View):
         user = AuxClass.credentials_to_dict(request)
 
         initial_data = {
-            "player_1": request.user.username,
+            "player_1": request.user.username_of_player,
         }
 
         form = MatchAddForm(initial=initial_data)
@@ -146,7 +145,7 @@ class EditMatch(View):
     def get(self, request, match_id):
         user = AuxClass.credentials_to_dict(request)
 
-        match_on_table = Match.objects.get(pk=match_id)
+        match_on_table = m.Match.objects.get(pk=match_id)
         form = MatchEditForm(instance=match_on_table)
         user["position"] = match_on_table.get_player_slot(user["credentials"])
         if user["position"] == 0 and request.user.is_staff == False:
@@ -167,7 +166,7 @@ class EditMatch(View):
             request.POST,
         )
 
-        match_on_table = Match.objects.get(pk=match_id)
+        match_on_table = m.Match.objects.get(pk=match_id)
         user["position"] = match_on_table.get_player_slot(user["credentials"])
 
         if form.is_valid():
@@ -192,8 +191,8 @@ def sample(request):
     user = AuxClass.credentials_to_dict(request)
 
     # aaa = Player.objects.get(also_known_as = "None")
-    em = Match.objects.get(pk=12)
-    mathes_hashed = [match.get_md5() for match in Match.objects.all()]
+    em = m.Match.objects.get(pk=12)
+    mathes_hashed = [match.get_md5() for match in m.Match.objects.all()]
 
     print(mathes_hashed)
 
