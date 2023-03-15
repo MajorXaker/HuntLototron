@@ -369,7 +369,7 @@ class MatchesDecoder:
                             try:
                                 self.good_data[player] = User.objects.get(
                                     username=playername
-                                ).username_of_player
+                                ).username
                             except User.DoesNotExist:
                                 self.match_fail(
                                     f'Player "{playername}" of column "{player}" is not found.'

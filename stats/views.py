@@ -28,7 +28,7 @@ def show_stats_table(request):
         else:
             look_for_user = User.objects.get(
                 username=user["username"]
-            ).username_of_player
+            ).username
 
         # 3 queries with the name of active player
         p1_group = Match.objects.filter(player_1=look_for_user)

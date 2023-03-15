@@ -12,7 +12,7 @@ from stats.models import Player, Match
 class ProfileSettings(View):
     def get(self, request):
         user = AuxClass.credentials_to_dict(request)
-        player = User.objects.get(username=user["username"]).username_of_player
+        player = User.objects.get(username=user["username"]).username
 
         active_user = user["user"]
         active_user_invited = Player.objects.filter(created_by=active_user)
@@ -44,7 +44,7 @@ class ProfileSettings(View):
         if "settings_update" in request.POST.keys():
             user = AuxClass.credentials_to_dict(request)
 
-            player = User.objects.get(username=user["username"]).username_of_player
+            player = User.objects.get(username=user["username"]).username
 
             if form_settings.is_valid():
                 player.also_known_as = form_settings.cleaned_data["also_known_as"]

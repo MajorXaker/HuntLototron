@@ -83,7 +83,7 @@ def delete_hash(request, hash_key):
         # do smth if mathes are found TBD
         # for example change with unknown player
 
-        unknown_player = User.objects.get(username="UnknownHunter").username_of_player
+        unknown_player = User.objects.get(username="UnknownHunter").username
         for match in matches_as_list:
             match.swap_players(hashed_player, unknown_player)
         hashed_player.delete()
