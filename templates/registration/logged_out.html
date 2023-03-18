@@ -1,7 +1,22 @@
-{% extends "pure_base.html" %}
-
+{% extends 'base.html' %}
 {% block content %}
-<p>Logged out!</p>
 
-<a href="{% url 'login'%}">Click here to login again.</a>
-{% endblock %}
+<head>
+<title>Hunt:Statsman</title>
+<link rel="stylesheet" href="/static/styles/account/logging_pages.css?{% now "U" %}">
+</head>
+    <form action = "/roulette/" method = "GET">
+        <main>
+            <div class="spaceleft"></div>
+            <div class="core">
+
+                <p>Logged out!</p>
+                <a href="{% url 'login'%}">Click here to login again.</a>
+            </div>
+            <div class="spaceright"></div>
+
+
+        </main>
+    </form>
+
+{% endblock  %}

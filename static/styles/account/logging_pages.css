@@ -31,7 +31,7 @@
   font-family: "Sansation-Light-Italic";
   src: url(/static/fonts/Sansation_Light_Italic.ttf) format("opentype");
 }
-.heading, .input-groups > div > label, .labeled-dark-input label {
+.heading, label, .input-groups > div > label, .labeled-dark-input label {
   font-family: "Sahitya-Regular", serif;
   font-size: 14px;
   color: #7F634C;
@@ -54,7 +54,7 @@
   cursor: pointer;
 }
 
-p {
+p, .column ul {
   color: #fff;
   font-family: "Sahitya-Regular", serif;
 }
@@ -245,7 +245,7 @@ a:hover {
   padding: 2px 10px;
 }
 
-.dark-input, .input-groups > div > input, .labeled-dark-input input {
+.dark-input, input, .input-groups > div > input, .labeled-dark-input input {
   background-image: url("/static/images/grey-input.png");
   background-size: 100% 100%;
   font-family: "Sansation-Italic", serif;
@@ -257,10 +257,10 @@ a:hover {
   min-width: 50px;
   padding: 10px;
 }
-.dark-input::placeholder, .input-groups > div > input::placeholder, .labeled-dark-input input::placeholder {
+.dark-input::placeholder, input::placeholder, .input-groups > div > input::placeholder, .labeled-dark-input input::placeholder {
   font-size: 11px;
 }
-.dark-input:focus, .input-groups > div > input:focus, .labeled-dark-input input:focus {
+.dark-input:focus, input:focus, .input-groups > div > input:focus {
   border-color: #7F634C;
   color: white;
   outline: none;
@@ -383,4 +383,56 @@ main > div.spaceright {
   flex: 25 5 1px;
 }
 
-/*# sourceMappingURL=landing.css.map */
+.core {
+  margin-top: 20px;
+}
+
+label {
+  font-size: 1.05em;
+}
+
+.row, p.row, .column ul.row {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  align-content: start;
+}
+.row label {
+  width: 40%;
+}
+.row input {
+  width: 60%;
+  max-height: 39px;
+}
+
+p.row, .column ul.row {
+  font-size: 0.7em;
+  margin-top: 2px;
+  justify-content: start;
+}
+
+.column {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+.column ul {
+  font-size: 0.7em;
+  justify-content: start;
+  margin-top: 0.7em;
+}
+
+.cell-grid {
+  display: grid;
+  justify-content: stretch;
+}
+
+.w-button {
+  margin: 15px 0 0 0;
+}
+
+.cell-item-40 {
+  width: 50%;
+}
+
+/*# sourceMappingURL=logging_pages.css.map */
