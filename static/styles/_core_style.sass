@@ -1,0 +1,418 @@
+$goldfont: #F0B385 //2be deleted! Why tho?
+$greyfont: #929292
+$gold-bright: #F0B385
+$gold-dark: #7F634C
+$red-brigt: #C52525
+$back-color: #262936
+
+
+    
+@font-face 
+    font-family: "Sahitya-Regular"
+    src: url("/static/fonts/Sahitya-Regular.ttf") format("opentype")
+    
+    
+
+@font-face 
+    font-family: "Sahitya-Bold"
+    src: url("/static/fonts/Sahitya-Bold.ttf") format("opentype")
+    font-weight: bold
+    
+
+@font-face 
+    font-family: 'Sansation'
+    src: url(/static/fonts/Sansation_regular.ttf) format("opentype")
+
+@font-face 
+    font-family: 'Sansation-Light'
+    src: url(/static/fonts/Sansation_Light.ttf) format("opentype")
+
+@font-face 
+    font-family: 'Sansation-Bold'
+    src: url(/static/fonts/Sansation_Bold.ttf) format("opentype")
+
+
+@font-face 
+    font-family: 'Sansation-Italic'
+    src: url(/static/fonts/Sansation_Italic.ttf) format("opentype")
+
+@font-face 
+    font-family: 'Sansation-Bold-Italic'
+    src: url(/static/fonts/Sansation_Bold_Italic.ttf) format("opentype")
+
+@font-face 
+    font-family: 'Sansation-Light-Italic'
+    src: url(/static/fonts/Sansation_Light_Italic.ttf) format("opentype")
+
+// group which defines text styles
+.heading
+    font-family: "Sahitya-Regular", serif
+    font-size: 14px 
+    color: $gold-dark
+
+.heading-big
+    font-family: "Sahitya-Bold", serif
+    font-size: 30px 
+    color: white
+    
+
+.link
+    font-size: 18px
+    font-family: "Sahitya", serif
+    color: white
+    text-decoration: none
+    &:hover
+        text-decoration: underline
+        cursor: pointer
+
+p
+    color: #fff
+    font-family: "Sahitya-Regular", serif
+        
+a
+    font-family: "Sahitya-Regular", serif
+    color: $gold-bright
+    text-decoration: none
+    
+    &:hover
+        text-decoration: underline $gold-bright
+        color: #fff
+
+//end of group
+
+//group which defines flexes and blocks
+.f-column
+    display: flex
+    flex-direction: column
+    
+
+.f-row
+    display: flex
+    flex-direction: row
+//end of group
+
+%button
+    display: flex
+    align-items: center
+    justify-content: center
+    font-family: "Sahitya Regular", serif
+    background-size: 100% 100%
+    background-repeat: no-repeat
+    color: $greyfont
+    text-decoration: none
+    cursor: pointer
+    &:active
+        font-family: "Sahitya Bold", serif
+        color: $goldfont
+        &:hover
+            text-shadow:  0 0 10px $goldfont
+    
+    
+.button-common
+    @extend %button
+    height: 34px
+    // width: 96px
+    background-image: url("/static/images/buttons/common.png")
+    font-size: 18px
+    &:hover
+        background-image: url('/static/images/buttons/common-p.png')
+    &:active
+        background-image: url('/static/images/buttons/common-p.png')
+
+
+.button-ornamented 
+    @extend %button
+    height: 52px
+    width: 133px
+    background-image: url("/static/images/buttons/ornamented.png")
+    font-size: 20px
+    &:hover
+        background-image: url('/static/images/buttons/ornamented-p.png')
+    &:active
+        background-image: url('/static/images/buttons/ornamented-p.png')
+
+.button-redcore-w
+    @extend %button
+    height: 51px
+    width: 267px
+    background-image: url('/static/images/buttons/redcore-w.png')
+    color: white
+    font-size: 20px
+    border: 0
+    &:hover
+        background-image: url('/static/images/buttons/redcore-w-p.png')
+    &:active
+        background-image: url('/static/images/buttons/redcore-w-p.png')
+
+.not-logged 
+    width: 134px
+    height: 51px
+
+    background-image: url("/static/images/login_btn.png")
+    background-size: 100%
+    background-repeat: no-repeat
+    background-position: center
+    &:hover 
+        background-image: url("/static/images/login_btn_hovered.png")
+        flex-shrink: 0
+        background-position: center
+        width: 154px
+        height: 71px
+        &:active 
+            background-image: url("/static/images/login_btn_pressed.png")
+            width: 134px
+            height: 51px
+
+        
+%glow-button-core
+    cursor: pointer
+    background-size: 100% 100%
+    background-repeat: no-repeat
+    background-position: center
+    height: 24px
+    width: 24px
+
+.button-remove
+    @extend %glow-button-core
+    background-image: url('/static/images/buttons/remove-a.png')
+    &:hover
+        background-image: url('/static/images/buttons/remove-h.png')
+    &:disabled
+        background-image: url('/static/images/buttons/remove.png')
+
+.button-add
+    @extend %glow-button-core
+    background-image: url('/static/images/buttons/add-a.png')
+    &:hover
+        background-image: url('/static/images/buttons/add-h.png')
+    &:disabled
+        background-image: url('/static/images/buttons/add.png')
+
+.button-ar-down
+    @extend %glow-button-core
+    background-image: url('/static/images/buttons/ar-down-a.png')
+    &:hover
+        background-image: url('/static/images/buttons/ar-down-h.png')
+    &:disabled
+        background-image: url('/static/images/buttons/ar-down.png')
+
+.button-ar-left
+    @extend %glow-button-core
+    background-image: url('/static/images/buttons/ar-left-a.png')
+    &:hover
+        background-image: url('/static/images/buttons/ar-left-h.png')
+    &:disabled
+        background-image: url('/static/images/buttons/ar-left.png')
+
+.button-ar-right
+    @extend %glow-button-core
+    background-image: url('/static/images/buttons/ar-right-a.png')
+    &:hover
+        background-image: url('/static/images/buttons/ar-right-h.png')
+    &:disabled
+        background-image: url('/static/images/buttons/ar-right.png')
+
+.button-ar-up
+    @extend %glow-button-core
+    background-image: url('/static/images/buttons/ar-up-a.png')
+    &:hover
+        background-image: url('/static/images/buttons/ar-up-h.png')
+    &:disabled
+        background-image: url('/static/images/buttons/ar-up.png')
+
+.button-calendar
+    @extend %glow-button-core
+    background-image: url('/static/images/buttons/calendar-a.png')
+    &:hover
+        background-image: url('/static/images/buttons/calendar-h.png')
+    &:disabled
+        background-image: url('/static/images/buttons/calendar.png')
+
+
+
+
+.stretch-for-text
+    text-align: center
+    //width: fit-content(120%)
+    //height: fit-content(120%)
+    div
+        padding: 2px 10px
+    
+//end of group
+
+
+.dark-input
+    background-image: url('/static/images/grey-input.png')
+    background-size: 100% 100%
+    font-family: "Sansation-Italic", serif
+    font-size: 14px
+    background-repeat: no-repeat
+    color: $goldfont
+    border: 1px solid $greyfont
+    margin-left: 0
+    min-width: 50px
+    padding: 10px
+
+    &::placeholder
+        font-size: 11px
+    
+    &:focus
+        border-color: $gold-dark
+        color: white
+
+        outline: none
+        
+    
+.dropdown-menu
+    background-color: #2F3136
+    display: flex
+    flex-direction: column
+    width: 150px
+    position: absolute
+    visibility: hidden
+    font-family: "Sahitya-Regular", serif
+    font-size: 10px
+
+    a
+        background-image: url('/static/images/menu-item.png')
+        
+        background-repeat: no-repeat 
+        color: $greyfont
+        font-family: "Sahitya-Regular", serif
+        font-size: 14px
+        text-decoration: none
+        margin: 3px
+        padding: 2px 2px 2px 10px
+
+        background-size: 100% 100%
+        &:hover
+            background-image: url('/static/images/menu-item-h.png')
+            background-size: 100% 100%
+            color: #fff
+            &:active
+                color: $goldfont
+
+.labeled-dark-input
+    @extend .f-column
+    input
+        @extend .dark-input
+    label
+        @extend .heading
+
+.beautiful-text
+    color: $goldfont
+    font-size: 26px
+    background-color: #fff
+
+.input-groups
+    @extend .f-row
+    > div
+        margin-bottom: 5px
+        margin-top: 5px
+        @extend .f-column
+        > label
+            @extend .heading
+            
+        > input
+            @extend .dark-input
+            margin: 0
+
+.radio-group
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+    list-style-type: none
+    padding: 0
+    gap: 5px
+
+    li
+        flex: 1 1 calc((100% / 3) - 5px)
+        
+        input[type="radio"]
+            visibility: hidden
+            // margin: 5px 5px 5px 10px
+            
+        label
+            @extend .button-common
+            position: relative
+            top: -35px
+            margin: 0 0 -35px 0
+            width: 100%
+
+            &:checked
+                font-family: "Sahitya-Bold", serif
+                //cursor:pointer
+
+        input[type="radio"]:checked + label
+            color: $goldfont
+            background-image: url('/static/images/buttons/common-p.png')
+
+.calendar-icon
+    width: 24px
+    height: 24px
+    background-image: url('/static/images/icons/calendar.svg')
+    background-size: 100% 100%
+    &:hover
+        background-image: url('/static/images/icons/calendar-h.svg')
+        &:active
+            background-image: url('/static/images/icons/calendar-a.svg')
+            
+.image-container
+    background-size: 100% 100%
+    background-repeat: no-repeat
+    background-position: center
+
+
+body
+    main
+        height: 800px
+        background-image: url('/static/images/back-1.png')
+        background-size: 100% 100%
+        background-repeat: no-repeat
+
+main
+    display: flex
+    flex: 1
+    flex-flow: row
+    & > div.core
+        display: flex
+        order: 2
+        flex: 50 90
+        flex-flow: column
+        font: 1.2em "Fira Sans", sans-serif
+        & > div.row
+            display: flex
+            margin: 5px
+            padding: 0.1em
+            border-radius: 5px
+            & > div.sub-row
+                display: flex
+                flex-direction: row
+                background-color: inherit
+                padding: 3px
+                margin-inline: 2px
+                flex: 1
+                border-radius: 3px
+                text-align: center
+                height: 3em
+                & > div.weapon_value
+                    flex: 55
+                    display: flex
+                    margin: inherit
+                    padding: inherit
+                    border-radius: inherit
+                    height: 90%
+                    justify-content: center
+                    align-items: center
+                & > div.extra
+                    flex: 10
+                    margin: inherit
+                    padding: inherit
+                    border-radius: inherit
+                    height: 90%
+    & > div.spaceleft
+        order: 1
+        flex: 25 5
+    & > div.spaceright
+        order: 3
+        flex: 25 5
