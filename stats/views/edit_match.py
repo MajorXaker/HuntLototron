@@ -15,7 +15,7 @@ class EditMatch(View):
         match_on_table = m.Match.objects.get(pk=match_id)
         form = MatchEditForm(instance=match_on_table)
         user["position"] = match_on_table.get_player_slot(user["credentials"])
-        if user["position"] == 0 and request.user.is_staff == False:
+        if user["position"] is None and request.user.is_staff == False:
             return render(request, "404_or_403_match.html", status=403)
 
         context = {
@@ -41,7 +41,7 @@ class EditMatch(View):
                 f"In match player 1 m weapon is {match_on_table.player_1_primary_weapon}, its size is {match_on_table.player_1_primary_weapon.size}"
             )
 
-            print(match_on_table.verify_guns(user["position"])[0])
+            # print(match_on_table.verify_guns(user["position"])[0])
             form.save()
 
             return HttpResponseRedirect(reverse("stats:table"))
