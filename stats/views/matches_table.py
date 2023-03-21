@@ -1,21 +1,48 @@
 from _operator import attrgetter
 from itertools import chain
 
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.handlers.wsgi import WSGIRequest
 from django.shortcuts import render
+from django.views import View
 
 from stats import models as m
 from stats.utils.get_credentials import get_credentials
 
 
-@login_required
-def show_stats_table(request: WSGIRequest):
-    user = get_credentials(request)
+class MatchesTable(View):
+    def get(self, request: WSGIRequest):
+        user = get_credentials(request)
 
-    if not request.user.is_staff:
-        # we need to know whose matches are we looking for
+        if request.user.is_staff:
+            return render(
+                request,
+                "stats_list.html",
+                {
+                    "matches": m.Match.objects.all(),
+                    "user": user,
+                },
+            )
+        if not request.user.pk:
+            return self.get_available_matches(user=user, request=request)
+
+        return self.get_players_matches(user=user, request=request)
+
+    def get_available_matches(self, user: dict, request: WSGIRequest):
+        available_matches = [
+            match for match in m.Match.objects.all() if match.display_allowed()
+        ]
+        [match.set_encoding() for match in available_matches]
+        return render(
+            request,
+            "stats_list.html",
+            {
+                "matches": available_matches,
+                "user": user,
+            },
+        )
+
+    def get_players_matches(self, user: dict, request: WSGIRequest):
         if user["has_aka"]:
             look_for_user = m.Player.objects.get(also_known_as=user["playername"])
         else:
@@ -36,7 +63,7 @@ def show_stats_table(request: WSGIRequest):
             filtered_matches = [
                 match for match in all_matches if match.display_allowed()
             ]
-            hashed_matches = [match.set_encoding() for match in filtered_matches]
+            [match.set_encoding() for match in filtered_matches]  # match hashing
 
         # results are sorted by their id
         result_as_list = sorted(
@@ -47,10 +74,7 @@ def show_stats_table(request: WSGIRequest):
         result_ready = list(result_as_set)
         result_ready.reverse()
 
-    else:
-        result_ready = m.Match.objects.all()
-
-    response = render(
-        request, "stats_list.html", {"matches": result_ready, "user": user}
-    )
-    return response
+        response = render(
+            request, "stats_list.html", {"matches": result_ready, "user": user}
+        )
+        return response

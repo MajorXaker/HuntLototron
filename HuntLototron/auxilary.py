@@ -12,6 +12,7 @@ from stats.models import Match, Compound, Weapon
 
 
 class AuxClass:
+    @staticmethod
     def credentials_to_dict(url_request, debug=False):
         """Exports usable data on current logged user
 

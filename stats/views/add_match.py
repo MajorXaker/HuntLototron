@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -7,7 +8,10 @@ from HuntLototron.auxilary import AuxClass
 from stats.forms import MatchAddForm
 
 
-class AddMatch(View):
+class AddMatch(LoginRequiredMixin, View):
+    login_url = "/accounts/login/"
+    redirect_field_name = 'redirect_to'
+
     def get(self, request):
         user = AuxClass.credentials_to_dict(request)
 

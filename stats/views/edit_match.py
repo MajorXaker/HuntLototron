@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -8,7 +9,7 @@ from stats import models as m
 from stats.forms import MatchEditForm
 
 
-class EditMatch(View):
+class EditMatch(LoginRequiredMixin, View):
     def get(self, request, match_id):
         user = AuxClass.credentials_to_dict(request)
 

@@ -15,8 +15,8 @@ app_name = "stats"
 # нужно чтобы делать линки вот такого типа "movies:detail" в хтмл разметке, типо такого {% url 'match:details' match.id %}
 
 urlpatterns = [
-    path("", stats.views.matches_table.show_stats_table, name="table"),
-    path("<int:match_id>", stats.views.match_details.show_match_detail, name="match_details"),
+    path("", stats.views.matches_table.MatchesTable.as_view(), name="table"),
+    path("<int:match_id>", stats.views.match_details.MatchDetails.as_view(), name="match_details"),
     path("edit/<int:match_id>", stats.views.edit_match.EditMatch.as_view(), name="edit"),
     path("add", stats.views.add_match.AddMatch.as_view(), name="add"),
     path("sample", stats.views.sample.sample, name="add_details"),

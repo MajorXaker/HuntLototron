@@ -12,7 +12,7 @@ from HuntLototron.forms import CSVUploadForm
 from stats import models as m
 
 
-class ProfilePage(LoginRequiredMixin, View):
+class ProfilePage(View, LoginRequiredMixin):
     login_url = "/accounts/login/"
     redirect_field_name = "redirect_to"
 
