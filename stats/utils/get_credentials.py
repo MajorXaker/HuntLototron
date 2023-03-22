@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.core.handlers.wsgi import WSGIRequest
 from pydantic import BaseModel
 
@@ -9,11 +9,11 @@ class UserCredsOrganised(BaseModel):
     anonymous: bool
     has_aka: bool
     username: str
-    playername: str
-    credentials: tuple[str, str]
+    playername: str | None
+    credentials: tuple[str, str | None]
     name: str
-    user: User
-    player: Player
+    user: User | AnonymousUser
+    player: Player | None
 
     class Config:
         arbitrary_types_allowed = True
@@ -21,7 +21,7 @@ class UserCredsOrganised(BaseModel):
     @classmethod
     def from_request(cls, url_request: WSGIRequest):
         username = url_request.user.username
-        player = url_request.user.username_of_player
+        player = getattr(url_request.user, "username_of_player", None)
         playername = getattr(player, "also_known_as", None)
 
         organised_creds = cls(
