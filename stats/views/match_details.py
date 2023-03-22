@@ -27,10 +27,11 @@ class MatchDetails(View):
         if getattr(request.user, "username_of_player", "") not in match.players():
             match.set_encoding()
 
-        additional = {
-            "player_2_here": match.player_2 is not None,
-            "player_3_here": match.player_3 is not None,
-        }
+        # additional = {
+        #     "player_2_here": match.player_2 is not None,
+        #     "player_3_here": match.player_3 is not None,
+        # }
+        additional = {}
 
         # temporary placeholder, as bounty for now is only 4 match, not for person
         # additional['player_1_bounty'] =  match.bounty

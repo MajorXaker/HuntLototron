@@ -44,7 +44,7 @@ class ProfileSettings(View):
         if "settings_update" in request.POST.keys():
             user = AuxClass.credentials_to_dict(request)
 
-            player = User.objects.get(username=user["username"]).username
+            player = User.objects.get(username=user["username"]).username_of_player
 
             if form_settings.is_valid():
                 player.also_known_as = form_settings.cleaned_data["also_known_as"]

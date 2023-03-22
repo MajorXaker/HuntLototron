@@ -1,8 +1,45 @@
+from django.contrib.auth.models import User
 from django.core.handlers.wsgi import WSGIRequest
+from pydantic import BaseModel
+
+from stats.models import Player
+
+
+class UserCredsOrganised(BaseModel):
+    anonymous: bool
+    has_aka: bool
+    username: str
+    playername: str
+    credentials: tuple[str, str]
+    name: str
+    user: User
+    player: Player
+
+    class Config:
+        arbitrary_types_allowed = True
+
+    @classmethod
+    def from_request(cls, url_request: WSGIRequest):
+        username = url_request.user.username
+        player = url_request.user.username_of_player
+        playername = getattr(player, "also_known_as", None)
+
+        organised_creds = cls(
+            anonymous=username == "",
+            has_aka=bool(playername),
+            username=username,
+            playername=playername,
+            credentials=(username, playername),
+            name=playername or username,
+            user=url_request.user,
+            player=player,
+        )
+        return organised_creds
 
 
 def get_credentials(url_request: WSGIRequest, debug=False):
     """Exports usable data on current logged user
+    DEPRECATED
 
     'anonymous': is_anon,
     'has_aka': has_aka,
