@@ -12,7 +12,7 @@ class MatchDetails(View):
         try:
             match = m.Match.objects.get(pk=match_id)
         except m.Match.DoesNotExist:
-            return render(request, "404_or_403_match.html", status=403)
+            return render(request, "404_or_403_match.html", status=404)
 
         open_for_browsing = any(
             (
