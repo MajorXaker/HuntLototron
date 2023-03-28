@@ -8,6 +8,7 @@ from django.views import View
 from HuntLototron.auxilary import AuxClass
 from HuntLototron.forms import CreateHashInvite, RedeemHashInvite, UserSettingsForm
 from stats.models import Player, Match
+from utils.md5_encoder import encode_md5
 
 
 class ProfileSettings(LoginRequiredMixin, View):
@@ -65,7 +66,7 @@ class ProfileSettings(LoginRequiredMixin, View):
         if "hash_create" in request.POST.keys():
             if form_create_hash.is_valid():
                 new_player_name = form_create_hash.cleaned_data["player_name"]
-                hash_invite = AuxClass.encode_md5(new_player_name, user["name"])
+                hash_invite = encode_md5(new_player_name, user["name"])
 
                 player_invited = Player()
                 player_invited.hash_key = hash_invite
