@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 import dj_database_url
-from HuntLototron.key import KeyHolder
+from config import settings as s
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,12 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = KeyHolder.key
-# near settings.py should be a key.py file with following content
-# class KeyHolder():
-#     key = "enter_your_key_here"
-# don't forget to change KeyHolder.key to something more breakproof :)
-
+SECRET_KEY = s.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -65,8 +60,8 @@ ROOT_URLCONF = 'HuntLototron.urls'
 LOGIN_REDIRECT_URL = 'stats:table' #might need to be changed
 
 EMAIL_HOST = 'localhost'
-EMAIL_HOST_USER = KeyHolder.email_user
-EMAIL_HOST_PASSWORD = KeyHolder.email_password
+EMAIL_HOST_USER = s.EMAIL_USER
+EMAIL_HOST_PASSWORD = s.EMAIL_PASSWORD
 
 
 TEMPLATES = [
