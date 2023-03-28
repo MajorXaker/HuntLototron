@@ -1,5 +1,6 @@
 from itertools import chain
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.views import View
@@ -9,7 +10,7 @@ from HuntLototron.forms import CreateHashInvite, RedeemHashInvite, UserSettingsF
 from stats.models import Player, Match
 
 
-class ProfileSettings(View):
+class ProfileSettings(LoginRequiredMixin, View):
     def get(self, request):
         user = AuxClass.credentials_to_dict(request)
         player = User.objects.get(username=user["username"]).username_of_player
