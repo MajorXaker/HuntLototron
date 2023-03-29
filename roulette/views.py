@@ -1,8 +1,7 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 
 from stats import models as m
-from stats.utils.get_credentials import get_credentials
+from utils.get_credentials import get_credentials
 from .logic_core import RouletteCore
 
 

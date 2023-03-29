@@ -4,19 +4,19 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
 
-from HuntLototron.auxilary import AuxClass
 from stats import models as m
 from stats.forms import MatchEditForm
+from utils.get_credentials import UserCredsOrganised
 
 
 class EditMatch(LoginRequiredMixin, View):
     def get(self, request, match_id):
-        user = AuxClass.credentials_to_dict(request)
+        user = UserCredsOrganised.from_request(request)
 
         match_on_table = m.Match.objects.get(pk=match_id)
         form = MatchEditForm(instance=match_on_table)
-        user["position"] = match_on_table.get_player_slot(user["credentials"])
-        if user["position"] is None and request.user.is_staff == False:
+        user.set_position(match_on_table.get_player_slot(user.player))
+        if user.position is None and not request.user.is_staff:
             return render(request, "404_or_403_match.html", status=403)
 
         context = {
@@ -29,13 +29,13 @@ class EditMatch(LoginRequiredMixin, View):
         return output
 
     def post(self, request, match_id):
-        user = AuxClass.credentials_to_dict(request)
+        user = UserCredsOrganised.from_request(request)
         form = MatchEditForm(
             request.POST,
         )
 
         match_on_table = m.Match.objects.get(pk=match_id)
-        user["position"] = match_on_table.get_player_slot(user["credentials"])
+        user.set_position(match_on_table.get_player_slot(user.player))
 
         if form.is_valid():
             print(

@@ -6,7 +6,7 @@ from django.views import View
 
 from stats import models as m
 from stats.models import Match
-from stats.utils.get_credentials import UserCredsOrganised
+from utils.get_credentials import UserCredsOrganised
 
 
 class MatchesTable(View):

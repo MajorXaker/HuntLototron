@@ -2,13 +2,13 @@ from django.core.handlers.wsgi import WSGIRequest
 from django.shortcuts import render
 from django.views import View
 
-from HuntLototron.auxilary import AuxClass
 from stats import models as m
+from utils.get_credentials import UserCredsOrganised
 
 
 class MatchDetails(View):
     def get(self, request: WSGIRequest, match_id: int):
-        user = AuxClass.credentials_to_dict(request)
+        user = UserCredsOrganised.from_request(request)
         try:
             match = m.Match.objects.get(pk=match_id)
         except m.Match.DoesNotExist:
@@ -27,11 +27,10 @@ class MatchDetails(View):
         if getattr(request.user, "username_of_player", "") not in match.players():
             match.set_encoding()
 
-        # additional = {
-        #     "player_2_here": match.player_2 is not None,
-        #     "player_3_here": match.player_3 is not None,
-        # }
-        additional = {}
+        additional = {
+            "player_2_here": match.player_2 is not None,
+            "player_3_here": match.player_3 is not None,
+        }
 
         # temporary placeholder, as bounty for now is only 4 match, not for person
         # additional['player_1_bounty'] =  match.bounty

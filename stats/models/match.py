@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+from typing import Tuple
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -330,20 +331,16 @@ class Match(models.Model):
         encoded = hashed.hexdigest()
         return encoded
 
-    def players(self):
+    def players(self) -> Tuple[Player, Player | None, Player | None]:
         """This func puts player classes into a tuple."""
         return self.player_1, self.player_2 or None, self.player_3 or None
 
-    def get_player_slot(self, player_lookup: Player, debug=False):
+    def get_player_slot(self, player_lookup: Player):
         """Gets number of player's slot - 1,2 or 3 on given class of credentials"""
         players = self.players()
         if player_lookup in players:
             position = players.index(player_lookup) + 1
-            if debug:
-                print(f"{player_lookup} found on position {position}")
             return position
-        if debug:
-            print(f"{player_lookup} not found")
 
     def display_allowed(self):
         """States whether participants allow to show this match"""

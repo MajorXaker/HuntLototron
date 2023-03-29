@@ -4,8 +4,8 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views import View
 
-from HuntLototron.auxilary import AuxClass
 from stats.forms import MatchAddForm
+from utils.get_credentials import UserCredsOrganised
 
 
 class AddMatch(LoginRequiredMixin, View):
@@ -13,7 +13,7 @@ class AddMatch(LoginRequiredMixin, View):
     redirect_field_name = 'redirect_to'
 
     def get(self, request):
-        user = AuxClass.credentials_to_dict(request)
+        user = UserCredsOrganised.from_request(request)
 
         initial_data = {
             "player_1": request.user.username_of_player,
@@ -31,7 +31,7 @@ class AddMatch(LoginRequiredMixin, View):
         return output
 
     def post(self, request):
-        user = AuxClass.credentials_to_dict(request)
+        user = UserCredsOrganised.from_request(request)
         form = MatchAddForm(request.POST)
 
         if form.is_valid():

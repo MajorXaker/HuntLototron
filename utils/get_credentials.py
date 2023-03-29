@@ -14,6 +14,7 @@ class UserCredsOrganised(BaseModel):
     name: str
     user: User | AnonymousUser
     player: Player | None
+    position: int = None
 
     class Config:
         arbitrary_types_allowed = True
@@ -35,6 +36,9 @@ class UserCredsOrganised(BaseModel):
             player=player,
         )
         return organised_creds
+
+    def set_position(self, pos):
+        self.position = pos
 
 
 def get_credentials(url_request: WSGIRequest, debug=False):

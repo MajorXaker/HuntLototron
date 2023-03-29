@@ -5,19 +5,18 @@ from django.contrib.auth.models import User
 from django.shortcuts import render
 from django.views import View
 
-from HuntLototron.auxilary import AuxClass
 from HuntLototron.forms import CreateHashInvite, RedeemHashInvite, UserSettingsForm
 from stats.models import Player, Match
+from utils.get_credentials import UserCredsOrganised
 from utils.md5_encoder import encode_md5
 
 
 class ProfileSettings(LoginRequiredMixin, View):
     def get(self, request):
-        user = AuxClass.credentials_to_dict(request)
+        user = UserCredsOrganised.from_request(request)
         player = User.objects.get(username=user["username"]).username_of_player
 
-        active_user = user["user"]
-        active_user_invited = Player.objects.filter(created_by=active_user)
+        active_user_invited = Player.objects.filter(created_by=user.user)
 
         form_create_hash = CreateHashInvite()
         form_redeem_invite = RedeemHashInvite()
@@ -33,20 +32,19 @@ class ProfileSettings(LoginRequiredMixin, View):
         return render(request, "registration/profile_settings.html", context)
 
     def post(self, request):
-        user = AuxClass.credentials_to_dict(request)
+        user = UserCredsOrganised.from_request(request)
         additional = {}  # dict for sending strings to front
 
-        active_user = user["user"]
-        active_user_invited = Player.objects.filter(created_by=active_user)
+        active_user_invited = Player.objects.filter(created_by=user.user)
 
         form_create_hash = CreateHashInvite(request.POST)
         form_redeem_invite = RedeemHashInvite(request.POST)
         form_settings = UserSettingsForm(request.POST)
 
         if "settings_update" in request.POST.keys():
-            user = AuxClass.credentials_to_dict(request)
+            user = UserCredsOrganised.from_request(request)
 
-            player = User.objects.get(username=user["username"]).username_of_player
+            player = User.objects.get(username=user.username).username_of_player
 
             if form_settings.is_valid():
                 player.also_known_as = form_settings.cleaned_data["also_known_as"]
@@ -59,14 +57,14 @@ class ProfileSettings(LoginRequiredMixin, View):
 
                 player.save()
 
-                user["name"] = form_settings.cleaned_data["also_known_as"]
+                user.name = form_settings.cleaned_data["also_known_as"]
 
             additional = {"changed": True}
 
         if "hash_create" in request.POST.keys():
             if form_create_hash.is_valid():
                 new_player_name = form_create_hash.cleaned_data["player_name"]
-                hash_invite = encode_md5(new_player_name, user["name"])
+                hash_invite = encode_md5(new_player_name, user.name)
 
                 player_invited = Player()
                 player_invited.hash_key = hash_invite
@@ -86,7 +84,7 @@ class ProfileSettings(LoginRequiredMixin, View):
                     hash_key=form_redeem_invite.cleaned_data["hash_key"]
                 )
 
-                if hashed_player.created_by == active_user:
+                if hashed_player.created_by == user.user:
                     form_redeem_invite = RedeemHashInvite()
                     additional["is_redeem_message"] = True
 
@@ -113,7 +111,7 @@ class ProfileSettings(LoginRequiredMixin, View):
 
                     try:
                         [
-                            match.swap_players(hashed_player, active_user.username)
+                            match.swap_players(hashed_player, user.username)
                             for match in matches_with_hashed_player
                         ]
                     except Match.PlayerDuplicationError:

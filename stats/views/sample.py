@@ -1,13 +1,13 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from HuntLototron.auxilary import AuxClass
 from stats import models as m
+from utils.get_credentials import UserCredsOrganised
 
 
 def sample(request):
     # this is main page of the app
-    user = AuxClass.credentials_to_dict(request)
+    user = UserCredsOrganised.from_request(request)
 
     # aaa = Player.objects.get(also_known_as = "None")
     em = m.Match.objects.get(pk=12)
