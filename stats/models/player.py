@@ -5,24 +5,11 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from stats.validators import UnicodeUsernameValidator, UnicodeAndSpaceValidator
+from utils.md5_encoder import encode_md5
 
 
 class Player(models.Model):
-    def encode_md5(self, *strings):
-        '''Connects any number of values into a single string, then MD5es it.
-        Returns 32 char hex string. Truncate it if you need.
-        '''
-        s_combined = ''.join(strings)
-        s_unspaced = [char for char in s_combined if char != ' ']
-        s_bytes = bytes(''.join(s_unspaced), encoding='utf-8')
-        code = hashlib.md5()
-        code.update(s_bytes)
-        encoded = code.hexdigest()
-        return encoded
-
-
     username_validator = UnicodeUsernameValidator()
-
 
     username = models.OneToOneField(
         User,
@@ -60,7 +47,8 @@ class Player(models.Model):
         )
 
     hash_key = models.CharField(
-        # It is used to bind non user profile to real user profile. So registred players could create accouts of their friends.
+        # It is used to bind a non-user profile to real user profile.
+        # So registered players could create accounts of their friends.
         # Because it's impossible to use anonymous player in matches.
         _("Hash key of this user."),
         max_length=32,
@@ -82,7 +70,9 @@ class Player(models.Model):
 
     created_by = models.ForeignKey(
         User,
-        verbose_name=_("Showss who is the creator of this player. It's used only while player is not assigned to a user."),
+        verbose_name=_(
+            "Shows who is the creator of this player. It's used only while player is not assigned to a user."
+        ),
         on_delete=models.SET( User.objects.get(username='UnknownHunter').pk),
         related_name= 'creator', # do I even need this if 'Player.objects.filter(created_by = active_user)'
         blank = True,
@@ -94,34 +84,25 @@ class Player(models.Model):
         default = False
         )
 
-
-
     def update(self, user):
-
         self.also_known_as = ''
         self.use_alternative_name = False
         self.username = user
 
-
-
     encode = False
 
     def __str__(self) -> str:
-        encode = self.encode
         if self.use_alternative_name:
 
-            result =  self.also_known_as
+            result = self.also_known_as
         else:
             try:
-                result =  self.username.username
+                result = self.username.username
             except AttributeError:
-                #needed to look for players which have no username
+                # needed to look for players which have no username
                 result = self.also_known_as
 
-        if encode:
-            return 'Player '+ self.encode_md5(result)[:6]
+        if self.encode:
+            return 'Player ' + encode_md5(result)[:6]
         else:
             return result
-
-    # def get_name(self):
-    #     return str(self)
