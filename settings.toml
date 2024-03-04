@@ -1,0 +1,13 @@
+[default]
+SECRET_KEY = "123"
+EMAIL_USER = 'HuntAdminLototron'
+IS_DEBUG = true
+USER_HASH_LIMIT=3
+
+[development]
+IS_DEBUG = true
+USER_HASH_LIMIT=10
+
+[production]
+IS_DEBUG = false
+USER_HASH_LIMIT=10

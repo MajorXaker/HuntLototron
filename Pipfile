@@ -16,6 +16,7 @@ psycopg2 = "*"
 dj-database-url = "*"
 dynaconf = "*"
 arrow = "*"
+pydantic = "*"
 
 [dev-packages]
 black = "*"

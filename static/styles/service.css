@@ -2,74 +2,66 @@
   font-family: "Sahitya-Regular";
   src: url("/static/fonts/Sahitya-Regular.ttf") format("opentype");
 }
-
 @font-face {
   font-family: "Sahitya-Bold";
   src: url("/static/fonts/Sahitya-Bold.ttf") format("opentype");
   font-weight: bold;
 }
-
 @font-face {
-  font-family: 'Sansation';
+  font-family: "Sansation";
   src: url(/static/fonts/Sansation_regular.ttf) format("opentype");
 }
-
 @font-face {
-  font-family: 'Sansation-Light';
+  font-family: "Sansation-Light";
   src: url(/static/fonts/Sansation_Light.ttf) format("opentype");
 }
-
 @font-face {
-  font-family: 'Sansation-Bold';
+  font-family: "Sansation-Bold";
   src: url(/static/fonts/Sansation_Bold.ttf) format("opentype");
 }
-
 @font-face {
-  font-family: 'Sansation-Italic';
+  font-family: "Sansation-Italic";
   src: url(/static/fonts/Sansation_Italic.ttf) format("opentype");
 }
-
 @font-face {
-  font-family: 'Sansation-Bold-Italic';
+  font-family: "Sansation-Bold-Italic";
   src: url(/static/fonts/Sansation_Bold_Italic.ttf) format("opentype");
 }
-
 @font-face {
-  font-family: 'Sansation-Light-Italic';
+  font-family: "Sansation-Light-Italic";
   src: url(/static/fonts/Sansation_Light_Italic.ttf) format("opentype");
 }
-
-.heading, .labeled-dark-input label, .input-groups > div > label {
-  font-family: "Sahitya-Regular";
+.heading, .input-groups > div > label, .labeled-dark-input label {
+  font-family: "Sahitya-Regular", serif;
   font-size: 14px;
   color: #7F634C;
 }
 
 .heading-big {
-  font-family: "Sahitya-Bold";
+  font-family: "Sahitya-Bold", serif;
   font-size: 30px;
   color: white;
 }
 
 .link {
-  font: "Sahitya" 18px;
+  font-size: 18px;
+  font-family: "Sahitya", serif;
   color: white;
   text-decoration: none;
 }
-
-.link:hover {
+.link:hover, .playername:hover .link.dropdown-icon {
   text-decoration: underline;
   cursor: pointer;
 }
 
 .name-on-map {
   margin: 0px;
-  font: "Sahitya" 10px;
+  font-size: 10px;
+  font-family: "Sahitya", serif;
   color: white;
   text-decoration: none;
 }
-
-.name-on-map:hover {
+.name-on-map:hover, .playername:hover .name-on-map.dropdown-icon {
   text-shadow: #929292 0px 0px 3px;
   cursor: pointer;
 }
@@ -84,43 +76,25 @@ a {
   color: #F0B385;
   text-decoration: none;
 }
-
-a:hover {
-  -webkit-text-decoration: underline #F0B385;
-          text-decoration: underline #F0B385;
+a:hover, .playername:hover a.dropdown-icon {
+  text-decoration: underline #F0B385;
   color: #fff;
 }
 
-.f-column, .labeled-dark-input, .input-groups > div {
-  display: -webkit-box;
-  display: -ms-flexbox;
+.f-column, .input-groups > div, .labeled-dark-input {
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
 }
 
 .f-row, .input-groups {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  flex-direction: row;
 }
 
-.button-common, .radio-group li label, .button-ornamented, .button-redcore-w {
-  display: -webkit-box;
-  display: -ms-flexbox;
+.button-redcore-w, .button-ornamented, .button-common, .radio-group li label {
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  align-items: center;
+  justify-content: center;
   font-family: "Sahitya Regular";
   background-size: 100% 100%;
   background-repeat: no-repeat;
@@ -128,13 +102,11 @@ a:hover {
   text-decoration: none;
   cursor: pointer;
 }
-
-.button-common:active, .radio-group li label:active, .button-ornamented:active, .button-redcore-w:active {
+.button-redcore-w:active, .button-ornamented:active, .button-common:active, .radio-group li label:active {
   font-family: "Sahitya Bold";
   color: #F0B385;
 }
-
-.button-common:active:hover, .radio-group li label:active:hover, .button-ornamented:active:hover, .button-redcore-w:active:hover {
+.button-redcore-w:active:hover, .playername:hover .button-redcore-w.dropdown-icon:active, .button-ornamented:active:hover, .playername:hover .button-ornamented.dropdown-icon:active, .button-common:active:hover, .playername:hover .button-common.dropdown-icon:active, .radio-group li label:active:hover, .radio-group li .playername:hover label.dropdown-icon:active, .playername:hover .radio-group li label.dropdown-icon:active {
   text-shadow: 0px 0px 10px #F0B385;
 }
 
@@ -143,11 +115,9 @@ a:hover {
   background-image: url("/static/images/buttons/common.png");
   font-size: 18px;
 }
-
-.button-common:hover, .radio-group li label:hover {
+.button-common:hover, .playername:hover .button-common.dropdown-icon, .radio-group li label:hover, .radio-group li .playername:hover label.dropdown-icon, .playername:hover .radio-group li label.dropdown-icon {
   background-image: url("/static/images/buttons/common-p.png");
 }
-
 .button-common:active, .radio-group li label:active {
   background-image: url("/static/images/buttons/common-p.png");
 }
@@ -158,11 +128,9 @@ a:hover {
   background-image: url("/static/images/buttons/ornamented.png");
   font-size: 20px;
 }
-
-.button-ornamented:hover {
+.button-ornamented:hover, .playername:hover .button-ornamented.dropdown-icon {
   background-image: url("/static/images/buttons/ornamented-p.png");
 }
-
 .button-ornamented:active {
   background-image: url("/static/images/buttons/ornamented-p.png");
 }
@@ -174,11 +142,9 @@ a:hover {
   color: white;
   font-size: 20px;
 }
-
-.button-redcore-w:hover {
+.button-redcore-w:hover, .playername:hover .button-redcore-w.dropdown-icon {
   background-image: url("/static/images/buttons/redcore-w-p.png");
 }
-
 .button-redcore-w:active {
   background-image: url("/static/images/buttons/redcore-w-p.png");
 }
@@ -191,23 +157,20 @@ a:hover {
   background-repeat: no-repeat;
   background-position: center;
 }
-
-.not-logged:hover {
+.not-logged:hover, .playername:hover .not-logged.dropdown-icon {
   background-image: url("/static/images/login_btn_hovered.png");
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  flex-shrink: 0;
   background-position: center;
   width: 154px;
   height: 71px;
 }
-
-.not-logged:hover:active {
+.not-logged:hover:active, .playername:hover .not-logged.dropdown-icon:active {
   background-image: url("/static/images/login_btn_pressed.png");
   width: 134px;
   height: 51px;
 }
 
-.button-remove, .button-add, .button-ar-down, .playername .dropdown-icon, .button-ar-left, .button-ar-right, .button-ar-up, .button-calendar {
+.button-calendar, .button-ar-up, .button-ar-right, .button-ar-left, .button-ar-down, .playername:hover .dropdown-icon, .playername .dropdown-icon, .button-add, .button-remove {
   cursor: pointer;
   background-size: 100% 100%;
   background-repeat: no-repeat;
@@ -219,11 +182,9 @@ a:hover {
 .button-remove {
   background-image: url("/static/images/buttons/remove-a.png");
 }
-
-.button-remove:hover {
+.button-remove:hover, .playername:hover .button-remove.dropdown-icon {
   background-image: url("/static/images/buttons/remove-h.png");
 }
-
 .button-remove:disabled {
   background-image: url("/static/images/buttons/remove.png");
 }
@@ -231,23 +192,19 @@ a:hover {
 .button-add {
   background-image: url("/static/images/buttons/add-a.png");
 }
-
-.button-add:hover {
+.button-add:hover, .playername:hover .button-add.dropdown-icon {
   background-image: url("/static/images/buttons/add-h.png");
 }
-
 .button-add:disabled {
   background-image: url("/static/images/buttons/add.png");
 }
 
-.button-ar-down, .playername .dropdown-icon {
+.button-ar-down, .playername:hover .dropdown-icon, .playername .dropdown-icon {
   background-image: url("/static/images/buttons/ar-down-a.png");
 }
-
 .button-ar-down:hover, .playername .dropdown-icon:hover, .playername:hover .dropdown-icon {
   background-image: url("/static/images/buttons/ar-down-h.png");
 }
-
 .button-ar-down:disabled, .playername .dropdown-icon:disabled {
   background-image: url("/static/images/buttons/ar-down.png");
 }
@@ -255,11 +212,9 @@ a:hover {
 .button-ar-left {
   background-image: url("/static/images/buttons/ar-left-a.png");
 }
-
-.button-ar-left:hover {
+.button-ar-left:hover, .playername:hover .button-ar-left.dropdown-icon {
   background-image: url("/static/images/buttons/ar-left-h.png");
 }
-
 .button-ar-left:disabled {
   background-image: url("/static/images/buttons/ar-left.png");
 }
@@ -267,11 +222,9 @@ a:hover {
 .button-ar-right {
   background-image: url("/static/images/buttons/ar-right-a.png");
 }
-
-.button-ar-right:hover {
+.button-ar-right:hover, .playername:hover .button-ar-right.dropdown-icon {
   background-image: url("/static/images/buttons/ar-right-h.png");
 }
-
 .button-ar-right:disabled {
   background-image: url("/static/images/buttons/ar-right.png");
 }
@@ -279,11 +232,9 @@ a:hover {
 .button-ar-up {
   background-image: url("/static/images/buttons/ar-up-a.png");
 }
-
-.button-ar-up:hover {
+.button-ar-up:hover, .playername:hover .button-ar-up.dropdown-icon {
   background-image: url("/static/images/buttons/ar-up-h.png");
 }
-
 .button-ar-up:disabled {
   background-image: url("/static/images/buttons/ar-up.png");
 }
@@ -291,26 +242,21 @@ a:hover {
 .button-calendar {
   background-image: url("/static/images/buttons/calendar-a.png");
 }
-
-.button-calendar:hover {
+.button-calendar:hover, .playername:hover .button-calendar.dropdown-icon {
   background-image: url("/static/images/buttons/calendar-h.png");
 }
-
 .button-calendar:disabled {
   background-image: url("/static/images/buttons/calendar.png");
 }
 
 .stretch-for-text {
   text-align: center;
-  width: fit-content(120%);
-  height: fit-content(120%);
 }
-
 .stretch-for-text div {
   padding: 2px 10px;
 }
 
-.dark-input, .labeled-dark-input input, .input-groups > div > input {
+.dark-input, .input-groups > div > input, .labeled-dark-input input {
   background-image: url("/static/images/grey-input.png");
   background-size: 100% 100%;
   font-family: "Sansation-Italic";
@@ -322,24 +268,10 @@ a:hover {
   min-width: 50px;
   padding: 10px;
 }
-
-.dark-input::-webkit-input-placeholder, .labeled-dark-input input::-webkit-input-placeholder, .input-groups > div > input::-webkit-input-placeholder {
+.dark-input::placeholder, .input-groups > div > input::placeholder, .labeled-dark-input input::placeholder {
   font-size: 11px;
 }
-
-.dark-input:-ms-input-placeholder, .labeled-dark-input input:-ms-input-placeholder, .input-groups > div > input:-ms-input-placeholder {
-  font-size: 11px;
-}
-
-.dark-input::-ms-input-placeholder, .labeled-dark-input input::-ms-input-placeholder, .input-groups > div > input::-ms-input-placeholder {
-  font-size: 11px;
-}
-
-.dark-input::placeholder, .labeled-dark-input input::placeholder, .input-groups > div > input::placeholder {
-  font-size: 11px;
-}
-
-.dark-input:focus, .labeled-dark-input input:focus, .input-groups > div > input:focus {
+.dark-input:focus, .input-groups > div > input:focus, .labeled-dark-input input:focus {
   border-color: #7F634C;
   color: white;
   outline: none;
@@ -347,20 +279,14 @@ a:hover {
 
 .dropdown-menu {
   background-color: #2F3136;
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
   width: 150px;
   position: absolute;
   visibility: hidden;
   font-family: "Sahitya-Regular";
   font-size: 10px;
 }
-
 .dropdown-menu a {
   background-image: url("/static/images/menu-item.png");
   background-repeat: no-repeat;
@@ -373,14 +299,12 @@ a:hover {
   padding-left: 10px;
   background-size: 100% 100%;
 }
-
-.dropdown-menu a:hover {
+.dropdown-menu a:hover, .dropdown-menu .playername:hover a.dropdown-icon, .playername:hover .dropdown-menu a.dropdown-icon {
   background-image: url("/static/images/menu-item-h.png");
   background-size: 100% 100%;
   color: #fff;
 }
-
-.dropdown-menu a:hover:active {
+.dropdown-menu a:hover:active, .dropdown-menu .playername:hover a.dropdown-icon:active, .playername:hover .dropdown-menu a.dropdown-icon:active {
   color: #F0B385;
 }
 
@@ -394,49 +318,34 @@ a:hover {
   margin-bottom: 5px;
   margin-top: 5px;
 }
-
 .input-groups > div > input {
   margin: 0px;
 }
 
 .radio-group {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
+  flex-direction: row;
+  justify-content: space-between;
   list-style-type: none;
   padding: 0px;
   gap: 5px;
 }
-
 .radio-group li {
-  -webkit-box-flex: 1;
-      -ms-flex: 1 1 calc((100% / 3) - 5px);
-          flex: 1 1 calc((100% / 3) - 5px);
+  flex: 1 1 calc(33.3333333333% - 5px);
 }
-
-.radio-group li input[type="radio"] {
+.radio-group li input[type=radio] {
   visibility: hidden;
 }
-
 .radio-group li label {
   position: relative;
   top: -35px;
   margin: 0px 0px -35px 0px;
   width: 100%;
 }
-
 .radio-group li label:checked {
-  font-family: "Sahitya-Bold";
+  font-family: "Sahitya-Bold", serif;
 }
-
-.radio-group li input[type="radio"]:checked + label {
+.radio-group li input[type=radio]:checked + label {
   color: #F0B385;
   background-image: url("/static/images/buttons/common-p.png");
 }
@@ -447,12 +356,10 @@ a:hover {
   background-image: url("/static/images/icons/calendar.svg");
   background-size: 100% 100%;
 }
-
-.calendar-icon:hover {
+.calendar-icon:hover, .playername:hover .calendar-icon.dropdown-icon {
   background-image: url("/static/images/icons/calendar-h.svg");
 }
-
-.calendar-icon:hover:active {
+.calendar-icon:hover:active, .playername:hover .calendar-icon.dropdown-icon:active {
   background-image: url("/static/images/icons/calendar-a.svg");
 }
 
@@ -462,45 +369,36 @@ a:hover {
   background-position: center;
 }
 
+body main {
+  height: 800px;
+  background-image: url("/static/images/back-1.png");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
 .user_bar {
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .playername {
   font: "Sahitya" bold;
-  -webkit-text-decoration-line: none;
-          text-decoration-line: none;
-  display: -webkit-box;
-  display: -ms-flexbox;
+  text-decoration-line: none;
   display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   font-size: 18px;
   color: white;
 }
-
 .playername .dropdown-icon {
   margin-left: 10px;
 }
-
-.playername:hover {
+.playername:hover, .playername:hover .playername.dropdown-icon {
   color: #F0B385;
 }
-
 .show {
   display: block;
 }
+
 /*# sourceMappingURL=service.css.map */

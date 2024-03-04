@@ -1,7 +1,7 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 
 from stats import models as m
+from utils.get_credentials import get_credentials
 from .logic_core import RouletteCore
 
 
@@ -55,9 +55,16 @@ def index(request):
         "secondary_weapon": secondary_weapon,
     }
 
-    output_data = render(request, "index.html", {"data": data})
-    response = HttpResponse(output_data)
-    response.set_cookie("previous_primary", primary_weapon)
-    response.set_cookie("previous_secondary", secondary_weapon)
+    output_data = render(
+        request,
+        "roulette/roulette.html",
+        {
+            "data": data,
+            "user": get_credentials(request),
+        },
+    )
 
-    return response
+    output_data.set_cookie("previous_primary", primary_weapon)
+    output_data.set_cookie("previous_secondary", secondary_weapon)
+
+    return output_data

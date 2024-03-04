@@ -1,12 +1,11 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from HuntLototron.auxilary import AuxClass
+from utils.get_credentials import UserCredsOrganised
 
 
 def home(request):
-    user = AuxClass.credentials_to_dict(request)
+    user = UserCredsOrganised.from_request(request)
 
-    # output = render (request, "landing.html") #temporary! delete
     output = render(request, "landing.html", {"user": user})
     return HttpResponse(output)

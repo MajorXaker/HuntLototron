@@ -1,40 +1,61 @@
-{% extends 'pure_base.html' %}
+{% extends 'base.html' %}
 {% block content %}
 
-{% if form.errors %}
-  <p>Your username and password didn't match. Please try again.</p>
-{% endif %}
+<head>
+<title>Hunt:Statsman</title>
+<link rel="stylesheet" href="/static/styles/account/logging_pages.css?{% now "U" %}">
+</head>
+<main>
+    <div class="spaceleft"></div>
+    <div class="core">
+        {% if form.errors %}
+          <p>Your username and password didn't match. Please try again.</p>
+        {% endif %}
 
-{% if next %}
-  {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-  {% else %}
-    <p>Please login to see this page.</p>
-  {% endif %}
-{% endif %}
+        {% if next %}
+          {% if user.is_authenticated %}
+            <p>Your account doesn't have access to this page. To proceed,
+            please login with an account that has access.</p>
+          {% else %}
+            <p>Please login to see this page.</p>
+          {% endif %}
+        {% endif %}
 
-<form method="post" action="{% url 'login'%}">
-{% csrf_token %}
-<table>
+        <form method="post" action="{% url 'login'%}">
+            {% csrf_token %}
+            <table>
+                <tr>
+                  <td>{{ form.username.label_tag }}</td>
+                  <td class="cell-grid">{{ form.username }}</td>
+                </tr>
 
-<tr>
-  <td>{{ form.username.label_tag }}</td>
-  <td>{{ form.username }}</td>
-</tr>
+                <tr>
+                  <td>{{ form.password.label_tag }}</td>
+                  <td class="cell-grid">{{ form.password }}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td class="cell-grid w-button">
+                    <input type="submit" value="login" />
+                    <input type="hidden" name="next" value="{{ next }}"/>
+                  </td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td class="cell-grid w-button">
+                    <a href="{% url 'password_reset' %}">Lost password?</a>
+                    <a href="{% url 'register' %}">Registration</a>
+                  </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div class="spaceright"></div>
 
-<tr>
-  <td>{{ form.password.label_tag }}</td>
-  <td>{{ form.password }}</td>
-</tr>
-</table>
 
-<input type="submit" value="login" />
-<input type="hidden" name="next" value="{{ next }}" />
-</form>
+</main>
 
-{# Assumes you setup the password_reset view in your URLconf #}
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-<a href="{% url 'register' %}">Registration</a>
+
+
 
 {% endblock %}

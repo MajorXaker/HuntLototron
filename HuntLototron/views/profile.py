@@ -7,9 +7,10 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 
-from HuntLototron.auxilary import AuxClass, MatchesDecoder
+from HuntLototron.auxilary import MatchesDecoder
 from HuntLototron.forms import CSVUploadForm
 from stats import models as m
+from utils.get_credentials import UserCredsOrganised
 
 
 class ProfilePage(LoginRequiredMixin, View):
@@ -17,7 +18,7 @@ class ProfilePage(LoginRequiredMixin, View):
     redirect_field_name = "redirect_to"
 
     def get(self, request):
-        user = AuxClass.credentials_to_dict(request)
+        user = UserCredsOrganised.from_request(request)
 
         csv_form = CSVUploadForm()
 
@@ -27,7 +28,7 @@ class ProfilePage(LoginRequiredMixin, View):
         return render(request, "registration/profile.html", context)
 
     def post(self, request):
-        user = AuxClass.credentials_to_dict(request)
+        user = UserCredsOrganised.from_request(request)
         csv_form = CSVUploadForm(request.POST, request.FILES)
         player = request.user.username
 

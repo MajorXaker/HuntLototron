@@ -46,18 +46,19 @@ $back-color: #262936
 
 // group which defines text styles
 .heading
-    font-family: "Sahitya-Regular" 
+    font-family: "Sahitya-Regular", serif
     font-size: 14px 
     color: $gold-dark
 
 .heading-big
-    font-family: "Sahitya-Bold" 
+    font-family: "Sahitya-Bold", serif
     font-size: 30px 
     color: white
     
 
 .link
-    font: "Sahitya" 18px 
+    font-size: 18px
+    font-family: "Sahitya", serif
     color: white
     text-decoration: none
     &:hover
@@ -67,7 +68,8 @@ $back-color: #262936
 
 .name-on-map
     margin: 0px
-    font: "Sahitya" 10px 
+    font-size: 10px
+    font-family: "Sahitya", serif
     color: white
     text-decoration: none
     &:hover
@@ -241,8 +243,8 @@ a
 
 .stretch-for-text
     text-align: center
-    width: fit-content(120%)
-    height: fit-content(120%)
+    //width: fit-content(120%)
+    //height: fit-content(120%)
     div
         padding: 2px 10px
     
@@ -354,8 +356,8 @@ a
             width: 100%
 
             &:checked
-                font-family: "Sahitya-Bold"
-                cursor:pointer
+                font-family: "Sahitya-Bold", serif
+                //cursor:pointer
 
         input[type="radio"]:checked + label
             color: $goldfont
@@ -375,3 +377,11 @@ a
     background-size: 100% 100%
     background-repeat: no-repeat
     background-position: center
+
+
+body
+    main
+        height: 800px
+        background-image: url('/static/images/back-1.png')
+        background-size: 100% 100%
+        background-repeat: no-repeat

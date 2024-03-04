@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <head>
+    <title>Roulette</title>
+    <link rel="stylesheet" href="/static/styles/roulette/roulette.css?{% now "U" %}">
+    </head>
+
+
+
+
+    <form action = "/roulette/" method = "GET">
+        <main>
+            <div class="spaceleft"></div>
+            <div class="core">
+                <div class="row" style="display: grid ; align-items: center; justify-items: center;">
+                    <h1 class="heading-big">
+                        Hunt: Showdown weapon roulette
+                    </h1>
+                </div>
+                <div class="row with_button">
+                    <div class="sub-row">
+                        <input class="weapon_interactive_label button-weapon" name="main roll" value="Main weapon" type="submit" >
+                        <div class="weapon_value main">
+                            <p>{{ data.primary_weapon }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row with_button">
+                    <div class="sub-row">
+                        <input class="weapon_interactive_label button-weapon" name="secondary roll" value="Secondary weapon" type="submit">
+                        <div class="weapon_value secondary">
+                            <p>{{ data.secondary_weapon }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-row">
+                    <div>
+                        <input type="checkbox" id="scales" name="quartermaster"
+                                unchecked>
+                        <label for="scales" class="label">Quartermaster</label>
+                    </div>
+                </div>
+                <div class="button-row">
+                    <input class="r1oll_button button-redcore-w" name='roll' type="submit" value="Roll" id="roll_button">
+                </div>
+            </div>
+            <div class="spaceright"></div>
+
+        </main>
+    </form>
+
+{% endblock  %}
