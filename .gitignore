@@ -135,3 +135,4 @@ test.py
 .mdj
 db\
 temp\
+db.sqlite3
