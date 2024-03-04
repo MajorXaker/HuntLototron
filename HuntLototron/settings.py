@@ -59,9 +59,9 @@ MIDDLEWARE = [
 ROOT_URLCONF = 'HuntLototron.urls'
 LOGIN_REDIRECT_URL = 'stats:table' #might need to be changed
 
-EMAIL_HOST = 'localhost'
-EMAIL_HOST_USER = s.EMAIL_USER
-EMAIL_HOST_PASSWORD = s.EMAIL_PASSWORD
+# EMAIL_HOST = 'localhost'
+# EMAIL_HOST_USER = s.EMAIL_USER
+# EMAIL_HOST_PASSWORD = s.EMAIL_PASSWORD
 
 
 TEMPLATES = [
