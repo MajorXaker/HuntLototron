@@ -30,4 +30,5 @@ jobs:
         cat Pipfile
     - name: Run Tests
       run: |
+        pipenv shell
         python manage.py test
