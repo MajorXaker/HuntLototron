@@ -27,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = s.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = s.IS_DEBUG
 
-ALLOWED_HOSTS = ['.herokuapp.com','127.0.0.1','localhost:8000']
+ALLOWED_HOSTS = ['.hunt.major-24.dev','127.0.0.1','localhost:8000']
 
 
 # Application definition
@@ -91,24 +91,6 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     },
-
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'postgres',
-    #     'USER': 'djangoadmins',
-    #     'PASSWORD': 'de1213fe',
-    #     'HOST': 'localhost',
-    #     'PORT': '5432',
-    # }
-    # heroku
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres',
-#         'USER': 'xfmnvwkwoimjpw',
-#         'PASSWORD': 'f1cf93c7e2749f29b3438942ab9f15aadc2ea01694f948d83a2f5750a71ec302',
-#         'HOST': 'ec2-54-74-35-87.eu-west-1.compute.amazonaws.com',
-#         'PORT': '5432',
-#     }
 }
 
 db_from_env = dj_database_url.config(conn_max_age=600)

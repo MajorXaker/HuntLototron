@@ -60,7 +60,7 @@ class Match(models.Model):
         AmmoType,
         on_delete=models.PROTECT,
         related_name='player_1_primary_weapon_ammo_A',
-        default=AmmoType.objects.get(name="Standard").id,
+        default=models.SET_NULL,
         null=True,
     )
     player_1_primary_ammo_B = models.ForeignKey(
@@ -81,7 +81,7 @@ class Match(models.Model):
     )
     player_1_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT,
                                                   related_name='player_1_secondary_weapon_ammo_A',
-                                                  default=AmmoType.objects.get(name="Standard").id,
+                                                  default=models.SET_NULL,
                                                   null=True,
 
                                                   )
@@ -139,7 +139,7 @@ class Match(models.Model):
         AmmoType,
         on_delete=models.PROTECT,
         related_name='player_2_primary_weapon_ammo_A',
-        # default=AmmoType.objects.get(name="Standard").id,
+        # default=models.SET_NULL,
         null=True,
         blank=True,
     )
@@ -161,7 +161,7 @@ class Match(models.Model):
     )
     player_2_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT,
                                                   related_name='player_2_secondary_weapon_ammo_A',
-                                                  # default=AmmoType.objects.get(name="Standard").id,
+                                                  # default=models.SET_NULL,
                                                   null=True,
                                                   blank=True,
                                                   )
@@ -218,7 +218,7 @@ class Match(models.Model):
         AmmoType,
         on_delete=models.PROTECT,
         related_name='player_3_primary_weapon_ammo_A',
-        # default=AmmoType.objects.get(name="Standard").id,
+        # default=models.SET_NULL,
         null=True,
         blank=True,
     )
@@ -240,7 +240,7 @@ class Match(models.Model):
     )
     player_3_secondary_ammo_A = models.ForeignKey(AmmoType, on_delete=models.PROTECT,
                                                   related_name='player_3_secondary_weapon_ammo_A',
-                                                  # default=AmmoType.objects.get(name="Standard").id,
+                                                  # default=models.SET_NULL,
                                                   null=True,
                                                   blank=True,
                                                   )

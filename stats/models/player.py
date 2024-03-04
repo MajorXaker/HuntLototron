@@ -73,7 +73,7 @@ class Player(models.Model):
         verbose_name=_(
             "Shows who is the creator of this player. It's used only while player is not assigned to a user."
         ),
-        on_delete=models.SET( User.objects.get(username='UnknownHunter').pk),
+        on_delete=models.SET_NULL,
         related_name= 'creator', # do I even need this if 'Player.objects.filter(created_by = active_user)'
         blank = True,
         null = True,
