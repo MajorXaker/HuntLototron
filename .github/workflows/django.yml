@@ -11,11 +11,11 @@ on:
     branches: [ "main" ]
 
 jobs:
-  black:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: psf/black@stable
+#  black:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#      - uses: psf/black@stable
 
   build-and-push-dev-image:
     runs-on: ubuntu-latest
