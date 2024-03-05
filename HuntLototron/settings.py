@@ -29,7 +29,7 @@ SECRET_KEY = s.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = s.IS_DEBUG
 
-ALLOWED_HOSTS = ['.hunt.major-24.dev','127.0.0.1','localhost:8000']
+ALLOWED_HOSTS = ["0.0.0.0:8000", '.hunt.major-24.dev','127.0.0.1','localhost:8000',]
 
 
 # Application definition
