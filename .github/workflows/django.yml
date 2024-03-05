@@ -18,7 +18,6 @@ jobs:
       - uses: psf/black@stable
 
   build-and-push-dev-image:
-    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
