@@ -1,0 +1,17 @@
+[default]
+    DATABASE_PORT = "5432"
+    DATABASE_USER = "postgres"
+    DATABASE_PASSWORD = "postgres"
+    DATABASE_DB = "lototron"
+    DATABASE_HOST = "localhost"
+    DATABASE_ECHO_MODE = false
+
+
+[test]
+    DATABASE_DB = "test-db"
+    DATABASE_HOST = "postgres"
+
+
+
+
+
