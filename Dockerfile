@@ -17,4 +17,4 @@ RUN find $WORKDIR_PATH -type d -exec chown $USER_CONTAINER:$USER_CONTAINER {} \;
 RUN find $WORKDIR_PATH -type d -exec chmod 755 {} \;
 
 USER $USER_CONTAINER
-CMD uv run alembic upgrade head && uv run app.py
+CMD uv run alembic upgrade head && uv run main.py
