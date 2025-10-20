@@ -9,6 +9,7 @@ WORKDIR $WORKDIR_PATH
 COPY ./pyproject.toml .
 COPY ./uv.lock .
 
+RUN apk add --no-cache build-base
 RUN uv sync --frozen --no-dev
 
 COPY --chmod=0444 . .
