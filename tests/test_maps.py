@@ -14,6 +14,7 @@ class TestMapsEndpoints:
         assert response.status_code == 201
         data = response.json()
         assert data["name"] == "Bayou"
+        assert "id" in data
 
     async def test_create_duplicate_map(self, test_client_rest, creator):
         """Test creating a map with duplicate name"""
@@ -41,6 +42,8 @@ class TestMapsEndpoints:
         assert "Bayou" in map_names
         assert "DeSalle" in map_names
         assert "Lawson" in map_names
+
+        assert "id" in data[0]
 
     async def test_get_map_by_name(self, test_client_rest, creator):
         """Test getting a specific map by name"""

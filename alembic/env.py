@@ -3,10 +3,6 @@ from logging.config import fileConfig
 
 from alembic import context
 
-import os
-
-print(os.getcwd())
-
 from config import settings
 from db import persistent_engine
 from models.db_models.base import Model
@@ -26,6 +22,7 @@ config.set_main_option(
         f"{settings.DATABASE_DB}"
     ),
 )
+
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
