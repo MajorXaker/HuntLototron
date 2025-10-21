@@ -10,5 +10,5 @@ from .muzzle_device_enum import MuzzleEnum
 class DefaultModsEnum(StrEnum):
     DEFAULT_SIGHTS = SightsEnum.IRON
     DEFAULT_MELEE = MeleeEnum.SELF
-    DEFAULT_MAGAZINE = MagazineEnum.NO_DESIGNATED
+    DEFAULT_MAGAZINE = MagazineEnum.REGULAR
     DEFAULT_MUZZLE = MuzzleEnum.REGULAR
