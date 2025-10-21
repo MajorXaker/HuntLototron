@@ -9,6 +9,7 @@ from api.router_maps import map_router
 from api.router_players import player_router
 from api.router_weapon_types import weapon_types_router
 from api.router_weapons import weapons_router
+from api.service_endpoints import service_router
 from config import settings
 from heartbeat import heartbeat_router
 
@@ -23,11 +24,12 @@ app = FastAPI(
 
 app.include_router(heartbeat_router, prefix="")
 app.include_router(ammo_type_router)
+app.include_router(weapon_types_router)
 app.include_router(weapons_router)
 app.include_router(map_router)
 app.include_router(compound_router)
 app.include_router(player_router)
-app.include_router(weapon_types_router)
+app.include_router(service_router)
 
 metrics_instrumentator = Instrumentator(
     should_group_status_codes=False,
