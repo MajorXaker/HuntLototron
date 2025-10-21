@@ -1,8 +1,5 @@
-from ipaddress import IPv4Address, IPv6Address, ip_address
-
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from starlette.responses import JSONResponse
 
 
 service_router = APIRouter()

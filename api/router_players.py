@@ -1,7 +1,7 @@
 from typing import List
 
 import sqlalchemy as sa
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session_dep
@@ -44,7 +44,7 @@ async def create_player(player_data: PlayerCreate, db: AsyncSession = get_sessio
 
     if not player_data.username:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=f"No username provided"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No username provided"
         )
     # Insert new player
     result = await db.execute(

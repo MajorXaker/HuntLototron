@@ -54,7 +54,7 @@ class WeaponBase(BaseModel):
 
     @classmethod
     @field_validator("sights")
-    def validate_melee(cls, v: str) -> mod.SightsEnum:
+    def validate_sights(cls, v: str) -> mod.SightsEnum:
         """Validate melee enum value"""
         try:
             # Convert string to enum to ensure it's valid
@@ -65,7 +65,7 @@ class WeaponBase(BaseModel):
 
     @classmethod
     @field_validator("muzzle")
-    def validate_melee(cls, v: str) -> mod.MuzzleEnum:
+    def validate_muzzle(cls, v: str) -> mod.MuzzleEnum:
         """Validate melee enum value"""
         try:
             # Convert string to enum to ensure it's valid
@@ -76,7 +76,7 @@ class WeaponBase(BaseModel):
 
     @classmethod
     @field_validator("magazine")
-    def validate_melee(cls, v: str) -> mod.MagazineEnum:
+    def validate_magazine(cls, v: str) -> mod.MagazineEnum:
         """Validate melee enum value"""
         try:
             # Convert string to enum to ensure it's valid
@@ -87,7 +87,7 @@ class WeaponBase(BaseModel):
 
     @classmethod
     @field_validator("ammo_size")
-    def validate_melee(cls, v: str) -> mod.AmmoSizeEnum:
+    def validate_ammosize(cls, v: str) -> mod.AmmoSizeEnum:
         """Validate melee enum value"""
         try:
             # Convert string to enum to ensure it's valid

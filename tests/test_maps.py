@@ -45,11 +45,11 @@ class TestMapsEndpoints:
 
         assert "id" in data[0]
 
-    async def test_get_map_by_name(self, test_client_rest, creator):
+    async def test_get_map_by_id(self, test_client_rest, creator):
         """Test getting a specific map by name"""
-        await creator.create_map("Bayou")
+        map_id = await creator.create_map("Bayou")
 
-        response = await test_client_rest.get("http://test/maps/Bayou")
+        response = await test_client_rest.get(f"http://test/maps/{map_id}")
 
         assert response.status_code == 200
         data = response.json()
@@ -57,25 +57,25 @@ class TestMapsEndpoints:
 
     async def test_get_nonexistent_map(self, test_client_rest):
         """Test getting a map that doesn't exist"""
-        response = await test_client_rest.get("http://test/maps/NonExistent")
+        response = await test_client_rest.get("http://test/maps/50")
 
         assert response.status_code == 404
         assert "not found" in response.json()["detail"]
 
     async def test_delete_map(self, test_client_rest, creator):
         """Test deleting a map"""
-        await creator.create_map("ToDelete")
+        map_id = await creator.create_map("ToDelete")
 
-        response = await test_client_rest.delete("http://test/maps/ToDelete")
+        response = await test_client_rest.delete(f"http://test/maps/{map_id}")
 
         assert response.status_code == 204
 
         # Verify it's deleted
-        get_response = await test_client_rest.get("http://test/maps/ToDelete")
+        get_response = await test_client_rest.get(f"http://test/maps/{map_id}")
         assert get_response.status_code == 404
 
     async def test_delete_nonexistent_map(self, test_client_rest):
         """Test deleting a map that doesn't exist"""
-        response = await test_client_rest.delete("http://test/maps/NonExistent")
+        response = await test_client_rest.delete("http://test/maps/50")
 
         assert response.status_code == 404

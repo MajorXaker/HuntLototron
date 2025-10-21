@@ -69,9 +69,11 @@ class TestCompoundsEndpoints:
     async def test_get_compound_by_name(self, test_client_rest, creator):
         """Test getting a specific compound by name"""
         map_id = await creator.create_map("Bayou")
-        await creator.create_compound("Arden Parish", map_id, True, 50.0, 60.0)
+        compound_id = await creator.create_compound(
+            "Arden Parish", map_id, True, 50.0, 60.0
+        )
 
-        response = await test_client_rest.get("http://test/compounds/Arden%20Parish")
+        response = await test_client_rest.get(f"http://test/compounds/{compound_id}")
 
         assert response.status_code == 200
         data = response.json()
@@ -83,7 +85,7 @@ class TestCompoundsEndpoints:
 
     async def test_get_nonexistent_compound(self, test_client_rest):
         """Test getting a compound that doesn't exist"""
-        response = await test_client_rest.get("http://test/compounds/NonExistent")
+        response = await test_client_rest.get("http://test/compounds/25")
 
         assert response.status_code == 404
         assert "not found" in response.json()["detail"]
@@ -91,10 +93,12 @@ class TestCompoundsEndpoints:
     async def test_update_compound(self, test_client_rest, creator):
         """Test updating a compound"""
         map_id = await creator.create_map("Bayou")
-        await creator.create_compound("Arden Parish", map_id, False, 10.0, 20.0)
+        compound_id = await creator.create_compound(
+            "Arden Parish", map_id, False, 10.0, 20.0
+        )
 
         response = await test_client_rest.patch(
-            "http://test/compounds/Arden%20Parish",
+            f"http://test/compounds/{compound_id}",
             json={"x_relative": 100.0, "y_relative": 200.0, "double_clue": True},
         )
 
@@ -108,10 +112,12 @@ class TestCompoundsEndpoints:
     async def test_update_partial_compound(self, test_client_rest, creator):
         """Test partial update of a compound"""
         map_id = await creator.create_map("Bayou")
-        await creator.create_compound("Arden Parish", map_id, False, 10.0, 20.0)
+        compound_id = await creator.create_compound(
+            "Arden Parish", map_id, False, 10.0, 20.0
+        )
 
         response = await test_client_rest.patch(
-            "http://test/compounds/Arden%20Parish", json={"x_relative": 150.0}
+            f"http://test/compounds/{compound_id}", json={"x_relative": 150.0}
         )
 
         assert response.status_code == 200
@@ -123,7 +129,7 @@ class TestCompoundsEndpoints:
     async def test_update_nonexistent_compound(self, test_client_rest):
         """Test updating a compound that doesn't exist"""
         response = await test_client_rest.patch(
-            "http://test/compounds/NonExistent", json={"x_relative": 100.0}
+            "http://test/compounds/33", json={"x_relative": 100.0}
         )
 
         assert response.status_code == 404
@@ -131,18 +137,20 @@ class TestCompoundsEndpoints:
     async def test_delete_compound(self, test_client_rest, creator):
         """Test deleting a compound"""
         map_id = await creator.create_map("Bayou")
-        await creator.create_compound("ToDelete", map_id)
+        compound_id = await creator.create_compound("ToDelete", map_id)
 
-        response = await test_client_rest.delete("http://test/compounds/ToDelete")
+        response = await test_client_rest.delete(f"http://test/compounds/{compound_id}")
 
         assert response.status_code == 204
 
         # Verify it's deleted
-        get_response = await test_client_rest.get("http://test/compounds/ToDelete")
+        get_response = await test_client_rest.get(
+            f"http://test/compounds/{compound_id}"
+        )
         assert get_response.status_code == 404
 
     async def test_delete_nonexistent_compound(self, test_client_rest):
         """Test deleting a compound that doesn't exist"""
-        response = await test_client_rest.delete("http://test/compounds/NonExistent")
+        response = await test_client_rest.delete("http://test/compounds/77")
 
         assert response.status_code == 404

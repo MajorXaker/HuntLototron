@@ -1,7 +1,7 @@
 from typing import List
 
 import sqlalchemy as sa
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session_dep
@@ -19,16 +19,16 @@ async def get_maps(db: AsyncSession = get_session_dep):
     return maps
 
 
-@map_router.get("/{name}", response_model=MapResponse)
-async def get_map(name: str, db: AsyncSession = get_session_dep):
-    """Get a specific map by name"""
-    result = await db.execute(sa.select(m.Map).where(m.Map.name == name))
+@map_router.get("/{map_id}", response_model=MapResponse)
+async def get_map(map_id: int, db: AsyncSession = get_session_dep):
+    """Get a specific map by id"""
+    result = await db.execute(sa.select(m.Map).where(m.Map.id == map_id))
     map_obj = result.scalar_one_or_none()
 
     if not map_obj:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Map with name '{name}' not found",
+            detail=f"Map with name '{map_id}' not found",
         )
 
     return map_obj
@@ -56,13 +56,15 @@ async def create_map(map_data: MapCreate, db: AsyncSession = get_session_dep):
     return map_obj
 
 
-@map_router.delete("/{name}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_map(name: str, db: AsyncSession = get_session_dep):
+@map_router.delete("/{map_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_map(map_id: int, db: AsyncSession = get_session_dep):
     """Delete a map"""
-    result = await db.execute(sa.delete(m.Map).where(m.Map.name == name))
+    result = await db.scalar(
+        sa.delete(m.Map).where(m.Map.id == map_id).returning(m.Map.id)
+    )
 
-    if result.rowcount == 0:
+    if not result:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Map with name '{name}' not found",
+            detail=f"Map with id '{map_id}' is not found",
         )

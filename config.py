@@ -2,7 +2,6 @@ import logging
 import os
 import pathlib
 
-import sentry_sdk
 from dynaconf import Dynaconf
 
 _configs_path = pathlib.Path(os.getcwd())

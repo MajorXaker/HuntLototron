@@ -48,10 +48,14 @@ run: ## start server
 .PHONY: format
 format: ## format project files
 	chmod +x ./lint.sh
-	./lint.sh black
-	./lint.sh ruff check --fix
-	./lint.sh ruff check --select I --fix
-	./lint.sh ruff format
+# 	./lint.sh black
+# 	./lint.sh ruff check --fix
+# 	./lint.sh ruff check --select I --fix
+# 	./lint.sh ruff format
+	black .
+	ruff check --fix
+	ruff check --select I --fix
+	ruff format
 
 .PHONY: lint
 lint: ## lint project files

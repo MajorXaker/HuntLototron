@@ -133,6 +133,6 @@ test.py
 .png
 .fig
 .mdj
-db\
-temp\
+db
+temp
 .sqlite3

@@ -1,5 +1,3 @@
-from datetime import date
-
 import sqlalchemy as sa
 
 import models.db_models as m

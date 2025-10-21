@@ -24,7 +24,7 @@ class Creator:
         double_clue: bool = False,
         x_relative: float = 10.0,
         y_relative: float = 20.0,
-    ) -> str:
+    ) -> int:
         """Create a test compound and return its name (PK)"""
         if not map_id:
             map_id = await self.create_map(name)
@@ -38,7 +38,7 @@ class Creator:
                 x_relative=x_relative,
                 y_relative=y_relative,
             )
-            .returning(m.Compound.name)
+            .returning(m.Compound.id)
         )
 
     async def create_weapon_type(self, name: str = "TestWeaponType") -> int:
