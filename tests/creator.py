@@ -52,12 +52,13 @@ class Creator:
         name: str,
         weapon_type_id: int,
         core_gun_id: int = None,
-        size: int = 3,
+        slot_size: int = 3,
         price: int = 100,
         sights: str = mod.DefaultModsEnum.DEFAULT_SIGHTS,
         melee: str = mod.DefaultModsEnum.DEFAULT_MELEE,
         muzzle: str = mod.DefaultModsEnum.DEFAULT_MUZZLE,
         magazine: str = mod.DefaultModsEnum.DEFAULT_MAGAZINE,
+        ammo_size: mod.AmmoSizeEnum = mod.AmmoSizeEnum.COMPACT,
         has_ammo_B: bool = False,
     ) -> int:
         """Create a test weapon and return its ID"""
@@ -67,14 +68,15 @@ class Creator:
                 name=name,
                 weapon_type_id=weapon_type_id,
                 core_gun_id=core_gun_id,
-                size=size,
+                slot_size=slot_size,
                 price=price,
                 sights=sights,
                 melee=melee,
                 muzzle=muzzle,
                 magazine=magazine,
                 has_ammo_B=has_ammo_B,
-                ammo_size=mod.AmmoSizeEnum.COMPACT,
+                ammo_size=ammo_size,
+                weapon_size=mod.WeaponSizeEnum.REGULAR
             )
             .returning(m.Weapon.id)
         )

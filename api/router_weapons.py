@@ -6,17 +6,38 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session_dep
 from models import db_models as m
-from models.schemas.weapon import WeaponCreate, WeaponUpdate, WeaponResponse
+from models.schemas.weapon import WeaponResponse, WeaponCreate, WeaponUpdate
+from models.enums import weapon_modifiers as mod
 
 weapons_router = APIRouter(prefix="/weapons", tags=["Weapons"])
 
 
 @weapons_router.get("", response_model=List[WeaponResponse])
 async def get_weapons(
-    skip: int = 0, limit: int = 100, db: AsyncSession = get_session_dep
+    skip: int = 0,
+    limit: int = 100,
+    ammo_size: mod.AmmoSizeEnum = None,
+    core_gun_id: int = None,
+    core_gun_only: bool = False,
+    db: AsyncSession = get_session_dep,
 ):
     """Get all weapons with pagination"""
-    result = await db.execute(sa.select(m.Weapon).offset(skip).limit(limit))
+    query = sa.select(m.Weapon).offset(skip).limit(limit)
+
+    if ammo_size:
+        query = query.where(m.Weapon.ammo_size == ammo_size)
+    if core_gun_id:
+        query = query.where(
+            sa.or_(
+                m.Weapon.core_gun_id == core_gun_id,
+                m.Weapon.id == core_gun_id,
+            )
+        )
+    if core_gun_only:
+        query = query.where(m.Weapon.core_gun_id.is_(None))
+
+    result = await db.execute(query)
+
     weapons = result.scalars().all()
     return weapons
 

@@ -162,3 +162,58 @@ class TestWeaponsEndpoints:
         response = await test_client_rest.delete("http://test/weapons/9999")
 
         assert response.status_code == 404
+
+    async def test_search_by_parameters(self, test_client_rest, creator):
+        """Test getting all weapons"""
+        weapon_type_id = await creator.create_weapon_type("Rifle")
+        await creator.create_weapon(
+            "Caldwell",
+            weapon_type_id,
+            ammo_size=mod.AmmoSizeEnum.COMPACT,
+        )
+        pax_core_id = await creator.create_weapon(
+            "Pax",
+            weapon_type_id,
+            ammo_size=mod.AmmoSizeEnum.MEDIUM,
+        )
+        await creator.create_weapon(
+            "Pax Trueshot",
+            weapon_type_id,
+            ammo_size=mod.AmmoSizeEnum.MEDIUM,
+            core_gun_id=pax_core_id,
+        )
+        await creator.create_weapon(
+            "Pax Claw",
+            weapon_type_id,
+            ammo_size=mod.AmmoSizeEnum.MEDIUM,
+            core_gun_id=pax_core_id,
+            melee=mod.MeleeEnum.CLAW
+        )
+        bornheim_id = await creator.create_weapon(
+            "Bornheim",
+            weapon_type_id,
+            ammo_size=mod.AmmoSizeEnum.COMPACT,
+        )
+        await creator.create_weapon(
+            "Bornheim Silenced",
+            weapon_type_id,
+            ammo_size=mod.AmmoSizeEnum.COMPACT,
+            muzzle=mod.MuzzleEnum.SILENCER,
+            core_gun_id=bornheim_id,
+        )
+
+        response = await test_client_rest.get("http://test/weapons?ammo_size=compact&core_gun_only=true")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 2
+
+        response = await test_client_rest.get("http://test/weapons?core_gun_only=true")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 3
+
+        response = await test_client_rest.get(f"http://test/weapons?core_gun_id={pax_core_id}")
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 3

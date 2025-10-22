@@ -14,7 +14,7 @@ class WeaponBase(BaseModel):
         None, gt=0, description="Base weapon this is derived from"
     )
 
-    size: int = Field(
+    slot_size: int = Field(
         ..., ge=1, le=3, description="Weapon size: 1=small, 2=medium, 3=large"
     )
 
@@ -33,6 +33,10 @@ class WeaponBase(BaseModel):
     magazine: Optional[mod.MagazineEnum] = Field(
         default=mod.DefaultModsEnum.DEFAULT_MAGAZINE,
         description="Magazine modification",
+    )
+    weapon_size: Optional[mod.WeaponSizeEnum] = Field(
+        default=mod.DefaultModsEnum.DEFAULT_WEAPON_SIZE,
+        description="Stock and barrel alterations",
     )
     ammo_size: mod.AmmoSizeEnum = Field(description="Ammo size of the gun")
 
@@ -96,12 +100,24 @@ class WeaponBase(BaseModel):
             valid_values = [e.value for e in mod.AmmoSizeEnum]
             raise ValueError(f"Invalid input '{v}'. Must be one of {valid_values}")
 
+    @classmethod
+    @field_validator("ammo_size")
+    def validate_weaponsize(cls, v: str) -> mod.AmmoSizeEnum:
+        """Validate melee enum value"""
+        try:
+            # Convert string to enum to ensure it's valid
+            return mod.AmmoSizeEnum(v)
+        except ValueError:
+            valid_values = [e.value for e in mod.WeaponSizeEnum]
+            raise ValueError(f"Invalid input '{v}'. Must be one of {valid_values}")
+
 
 class WeaponCreate(WeaponBase):
     sights: Optional[str] = mod.DefaultModsEnum.DEFAULT_SIGHTS
     melee: Optional[str] = mod.DefaultModsEnum.DEFAULT_MELEE
     muzzle: Optional[str] = mod.DefaultModsEnum.DEFAULT_MUZZLE
     magazine: Optional[str] = mod.DefaultModsEnum.DEFAULT_MAGAZINE
+    weapon_size: Optional[str] = mod.DefaultModsEnum.DEFAULT_WEAPON_SIZE
 
 
 class WeaponUpdate(BaseModel):
