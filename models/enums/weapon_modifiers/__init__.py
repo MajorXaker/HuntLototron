@@ -7,7 +7,9 @@ from .magazine_modifier import MagazineEnum
 from .ammo_size import AmmoSizeEnum
 from .muzzle_device_enum import MuzzleEnum
 from .weapon_size import WeaponSizeEnum
+
 # TODO semi avto and avto variants
+
 
 class DefaultModsEnum(StrEnum):
     DEFAULT_SIGHTS = SightsEnum.IRON

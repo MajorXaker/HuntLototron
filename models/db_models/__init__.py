@@ -8,3 +8,4 @@ from .weapon import Weapon
 from .ammo import AmmoType
 from .match_player_data import MatchPlayerData
 from .match import Match
+from .m2m.m2m_fight_locations import M2MFightLocations

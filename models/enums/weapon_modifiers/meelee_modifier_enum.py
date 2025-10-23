@@ -6,7 +6,7 @@ class MeleeEnum(StrEnum):
     SELF = "self"  # when the weapon is actually melee (e.g. bomblance, machete)
     HATCHED = "hatchet"  # small weapon to act like a small hatchet
     TALON = "talon"  # full weapon swing to deal serious damage
-    CLAW = "claw" # small knife attached to handgrip
+    CLAW = "claw"  # small knife attached to handgrip
     BAYONET = "bayonet"  # hard piercing variant, similar to previous
     MACE = "mace"  # blunt strike for small weapons
     KNUCKLES = "knuckles"  # same as previous but for pistols

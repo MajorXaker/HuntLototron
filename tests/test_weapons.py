@@ -15,7 +15,7 @@ class TestWeaponsEndpoints:
             json={
                 "name": "Winfield M1873C Marksman",
                 "weapon_type_id": weapon_type_id,
-                "size": 2,
+                "slot_size": 2,
                 "price": 75,
                 "sights": mod.SightsEnum.MARKSMAN,
                 "ammo_size": mod.AmmoSizeEnum.COMPACT,
@@ -26,31 +26,34 @@ class TestWeaponsEndpoints:
         data = response.json()
         assert data["name"] == "Winfield M1873C Marksman"
         assert data["weapon_type_id"] == weapon_type_id
-        assert data["size"] == 2
+        assert data["slot_size"] == 2
         assert data["price"] == 75
+        assert data["sights"] == mod.SightsEnum.MARKSMAN
+        assert data["ammo_size"] == mod.AmmoSizeEnum.COMPACT
         assert "id" in data
 
     async def test_create_duplicate_weapon(self, test_client_rest, creator):
         """Test creating a weapon with duplicate name"""
         weapon_type_id = await creator.create_weapon_type("Rifle")
 
-        await test_client_rest.post(
-            "http://test/weapons",
-            json={
-                "name": "Winfield M1873C Marksman",
-                "weapon_type_id": weapon_type_id,
-                "size": 2,
-                "price": 75,
-                "sights": mod.SightsEnum.MARKSMAN,
-                "ammo_size": mod.AmmoSizeEnum.COMPACT,
-            },
-        )
         response = await test_client_rest.post(
             "http://test/weapons",
             json={
                 "name": "Winfield M1873C Marksman",
                 "weapon_type_id": weapon_type_id,
-                "size": 2,
+                "slot_size": 2,
+                "price": 75,
+                "sights": mod.SightsEnum.MARKSMAN,
+                "ammo_size": mod.AmmoSizeEnum.COMPACT,
+            },
+        )
+        assert response.status_code == 201
+        response = await test_client_rest.post(
+            "http://test/weapons",
+            json={
+                "name": "Winfield M1873C Marksman",
+                "weapon_type_id": weapon_type_id,
+                "slot_size": 2,
                 "price": 75,
                 "sights": mod.SightsEnum.MARKSMAN,
                 "ammo_size": mod.AmmoSizeEnum.COMPACT,
@@ -187,7 +190,7 @@ class TestWeaponsEndpoints:
             weapon_type_id,
             ammo_size=mod.AmmoSizeEnum.MEDIUM,
             core_gun_id=pax_core_id,
-            melee=mod.MeleeEnum.CLAW
+            melee=mod.MeleeEnum.CLAW,
         )
         bornheim_id = await creator.create_weapon(
             "Bornheim",
@@ -202,7 +205,9 @@ class TestWeaponsEndpoints:
             core_gun_id=bornheim_id,
         )
 
-        response = await test_client_rest.get("http://test/weapons?ammo_size=compact&core_gun_only=true")
+        response = await test_client_rest.get(
+            "http://test/weapons?ammo_size=compact&core_gun_only=true"
+        )
 
         assert response.status_code == 200
         data = response.json()
@@ -213,7 +218,9 @@ class TestWeaponsEndpoints:
         data = response.json()
         assert len(data) == 3
 
-        response = await test_client_rest.get(f"http://test/weapons?core_gun_id={pax_core_id}")
+        response = await test_client_rest.get(
+            f"http://test/weapons?core_gun_id={pax_core_id}"
+        )
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 3

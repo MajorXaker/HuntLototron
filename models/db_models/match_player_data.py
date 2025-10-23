@@ -11,25 +11,27 @@ class MatchPlayerData(m.Model):
         sa.ForeignKey(m.Player.id, ondelete="RESTRICT"), nullable=False
     )
 
-    primary_weapon_id = sa.Column(
+    slot_a_weapon_id = sa.Column(
         sa.ForeignKey(m.Weapon.id, ondelete="RESTRICT"), nullable=True
     )
-    primary_ammo_A_id = sa.Column(
+    slot_a_ammo_a_id = sa.Column(
         sa.ForeignKey(m.AmmoType.id, ondelete="RESTRICT"), nullable=True
     )
-    primary_ammo_B_id = sa.Column(
+    slot_a_ammo_b_id = sa.Column(
         sa.ForeignKey(m.AmmoType.id, ondelete="RESTRICT"), nullable=True
     )
+    slot_a_dual_wielding = sa.Column(sa.Boolean, nullable=False, default=False)
 
-    secondary_weapon_id = sa.Column(
+    slot_b_weapon_id = sa.Column(
         sa.ForeignKey(m.Weapon.id, ondelete="RESTRICT"), nullable=True
     )
-    secondary_ammo_A_id = sa.Column(
+    slot_b_ammo_a_id = sa.Column(
         sa.ForeignKey(m.AmmoType.id, ondelete="RESTRICT"), nullable=True
     )
-    secondary_ammo_B_id = sa.Column(
+    slot_b_ammo_b_id = sa.Column(
         sa.ForeignKey(m.AmmoType.id, ondelete="RESTRICT"), nullable=True
     )
+    slot_b_dual_wielding = sa.Column(sa.Boolean, nullable=False, default=False)
 
     kills = sa.Column(sa.Integer, nullable=False, default=0)
     assists = sa.Column(sa.Integer, nullable=False, default=0)

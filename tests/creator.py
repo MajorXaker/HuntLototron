@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import models.db_models as m
 import models.enums.weapon_modifiers as mod
+from datetime import date, timedelta
 
 
 class Creator:
@@ -76,7 +77,7 @@ class Creator:
                 magazine=magazine,
                 has_ammo_B=has_ammo_B,
                 ammo_size=ammo_size,
-                weapon_size=mod.WeaponSizeEnum.REGULAR
+                weapon_size=mod.WeaponSizeEnum.REGULAR,
             )
             .returning(m.Weapon.id)
         )
@@ -94,4 +95,95 @@ class Creator:
         """Create a test player and return its ID"""
         return await self.session.scalar(
             sa.insert(m.Player).values(username=username).returning(m.Player.id)
+        )
+
+    async def create_match_player_data(
+        self,
+        player_id: int,
+        slot_a_weapon_id: int,
+        slot_b_weapon_id: int,
+        slot_a_ammo_a_id: int = None,
+        slot_a_ammo_b_id: int = None,
+        slot_a_dual_wielding: bool = False,
+        slot_b_ammo_a_id: int = None,
+        slot_b_ammo_b_id: int = None,
+        slot_b_dual_wielding: bool = False,
+        kills: int = 0,
+        assists: int = 0,
+        deaths: int = 0,
+        bounty: int = 0,
+    ) -> int:
+        """Create match player data and return its ID"""
+        return await self.session.scalar(
+            sa.insert(m.MatchPlayerData)
+            .values(
+                player_id=player_id,
+                slot_a_weapon_id=slot_a_weapon_id,
+                slot_a_ammo_a_id=slot_a_ammo_a_id,
+                slot_a_ammo_b_id=slot_a_ammo_b_id,
+                slot_a_dual_wielding=slot_a_dual_wielding,
+                slot_b_weapon_id=slot_b_weapon_id,
+                slot_b_ammo_a_id=slot_b_ammo_a_id,
+                slot_b_ammo_b_id=slot_b_ammo_b_id,
+                slot_b_dual_wielding=slot_b_dual_wielding,
+                kills=kills,
+                assists=assists,
+                deaths=deaths,
+                bounty=bounty,
+            )
+            .returning(m.MatchPlayerData.id)
+        )
+
+    async def create_match(
+        self,
+        player_1_id: int,
+        player_1_match_data_id: int,
+        wl_status: str = None,
+        match_date: date = None,
+        kills_total: int = 0,
+        playtime=None,
+        map_id: int = None,
+        player_2_id: int = None,
+        player_2_match_data_id: int = None,
+        player_3_id: int = None,
+        player_3_match_data_id: int = None,
+    ) -> int:
+        """Create a match and return its ID"""
+
+        if match_date is None:
+            match_date = date.today()
+        if playtime is None:
+            playtime = timedelta(minutes=20)
+
+        return await self.session.scalar(
+            sa.insert(m.Match)
+            .values(
+                wl_status=wl_status,
+                date=match_date,
+                kills_total=kills_total,
+                playtime=playtime,
+                map_id=map_id,
+                player_1_id=player_1_id,
+                player_2_id=player_2_id,
+                player_3_id=player_3_id,
+                player_1_match_data_id=player_1_match_data_id,
+                player_2_match_data_id=player_2_match_data_id,
+                player_3_match_data_id=player_3_match_data_id,
+            )
+            .returning(m.Match.id)
+        )
+
+    async def create_fight_location(
+        self,
+        match_id: int,
+        compound_id: int,
+        fight_ordering: int = 0,
+    ) -> None:
+        """Create a fight location entry"""
+        await self.session.execute(
+            sa.insert(m.M2MFightLocations).values(
+                match_id=match_id,
+                compound_id=compound_id,
+                fight_ordering=fight_ordering,
+            )
         )

@@ -6,6 +6,7 @@ from starlette.responses import RedirectResponse
 from api.router_ammo_types import ammo_type_router
 from api.router_compounds import compound_router
 from api.router_maps import map_router
+from api.router_match import match_router
 from api.router_players import player_router
 from api.router_weapon_types import weapon_types_router
 from api.router_weapons import weapons_router
@@ -23,6 +24,7 @@ app = FastAPI(
 
 
 app.include_router(heartbeat_router, prefix="")
+app.include_router(match_router)
 app.include_router(ammo_type_router)
 app.include_router(weapon_types_router)
 app.include_router(weapons_router)
