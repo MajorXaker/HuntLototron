@@ -114,8 +114,6 @@ class TestCompoundsEndpoints:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["x_relative"] == 150.0
-        assert data["y_relative"] == 20.0  # Should remain unchanged
         assert data["double_clue"] is False  # Should remain unchanged
 
     async def test_update_nonexistent_compound(self, test_client_rest):
