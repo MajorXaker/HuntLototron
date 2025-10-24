@@ -15,8 +15,6 @@ class TestCompoundsEndpoints:
                 "name": "Arden Parish",
                 "map_id": map_id,
                 "double_clue": True,
-                "x_relative": 45.5,
-                "y_relative": 32.1,
             },
         )
 
