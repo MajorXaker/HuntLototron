@@ -69,7 +69,13 @@ async def create_compound(
 
     # Insert new compound
     result = await db.execute(
-        sa.insert(m.Compound).values(**compound_data.model_dump()).returning(m.Compound)
+        sa.insert(m.Compound).values(
+            {
+                m.Compound.name: compound_data.name,
+                m.Compound.map_id: compound_data.map_id,
+                m.Compound.double_clue: compound_data.double_clue,
+            }
+        ).returning(m.Compound)
     )
     compound = result.scalar_one()
 

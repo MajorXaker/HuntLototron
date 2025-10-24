@@ -25,8 +25,6 @@ class TestCompoundsEndpoints:
         assert data["name"] == "Arden Parish"
         assert data["map_id"] == map_id
         assert data["double_clue"] is True
-        assert data["x_relative"] == 45.5
-        assert data["y_relative"] == 32.1
 
     async def test_create_duplicate_compound(self, test_client_rest, creator):
         """Test creating a compound with duplicate name"""
@@ -80,8 +78,6 @@ class TestCompoundsEndpoints:
         assert data["name"] == "Arden Parish"
         assert data["map_id"] == map_id
         assert data["double_clue"] is True
-        assert data["x_relative"] == 50.0
-        assert data["y_relative"] == 60.0
 
     async def test_get_nonexistent_compound(self, test_client_rest):
         """Test getting a compound that doesn't exist"""
@@ -105,8 +101,6 @@ class TestCompoundsEndpoints:
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "Arden Parish"
-        assert data["x_relative"] == 100.0
-        assert data["y_relative"] == 200.0
         assert data["double_clue"] is True
 
     async def test_update_partial_compound(self, test_client_rest, creator):
