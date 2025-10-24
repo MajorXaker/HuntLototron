@@ -14,5 +14,6 @@ async def get_modification_types():
         "melee": [i for i in mod.MeleeEnum],
         "muzzle": [i for i in mod.MuzzleEnum],
         "magazine": [i for i in mod.MagazineEnum],
+        "weapon_size": [i for i in mod.WeaponSizeEnum],
     }
     return data
