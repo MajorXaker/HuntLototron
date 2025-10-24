@@ -82,12 +82,17 @@ async def add_results(
         .where(m.Match.id == results_data.match_id)
         .values(
             {
+                m.Match.wl_status: results_data.wl_status,
                 m.Match.playtime: results_data.playtime,
                 m.Match.kills_total: results_data.kills_total,
                 m.Match.map_id: results_data.map_id,
             }
         )
         .returning(m.Match.player_1_match_data_id)
+    )
+
+    await db.execute(
+        sa.delete(m.M2MFightLocations).where(m.M2MFightLocations.match_id == match_id)
     )
 
     fights_data = [
@@ -249,3 +254,41 @@ async def get_specific_matches(
         session=db,
     )
     return GetMatchesSchema(data=res)
+
+
+@match_router.delete(
+    "/{match_id}",
+    response_model=ShortMatchResponseSchema,
+)
+async def remove_matches(
+    match_id: int,
+    db: AsyncSession = get_session_dep,
+):
+    match_id = await db.scalar(sa.select(m.Match.id).where(m.Match.id == match_id))
+    if not match_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    match_player_data_ids = (
+        (
+            await db.execute(
+                sa.delete(m.Match)
+                .where(m.Match.id == match_id)
+                .returning(
+                    m.Match.player_1_match_data_id,
+                    m.Match.player_2_match_data_id,
+                    m.Match.player_3_match_data_id,
+                )
+            )
+        )
+        .scalars()
+        .all()
+    )
+    await db.execute(
+        sa.delete(m.M2MFightLocations).where(m.M2MFightLocations.match_id == match_id)
+    )
+    await db.execute(
+        sa.delete(m.MatchPlayerData).where(
+            m.MatchPlayerData.id.in_(match_player_data_ids)
+        )
+    )
+    return ShortMatchResponseSchema(match_id=match_id)

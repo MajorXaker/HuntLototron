@@ -43,21 +43,16 @@ class TestMatchEndpoints:
         match_id = data["match_id"]
         assert match_id is not None
 
-        match_data = (
-            (
-                await dbsession.execute(
-                    sa.select(
-                        m.Match.player_1_match_data_id,
-                        m.Match.player_2_match_data_id,
-                        m.Match.player_3_match_data_id,
-                        m.Match.wl_status,
-                        m.Match.date,
-                    )
-                )
-            )
-            .mappings()
-            .fetchone()
+        match_query = sa.select(
+            m.Match.player_1_match_data_id,
+            m.Match.player_2_match_data_id,
+            m.Match.player_3_match_data_id,
+            m.Match.wl_status,
+            m.Match.date,
+            m.Match.playtime,
         )
+
+        match_data = (await dbsession.execute(match_query)).mappings().fetchone()
 
         assert match_data == {
             "player_1_match_data_id": 1,
@@ -65,6 +60,7 @@ class TestMatchEndpoints:
             "player_3_match_data_id": None,
             "wl_status": None,
             "date": match_date,
+            "playtime": None,
         }
         match_player_query = sa.select(
             m.MatchPlayerData.player_id,
@@ -122,6 +118,10 @@ class TestMatchEndpoints:
             },
         )
 
+        match_data = (await dbsession.execute(match_query)).mappings().fetchone()
+
+        assert match_data.playtime == playtime
+
         assert response.status_code == 201
         data = response.json()
         assert data["match_id"] == match_id
@@ -140,6 +140,20 @@ class TestMatchEndpoints:
         )
 
         assert match_player_data == expected_match_player_result
+
+        fight_location_results = (
+            (
+                await dbsession.execute(
+                    sa.select(m.M2MFightLocations.compound_id)
+                    .where(m.M2MFightLocations.match_id == match_id)
+                    .order_by(m.M2MFightLocations.fight_ordering.asc())
+                )
+            )
+            .scalars()
+            .all()
+        )
+
+        assert fight_location_results == [compound_1_id, compound_2_id]
 
     @pytest.mark.skip
     async def test_create_match_with_multiple_players(self, test_client, creator):
@@ -275,3 +289,48 @@ class TestMatchEndpoints:
         )
 
         assert response.status_code == 404
+
+    async def test_delete_match(self, test_client_rest, creator, dbsession):
+        """Test getting all matches"""
+        # Create prerequisites
+        player_id = await creator.create_player(username="Player1")
+        weapon_type_id = await creator.create_weapon_type("Rifle")
+        weapon_id = await creator.create_weapon("Winfield", weapon_type_id)
+
+        player_data_id = await creator.create_match_player_data(
+            player_id=player_id,
+            slot_a_weapon_id=weapon_id,
+            slot_b_weapon_id=weapon_id,
+        )
+
+        map_id = await creator.create_map()
+        compound_id = await creator.create_compound(map_id=map_id)
+
+        # Create matches
+        match_1_id = await creator.create_match(
+            match_date=date(2025, 1, 20),
+            player_1_id=player_id,
+            player_1_match_data_id=player_data_id,
+            kills_total=5,
+            map_id=map_id,
+        )
+
+        await creator.create_fight_location(
+            match_id=match_1_id,
+            compound_id=compound_id,
+        )
+        data = await dbsession.scalar(sa.select(m.Match.id))
+        assert data
+        data = await dbsession.scalar(sa.select(m.MatchPlayerData.id))
+        assert data
+        data = await dbsession.scalar(sa.select(m.M2MFightLocations.match_id))
+        assert data
+
+        await test_client_rest.delete(f"http://test/matches/{match_1_id}")
+
+        data = await dbsession.scalar(sa.select(m.Match.id))
+        assert not data
+        data = await dbsession.scalar(sa.select(m.MatchPlayerData.id))
+        assert not data
+        data = await dbsession.scalar(sa.select(m.M2MFightLocations.match_id))
+        assert not data
