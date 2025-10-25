@@ -56,7 +56,7 @@ class FullMatchSchema(BaseModel):
     wl_status: Optional[WLStatusEnum] = None
     date: Optional[date]
     kills_total: Optional[int] = None
-    playtime: Optional[timedelta] = None
+    playtime: Optional[int] = None # timedelta returns weird result hard to work with - 'PT20M1S'
     map_id: Optional[int] = None
     fights_places_ids: list[int]
 

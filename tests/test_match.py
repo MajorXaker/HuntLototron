@@ -118,9 +118,9 @@ class TestMatchEndpoints:
             },
         )
 
-        match_data = (await dbsession.execute(match_query)).mappings().fetchone()
+        playtime = await dbsession.scalar(sa.select(m.Match.playtime).where(m.Match.id == match_id))
 
-        assert match_data.playtime == playtime
+        assert playtime == playtime
 
         assert response.status_code == 201
         data = response.json()
@@ -177,51 +177,14 @@ class TestMatchEndpoints:
     async def test_get_all_matches(self, test_client_rest, creator):
         """Test getting all matches"""
         # Create prerequisites
-        player_id = await creator.create_player(username="Player1")
-        weapon_type_id = await creator.create_weapon_type("Rifle")
-        weapon_id = await creator.create_weapon("Winfield", weapon_type_id)
-
-        player_data_id = await creator.create_match_player_data(
-            player_id=player_id,
-            slot_a_weapon_id=weapon_id,
-            slot_b_weapon_id=weapon_id,
-        )
-
-        map_id = await creator.create_map()
-        compound_id = await creator.create_compound(map_id=map_id)
-
-        # Create matches
-        match_1_id = await creator.create_match(
-            match_date=date(2025, 1, 20),
-            player_1_id=player_id,
-            player_1_match_data_id=player_data_id,
-            kills_total=5,
-            map_id=map_id,
-        )
-
-        match_2_id = await creator.create_match(
-            match_date=date(2025, 1, 10),
-            player_1_id=player_id,
-            player_1_match_data_id=player_data_id,
-            kills_total=8,
-            map_id=map_id,
-        )
-
-        await creator.create_fight_location(
-            match_id=match_1_id,
-            compound_id=compound_id,
-        )
-        await creator.create_fight_location(
-            match_id=match_2_id,
-            compound_id=compound_id,
-        )
+        compound_id, map_id, match_1_id, match_2_id, player_id = await self.create_match(creator)
 
         # Get all matches
         response = await test_client_rest.get("http://test/matches")
 
         assert response.status_code == 200
         data = response.json()["data"]
-        assert len(data) >= 2
+        assert len(data) == 2
 
         first_match, second_match = data
 
@@ -230,10 +193,73 @@ class TestMatchEndpoints:
         assert first_match["fights_places_ids"] == [compound_id]
         assert first_match["player_1_id"] == player_id
         assert first_match["kills_total"] == 8
+        assert first_match["playtime"] == timedelta(minutes=20, seconds=1).seconds
 
         assert second_match["map_id"] == map_id
         assert second_match["id"] == match_1_id
         assert second_match["kills_total"] == 5
+        assert second_match["playtime"] == timedelta(minutes=15, seconds=44).seconds
+
+    async def test_ordering(self, test_client_rest, creator):
+        await self.create_match(creator)
+
+        response = await test_client_rest.get("http://test/matches?ordering=desc")
+
+        assert response.status_code == 200
+        data = response.json()["data"]
+        assert len(data) == 2
+
+        first_match, second_match = data
+
+        assert datetime.date.fromisoformat(first_match["date"]) > datetime.date.fromisoformat(second_match["date"])
+
+        response = await test_client_rest.get("http://test/matches?ordering=asc")
+
+        assert response.status_code == 200
+        data = response.json()["data"]
+        assert len(data) == 2
+
+        first_match, second_match = data
+
+        assert datetime.date.fromisoformat(first_match["date"]) < datetime.date.fromisoformat(second_match["date"])
+
+    async def create_match(self, creator):
+        player_id = await creator.create_player(username="Player1")
+        weapon_type_id = await creator.create_weapon_type("Rifle")
+        weapon_id = await creator.create_weapon("Winfield", weapon_type_id)
+        player_data_id = await creator.create_match_player_data(
+            player_id=player_id,
+            slot_a_weapon_id=weapon_id,
+            slot_b_weapon_id=weapon_id,
+        )
+        map_id = await creator.create_map()
+        compound_id = await creator.create_compound(map_id=map_id)
+        # Create matches
+        match_1_id = await creator.create_match(
+            match_date=date(2025, 1, 20),
+            player_1_id=player_id,
+            player_1_match_data_id=player_data_id,
+            kills_total=5,
+            map_id=map_id,
+            playtime=timedelta(minutes=15, seconds=44),
+        )
+        match_2_id = await creator.create_match(
+            match_date=date(2025, 1, 10),
+            player_1_id=player_id,
+            player_1_match_data_id=player_data_id,
+            kills_total=8,
+            map_id=map_id,
+            playtime=timedelta(minutes=20, seconds=1),
+        )
+        await creator.create_fight_location(
+            match_id=match_1_id,
+            compound_id=compound_id,
+        )
+        await creator.create_fight_location(
+            match_id=match_2_id,
+            compound_id=compound_id,
+        )
+        return compound_id, map_id, match_1_id, match_2_id, player_id
 
     @pytest.mark.skip
     async def test_get_match_by_id(self, test_client, creator):
@@ -293,32 +319,8 @@ class TestMatchEndpoints:
     async def test_delete_match(self, test_client_rest, creator, dbsession):
         """Test getting all matches"""
         # Create prerequisites
-        player_id = await creator.create_player(username="Player1")
-        weapon_type_id = await creator.create_weapon_type("Rifle")
-        weapon_id = await creator.create_weapon("Winfield", weapon_type_id)
+        compound_id, map_id, match_1_id, match_2_id, player_id = await self.create_match(creator)
 
-        player_data_id = await creator.create_match_player_data(
-            player_id=player_id,
-            slot_a_weapon_id=weapon_id,
-            slot_b_weapon_id=weapon_id,
-        )
-
-        map_id = await creator.create_map()
-        compound_id = await creator.create_compound(map_id=map_id)
-
-        # Create matches
-        match_1_id = await creator.create_match(
-            match_date=date(2025, 1, 20),
-            player_1_id=player_id,
-            player_1_match_data_id=player_data_id,
-            kills_total=5,
-            map_id=map_id,
-        )
-
-        await creator.create_fight_location(
-            match_id=match_1_id,
-            compound_id=compound_id,
-        )
         data = await dbsession.scalar(sa.select(m.Match.id))
         assert data
         data = await dbsession.scalar(sa.select(m.MatchPlayerData.id))
@@ -327,6 +329,7 @@ class TestMatchEndpoints:
         assert data
 
         await test_client_rest.delete(f"http://test/matches/{match_1_id}")
+        await test_client_rest.delete(f"http://test/matches/{match_2_id}")
 
         data = await dbsession.scalar(sa.select(m.Match.id))
         assert not data

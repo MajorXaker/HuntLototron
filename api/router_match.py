@@ -191,7 +191,13 @@ async def _get_matches(
 
     if match_id:
         query = query.where(m.Match.id == match_id)
-    query = query.order_by(m.Match.date).limit(limit).offset(offset)
+
+    query = query.limit(limit).offset(offset)
+
+    if ordering == OrderingEnum.DESC:
+        query = query.order_by(m.Match.date.desc())
+    else:
+        query = query.order_by(m.Match.date.asc())
 
     data = (await session.execute(query)).fetchall()
 
@@ -201,7 +207,7 @@ async def _get_matches(
             wl_status=match.wl_status,
             date=match.date,
             kills_total=match.kills_total,
-            playtime=match.playtime,
+            playtime=match.playtime.total_seconds(),
             map_id=match.map_id,
             fights_places_ids=match.fight_locations_ids,
             player_1_id=match.player_1_id,
