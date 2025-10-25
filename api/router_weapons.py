@@ -88,9 +88,16 @@ async def update_weapon(
     weapon_id: int, weapon_data: WeaponUpdate, db: AsyncSession = get_session_dep
 ):
     """Update a weapon"""
+    if weapon_id == weapon_data.core_gun_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Weapon cannot reference itself as core weapon",
+        )
+
     # Check if weapon exists
     result = await db.execute(sa.select(m.Weapon).where(m.Weapon.id == weapon_id))
     weapon = result.scalar_one_or_none()
+
 
     if not weapon:
         raise HTTPException(
