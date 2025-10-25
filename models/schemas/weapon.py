@@ -123,13 +123,15 @@ class WeaponCreate(WeaponBase):
 class WeaponUpdate(BaseModel):
     name: Optional[str] = None
     weapon_type_id: Optional[int] = None
-    core_gun_id: Optional[str] = None
+    core_gun_id: Optional[int] = None
 
     size: Optional[int] = None
-    sights: Optional[str] = None
-    melee: Optional[str] = None
-    muzzle: Optional[str] = None
-    magazine: Optional[str] = None
+    sights: Optional[str] = mod.DefaultModsEnum.DEFAULT_SIGHTS
+    melee: Optional[str] = mod.DefaultModsEnum.DEFAULT_MELEE
+    muzzle: Optional[str] = mod.DefaultModsEnum.DEFAULT_MUZZLE
+    magazine: Optional[str] = mod.DefaultModsEnum.DEFAULT_MAGAZINE
+    weapon_size: Optional[str] = mod.DefaultModsEnum.DEFAULT_WEAPON_SIZE
+
 
     price: Optional[int] = None
     has_ammo_B: Optional[bool] = None
