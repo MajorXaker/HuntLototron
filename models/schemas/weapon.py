@@ -125,7 +125,7 @@ class WeaponUpdate(BaseModel):
     weapon_type_id: Optional[int] = None
     core_gun_id: Optional[int] = None
 
-    size: Optional[int] = None
+    slot_size: Optional[int] = None
     sights: Optional[str] = mod.DefaultModsEnum.DEFAULT_SIGHTS
     melee: Optional[str] = mod.DefaultModsEnum.DEFAULT_MELEE
     muzzle: Optional[str] = mod.DefaultModsEnum.DEFAULT_MUZZLE
