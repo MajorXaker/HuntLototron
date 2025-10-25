@@ -207,7 +207,7 @@ async def _get_matches(
             wl_status=match.wl_status,
             date=match.date,
             kills_total=match.kills_total,
-            playtime=match.playtime.total_seconds(),
+            playtime=match.playtime.total_seconds() if match.playtime else None,
             map_id=match.map_id,
             fights_places_ids=match.fight_locations_ids,
             player_1_id=match.player_1_id,
