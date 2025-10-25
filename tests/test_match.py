@@ -118,7 +118,9 @@ class TestMatchEndpoints:
             },
         )
 
-        playtime = await dbsession.scalar(sa.select(m.Match.playtime).where(m.Match.id == match_id))
+        playtime = await dbsession.scalar(
+            sa.select(m.Match.playtime).where(m.Match.id == match_id)
+        )
 
         assert playtime == playtime
 
@@ -177,7 +179,9 @@ class TestMatchEndpoints:
     async def test_get_all_matches(self, test_client_rest, creator):
         """Test getting all matches"""
         # Create prerequisites
-        compound_id, map_id, match_1_id, match_2_id, player_id = await self.create_match(creator)
+        compound_id, map_id, match_1_id, match_2_id, player_id = (
+            await self.create_match(creator)
+        )
 
         # Get all matches
         response = await test_client_rest.get("http://test/matches")
@@ -211,7 +215,9 @@ class TestMatchEndpoints:
 
         first_match, second_match = data
 
-        assert datetime.date.fromisoformat(first_match["date"]) > datetime.date.fromisoformat(second_match["date"])
+        assert datetime.date.fromisoformat(
+            first_match["date"]
+        ) > datetime.date.fromisoformat(second_match["date"])
 
         response = await test_client_rest.get("http://test/matches?ordering=asc")
 
@@ -221,7 +227,9 @@ class TestMatchEndpoints:
 
         first_match, second_match = data
 
-        assert datetime.date.fromisoformat(first_match["date"]) < datetime.date.fromisoformat(second_match["date"])
+        assert datetime.date.fromisoformat(
+            first_match["date"]
+        ) < datetime.date.fromisoformat(second_match["date"])
 
     async def create_match(self, creator):
         player_id = await creator.create_player(username="Player1")
@@ -319,7 +327,9 @@ class TestMatchEndpoints:
     async def test_delete_match(self, test_client_rest, creator, dbsession):
         """Test getting all matches"""
         # Create prerequisites
-        compound_id, map_id, match_1_id, match_2_id, player_id = await self.create_match(creator)
+        compound_id, map_id, match_1_id, match_2_id, player_id = (
+            await self.create_match(creator)
+        )
 
         data = await dbsession.scalar(sa.select(m.Match.id))
         assert data

@@ -19,6 +19,7 @@ async def get_weapons(
     ammo_size: mod.AmmoSizeEnum = None,
     core_gun_id: int = None,
     core_gun_only: bool = False,
+    weapon_type_id: int = None,
     db: AsyncSession = get_session_dep,
 ):
     """Get all weapons with pagination"""
@@ -35,6 +36,8 @@ async def get_weapons(
         )
     if core_gun_only:
         query = query.where(m.Weapon.core_gun_id.is_(None))
+    if weapon_type_id:
+        query = query.where(m.Weapon.weapon_type_id == weapon_type_id)
 
     result = await db.execute(query)
 
@@ -91,13 +94,12 @@ async def update_weapon(
     if weapon_id == weapon_data.core_gun_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Weapon cannot reference itself as core weapon",
+            detail="Weapon cannot reference itself as core weapon",
         )
 
     # Check if weapon exists
     result = await db.execute(sa.select(m.Weapon).where(m.Weapon.id == weapon_id))
     weapon = result.scalar_one_or_none()
-
 
     if not weapon:
         raise HTTPException(
