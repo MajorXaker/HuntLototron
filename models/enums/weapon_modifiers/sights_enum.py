@@ -6,3 +6,4 @@ class SightsEnum(StrEnum):
     DEADEYE = "deadeye"
     MARKSMAN = "marksman"
     SNIPER = "sniper"
+    APERTURE = "aperture"
