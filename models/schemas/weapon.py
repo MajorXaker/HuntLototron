@@ -131,7 +131,7 @@ class WeaponUpdate(BaseModel):
     muzzle: Optional[str] = mod.DefaultModsEnum.DEFAULT_MUZZLE
     magazine: Optional[str] = mod.DefaultModsEnum.DEFAULT_MAGAZINE
     weapon_size: Optional[str] = mod.DefaultModsEnum.DEFAULT_WEAPON_SIZE
-
+    ammo_size: Optional[mod.AmmoSizeEnum] = Field(description="Ammo size of the gun")
 
     price: Optional[int] = None
     has_ammo_B: Optional[bool] = None
