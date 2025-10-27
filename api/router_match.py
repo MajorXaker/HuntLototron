@@ -195,9 +195,15 @@ async def _get_matches(
     query = query.limit(limit).offset(offset)
 
     if ordering == OrderingEnum.DESC:
-        query = query.order_by(m.Match.date.desc())
+        query = query.order_by(
+            m.Match.date.desc(),
+            m.Match.id.desc(),
+        )
     else:
-        query = query.order_by(m.Match.date.asc())
+        query = query.order_by(
+            m.Match.date.asc(),
+            m.Match.id.asc(),
+        )
 
     data = (await session.execute(query)).fetchall()
 
