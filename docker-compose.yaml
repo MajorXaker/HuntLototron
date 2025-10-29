@@ -1,0 +1,20 @@
+services:
+  postgres:
+    container_name: huntotron-postgres
+    image: postgres:15.1
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=huntotron
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d huntotron" ]
+      interval: 90s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    restart: unless-stopped
+

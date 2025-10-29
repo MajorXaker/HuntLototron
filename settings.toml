@@ -1,13 +1,15 @@
 [default]
-SECRET_KEY = "123"
-EMAIL_USER = 'HuntAdminLototron'
-IS_DEBUG = true
-USER_HASH_LIMIT=3
+    APPNAME = "Huntotron"
+    VERSION = "0.2.1"
 
-[development]
-IS_DEBUG = true
-USER_HASH_LIMIT=10
+    DATABASE_PORT = "5432"
+    DATABASE_USER = "postgres"
+    DATABASE_PASSWORD = "postgres"
+    DATABASE_DB = "huntotron"
+    DATABASE_HOST = "localhost"
+    DATABASE_ECHO_MODE = false
 
-[production]
-IS_DEBUG = false
-USER_HASH_LIMIT=10
+
+[test]
+    DATABASE_DB = "test-db"
+    DATABASE_HOST = "postgres"
