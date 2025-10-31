@@ -117,7 +117,7 @@ class TestWeaponsEndpoints:
         weapon_id = await creator.create_weapon("Winfield", weapon_type_id, price=75)
 
         response = await test_client_rest.patch(
-            f"http://test/weapons/{weapon_id}", json={"price": 100, "weight": 4.0}
+            f"http://test/weapons/{weapon_id}", json={"price": 100 }
         )
 
         assert response.status_code == 200

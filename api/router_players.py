@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session_dep
 from models import db_models as m
+from models.enums.player_status import PlayerStatusEnum
 from models.schemas.player import PlayerCreate, PlayerUpdate, PlayerResponse
 
 player_router = APIRouter(prefix="/players", tags=["Players"])
@@ -13,10 +14,18 @@ player_router = APIRouter(prefix="/players", tags=["Players"])
 
 @player_router.get("", response_model=List[PlayerResponse])
 async def get_players(
-    skip: int = 0, limit: int = 100, db: AsyncSession = get_session_dep
+    skip: int = 0,
+    limit: int = 100,
+    include_disabled: bool = False,
+    db: AsyncSession = get_session_dep
 ):
     """Get all players with pagination"""
-    result = await db.execute(sa.select(m.Player).offset(skip).limit(limit))
+    query = sa.select(m.Player).offset(skip).limit(limit)
+
+    if not include_disabled:
+        query = query.where(m.Player.status == PlayerStatusEnum.ACTIVE)
+
+    result = await db.execute(query)
     players = result.scalars().all()
     return players
 
@@ -72,13 +81,23 @@ async def update_player(
             detail=f"Player with id {player_id} not found",
         )
 
+    update_data = {}
+    if player_data.username:
+        update_data[m.Player.username] = player_data.username
+
+    if player_data.is_disabled is not None:
+        disabled_map = {
+            True: PlayerStatusEnum.ACTIVE,
+            False: PlayerStatusEnum.INACTIVE,
+        }
+        update_data[m.Player.status] = disabled_map[player_data.is_disabled]
+
     # Update only provided fields
-    update_data = player_data.model_dump(exclude_unset=True)
     if update_data:
         result = await db.execute(
             sa.update(m.Player)
             .where(m.Player.id == player_id)
-            .values(**update_data)
+            .values(update_data)
             .returning(m.Player)
         )
         player = result.scalar_one()

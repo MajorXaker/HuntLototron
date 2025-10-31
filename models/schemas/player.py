@@ -14,6 +14,7 @@ class PlayerCreate(PlayerBase):
 
 class PlayerUpdate(BaseModel):
     username: Optional[str] = None
+    is_disabled: Optional[bool] = None
 
 
 class PlayerResponse(PlayerBase):

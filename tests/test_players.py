@@ -110,3 +110,29 @@ class TestPlayersEndpoints:
         response = await test_client_rest.delete("http://test/players/9999")
 
         assert response.status_code == 404
+
+    async def test_deactivated_player(self, test_client_rest, creator):
+        """Test deactivating a player"""
+        player_1_id = await creator.create_player()
+        player_2_id = await creator.create_player()
+
+        response = await test_client_rest.patch(
+            f"http://test/players/{player_2_id}",
+            json={
+                "is_disabled": "False",
+            },
+        )
+
+        assert response.status_code == 200
+
+        response = await test_client_rest.get(f"http://test/players")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+
+        response = await test_client_rest.get(f"http://test/players?include_disabled=true")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 2
