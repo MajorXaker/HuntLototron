@@ -1,43 +1,20 @@
-# Build stage
-FROM ghcr.io/astral-sh/uv:python3.14-alpine AS builder
-
-# Optimize uv for Docker
-ENV UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy
-
-WORKDIR /app
-
-# Install build dependencies
-RUN apk add --no-cache build-base
-
-# Copy only dependency files first for layer caching
-COPY pyproject.toml uv.lock ./
-
-# Install dependencies with cache mount
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
-
-# Copy application code
-COPY . .
-
-# Runtime stage
 FROM ghcr.io/astral-sh/uv:python3.14-alpine
 
-# Create non-root user
-RUN addgroup -g 1000 appgroup && \
-    adduser -D -u 1000 -G appgroup appuser
-
-ENV WORKDIR_PATH=/app \
-    PATH="/app/.venv/bin:$PATH"
+ENV WORKDIR_PATH /app
+ENV XDG_DATA_HOME=${WORKDIR_PATH}
+ENV UV_CACHE_DIR=./.uv-cache
 
 WORKDIR $WORKDIR_PATH
 
-# Copy virtual environment and application from builder
-COPY --from=builder --chown=appuser:appgroup /app/.venv /app/.venv
-COPY --from=builder --chown=appuser:appgroup /app /app
+COPY ./pyproject.toml .
+COPY ./uv.lock .
 
-# Switch to non-root user
-USER appuser
+RUN apk add build-base
+RUN uv sync --frozen --no-dev
 
-# Use proper signal handling with exec form
+COPY --chmod=0444 . .
+RUN find $WORKDIR_PATH -type d -exec chown $USER_CONTAINER:$USER_CONTAINER {} \;
+RUN find $WORKDIR_PATH -type d -exec chmod 755 {} \;
+
+USER $USER_CONTAINER
 CMD uv run alembic upgrade head && uv run main.py
