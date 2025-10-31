@@ -40,5 +40,4 @@ COPY --from=builder --chown=appuser:appgroup /app /app
 USER appuser
 
 # Use proper signal handling with exec form
-ENTRYPOINT ["sh", "-c"]
-CMD ["uv run alembic upgrade head && uv run python main.py"]
+CMD uv run alembic upgrade head && uv run main.py
