@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict
 class PlayerBase(BaseModel):
     id: Optional[int] = None
     username: Optional[str] = None
+    status: Optional[str] = None
 
 
 class PlayerCreate(PlayerBase):
