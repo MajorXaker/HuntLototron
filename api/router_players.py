@@ -87,8 +87,8 @@ async def update_player(
 
     if player_data.is_disabled is not None:
         disabled_map = {
-            True: PlayerStatusEnum.ACTIVE,
-            False: PlayerStatusEnum.INACTIVE,
+            True: PlayerStatusEnum.INACTIVE,
+            False: PlayerStatusEnum.ACTIVE,
         }
         update_data[m.Player.status] = disabled_map[player_data.is_disabled]
 
