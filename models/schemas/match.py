@@ -75,7 +75,7 @@ class FullMatchSchema(BaseModel):
 
 class GetMatchesSchema(BaseModel):
     data: list[FullMatchSchema]
-
+    total_results: int
 
 class ShortMatchResponseSchema(BaseModel):
     match_id: int

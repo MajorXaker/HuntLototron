@@ -127,7 +127,7 @@ async def _get_matches(
     ordering: OrderingEnum = OrderingEnum.DESC,
     limit: int = 50,
     offset: int = 0,
-) -> list[FullMatchSchema]:
+) -> tuple[list[FullMatchSchema], int]:
     match_data_raw_q = sa.select(
         m.MatchPlayerData.id,
         m.MatchPlayerData.player_id,
@@ -180,6 +180,7 @@ async def _get_matches(
         build_player_data_json(player_2_data).label("player_2_data"),
         build_player_data_json(player_3_data).label("player_3_data"),
         compounds_subquery.c.compound_ids.label("fight_locations_ids"),
+        m.Match, sa.func.count().over().label("total_count")
     ).select_from(
         sa.outerjoin(
             m.Match, player_1_data, m.Match.player_1_match_data_id == player_1_data.c.id
@@ -226,7 +227,11 @@ async def _get_matches(
         for match in data
     ]
 
-    return results
+    total = 0
+    if results:
+        total = data[0].total_count
+
+    return results, total
 
 
 @match_router.get(
@@ -239,14 +244,16 @@ async def get_matches(
     offset: Annotated[int | None, Query(ge=0)] = 0,
     db: AsyncSession = get_session_dep,
 ):
-    res = await _get_matches(
+
+
+    matches, total_count = await _get_matches(
         session=db,
         match_id=None,
         ordering=ordering,
         limit=limit,
         offset=offset,
     )
-    return GetMatchesSchema(data=res)
+    return GetMatchesSchema(data=matches, total_results=total_count)
 
 
 @match_router.get(
@@ -261,11 +268,11 @@ async def get_specific_matches(
     if not match_id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    res = await _get_matches(
+    matches, total_count = await _get_matches(
         match_id=match_id,
         session=db,
     )
-    return GetMatchesSchema(data=res)
+    return GetMatchesSchema(data=matches, total_results=1)
 
 
 @match_router.delete(

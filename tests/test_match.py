@@ -187,7 +187,10 @@ class TestMatchEndpoints:
         response = await test_client_rest.get("http://test/matches")
 
         assert response.status_code == 200
-        data = response.json()["data"]
+        data = response.json()
+
+        assert data["total_results"] == 2
+        data = data["data"]
         assert len(data) == 2
 
         first_match, second_match = data
