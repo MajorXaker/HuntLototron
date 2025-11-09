@@ -113,7 +113,7 @@ class TestPlayersEndpoints:
 
     async def test_deactivated_player(self, test_client_rest, creator):
         """Test deactivating a player"""
-        player_1_id = await creator.create_player(username="Player1")
+        await creator.create_player(username="Player1")
         player_2_id = await creator.create_player(username="Player2")
 
         response = await test_client_rest.patch(
@@ -125,13 +125,13 @@ class TestPlayersEndpoints:
 
         assert response.status_code == 200
 
-        response = await test_client_rest.get(f"http://test/players")
+        response = await test_client_rest.get("http://test/players")
 
         assert response.status_code == 200
         data = response.json()
         assert len(data) == 1
 
-        response = await test_client_rest.get(f"http://test/players?include_disabled=true")
+        response = await test_client_rest.get("http://test/players?include_disabled=true")
 
         assert response.status_code == 200
         data = response.json()
@@ -145,7 +145,7 @@ class TestPlayersEndpoints:
         )
         assert response.status_code == 200
 
-        response = await test_client_rest.get(f"http://test/players")
+        response = await test_client_rest.get("http://test/players")
 
         assert response.status_code == 200
         data = response.json()

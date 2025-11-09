@@ -355,3 +355,145 @@ class TestMatchEndpoints:
         assert not data
         data = await dbsession.scalar(sa.select(m.M2MFightLocations.match_id))
         assert not data
+
+
+@pytest.mark.asyncio
+class TestMatchUpdateEndpoint:
+    """Test cases for PATCH /matches/{match_id} endpoint"""
+
+    async def test_update_match_basic(self, test_client_rest, creator, dbsession):
+        """Test updating match with corrected data"""
+        # Create prerequisites
+        map_id = await creator.create_map("Bayou")
+        player_1_id = await creator.create_player(username="Player1")
+        weapon_type_id = await creator.create_weapon_type("Rifle")
+        weapon_1_id = await creator.create_weapon("Winfield", weapon_type_id)
+        weapon_2_id = await creator.create_weapon("Vetterli", weapon_type_id)
+        ammo_id = await creator.create_ammo_type("Compact Ammo")
+
+        compound_1 = await creator.create_compound("Compound1", map_id)
+        compound_2 = await creator.create_compound("Compound2", map_id)
+        compound_3 = await creator.create_compound("Compound3", map_id)
+
+        # Create initial match with player data
+        player_data_id = await creator.create_match_player_data(
+            player_id=player_1_id,
+            slot_a_weapon_id=weapon_1_id,
+            slot_b_weapon_id=weapon_2_id,
+            slot_a_ammo_a_id=ammo_id,
+            kills=5,
+            assists=2,
+            deaths=1,
+            bounty=250,
+        )
+
+        match_id = await creator.create_match(
+            player_1_id=player_1_id,
+            player_1_match_data_id=player_data_id,
+            wl_status="win",
+            kills_total=5,
+        )
+
+        # Add initial fight locations
+        await creator.create_fight_location(match_id, compound_1, 0)
+        await creator.create_fight_location(match_id, compound_2, 1)
+
+        # Update the match with corrected data
+        update_data = {
+            "date": "2025-11-10",
+            "player_1_id": player_1_id,
+            "player_2_id": None,
+            "player_3_id": None,
+            "slot_a_weapon_id": weapon_2_id,  # Changed weapon
+            "slot_a_ammo_a_id": ammo_id,
+            "slot_a_ammo_b_id": None,
+            "slot_a_dual_wielding": False,
+            "slot_b_weapon_id": weapon_1_id,  # Swapped weapons
+            "slot_b_ammo_a_id": None,
+            "slot_b_ammo_b_id": None,
+            "slot_b_dual_wielding": False,
+            "wl_status": "lose",  # Changed from win to lose
+            "kills_total": 8,  # Updated kills
+            "kills": 8,
+            "assists": 3,  # Updated assists
+            "deaths": 2,  # Updated deaths
+            "bounty": 300,  # Updated bounty
+            "playtime": "PT25M",  # 25 minutes in ISO 8601 format
+            "map_id": map_id,
+            "fights_places_ids": [compound_1, compound_2, compound_3],  # Added third location
+        }
+
+        response = await test_client_rest.patch(
+            f"http://test/matches/{match_id}",
+            json=update_data
+        )
+        if response.status_code == 422:
+            print(response.text)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["match_id"] == match_id
+
+
+        # Verify the match was updated
+        get_response = await test_client_rest.get(f"http://test/matches/specific/{match_id}")
+        assert get_response.status_code == 200
+        match_data = get_response.json()["data"][0]
+
+
+        # Verify match fields were updated
+        assert match_data["wl_status"] == "lose"
+        assert match_data["kills_total"] == 8
+
+        player_data = match_data["player_1_data"]
+
+        assert player_data["slot_a_weapon_id"] == weapon_2_id
+        assert player_data["slot_b_weapon_id"] == weapon_1_id
+        assert player_data["kills"] == 8
+        assert player_data["assists"] == 3
+        assert player_data["deaths"] == 2
+
+        fight_locations = match_data["fights_places_ids"]
+
+        assert fight_locations[0] == compound_1
+        assert fight_locations[1] == compound_2
+        assert fight_locations[2] == compound_3
+
+    async def test_update_nonexistent_match(self, test_client_rest, creator):
+        """Test updating a match that doesn't exist returns 404"""
+        # Create prerequisites for valid data
+        player_id = await creator.create_player(username="Player1")
+        weapon_type_id = await creator.create_weapon_type("Rifle")
+        weapon_id = await creator.create_weapon("Winfield", weapon_type_id)
+        ammo_id = await creator.create_ammo_type("Compact Ammo")
+
+        # Try to update non-existent match
+        update_data = {
+            "date": "2025-11-10",
+            "player_1_id": player_id,
+            "player_2_id": None,
+            "player_3_id": None,
+            "slot_a_weapon_id": weapon_id,
+            "slot_a_ammo_a_id": ammo_id,
+            "slot_a_ammo_b_id": None,
+            "slot_a_dual_wielding": False,
+            "slot_b_weapon_id": weapon_id,
+            "slot_b_ammo_a_id": None,
+            "slot_b_ammo_b_id": None,
+            "slot_b_dual_wielding": False,
+            "wl_status": "win",
+            "kills_total": 5,
+            "kills": 5,
+            "assists": 2,
+            "deaths": 1,
+            "bounty": 250,
+            "playtime": "PT20M",
+            "map_id": 1,
+            "fights_places_ids": [],
+        }
+
+        response = await test_client_rest.patch(
+            "http://test/matches/9999",  # Non-existent match ID
+            json=update_data
+        )
+
+        assert response.status_code == 404

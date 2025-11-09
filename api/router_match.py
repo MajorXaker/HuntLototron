@@ -13,7 +13,7 @@ from models.schemas.match import (
     CreateMatchResultSchema,
     GetMatchesSchema,
     FullMatchSchema,
-    NewMatchSchema,
+    NewMatchSchema, UpdateMatchSchema,
 )
 
 match_router = APIRouter(prefix="/matches", tags=["Matches"])
@@ -310,4 +310,78 @@ async def remove_matches(
             m.MatchPlayerData.id.in_(match_player_data_ids)
         )
     )
+    return ShortMatchResponseSchema(match_id=match_id)
+
+@match_router.patch(
+    "/{match_id}",
+    response_model=ShortMatchResponseSchema,
+)
+async def update_match(
+    match_id: int,
+    update_match_data: UpdateMatchSchema,
+    db: AsyncSession = get_session_dep,
+):
+    match_id = await db.scalar(sa.select(m.Match.id).where(m.Match.id == match_id))
+    if not match_id:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    match_update_data = {
+        m.Match.wl_status: update_match_data.wl_status,
+        m.Match.playtime: update_match_data.playtime,
+        m.Match.kills_total: update_match_data.kills_total,
+        # m.Match.player_1_id: update_match_data.player_1_id, # player 1, player 1 never changes
+        m.Match.player_2_id: update_match_data.player_2_id,
+        m.Match.player_3_id: update_match_data.player_3_id,
+        m.Match.map_id: update_match_data.map_id,
+    }
+
+    match_player_data_id = await db.scalar(
+        sa.update(m.Match)
+        .where(m.Match.id == match_id)
+        .values(match_update_data)
+        .returning(m.Match.player_1_match_data_id)
+    )
+
+    match_player_update_data = {
+        m.MatchPlayerData.kills: update_match_data.kills,
+        m.MatchPlayerData.deaths: update_match_data.deaths,
+        m.MatchPlayerData.assists: update_match_data.assists,
+        # slots config - slot a
+        m.MatchPlayerData.slot_a_weapon_id: update_match_data.slot_a_weapon_id,
+        m.MatchPlayerData.slot_a_ammo_a_id: update_match_data.slot_a_ammo_a_id,
+        m.MatchPlayerData.slot_a_ammo_b_id: update_match_data.slot_a_ammo_b_id,
+        m.MatchPlayerData.slot_a_dual_wielding: update_match_data.slot_a_dual_wielding,
+        # slots config - slot b
+        m.MatchPlayerData.slot_b_weapon_id: update_match_data.slot_b_weapon_id,
+        m.MatchPlayerData.slot_b_ammo_a_id: update_match_data.slot_b_ammo_a_id,
+        m.MatchPlayerData.slot_b_ammo_b_id: update_match_data.slot_b_ammo_b_id,
+        m.MatchPlayerData.slot_b_dual_wielding: update_match_data.slot_b_dual_wielding,
+    }
+    await db.execute(
+        sa.update(m.MatchPlayerData)
+        .where(m.MatchPlayerData.id == match_player_data_id)
+        .values(match_player_update_data)
+    )
+
+    compound_ids = (await db.scalars(
+        sa.select(m.M2MFightLocations.compound_id)
+        .where(m.M2MFightLocations.match_id == match_id)
+        .order_by(m.M2MFightLocations.fight_ordering.asc())
+    )).all()
+
+    if compound_ids != update_match_data.fights_places_ids:
+        await db.execute(
+            sa.delete(m.M2MFightLocations).where(m.M2MFightLocations.match_id == match_id)
+        )
+        fights_data = [
+            {
+                "match_id": match_id,
+                "compound_id": fight_location_id,
+                "fight_ordering": n,
+            }
+            for n, fight_location_id in enumerate(update_match_data.fights_places_ids)
+        ]
+        await db.execute(sa.insert(m.M2MFightLocations), fights_data)
+
+
     return ShortMatchResponseSchema(match_id=match_id)

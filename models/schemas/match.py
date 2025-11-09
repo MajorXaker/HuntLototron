@@ -50,6 +50,40 @@ class NewMatchSchema(BaseModel):
     slot_b_ammo_b_id: Optional[int] = None
     slot_b_dual_wielding: bool = False
 
+class UpdateMatchSchema(BaseModel):
+    """We could add here some fields that would indicate that the field got changed,
+    so it's necessary to include its data to the query. However, there are no plans to distribute this system
+    anymore. So the BE would be solely tied to a single and current FE.
+    If by any chance this status quo changes - I'll be happy to rework the app to allow distribution
+    and collaborative work"""
+
+    date: date
+
+    player_1_id: int
+    player_2_id: Optional[int]
+    player_3_id: Optional[int]
+
+    slot_a_weapon_id: int
+    slot_a_ammo_a_id: Optional[int] = None
+    slot_a_ammo_b_id: Optional[int] = None
+    slot_a_dual_wielding: bool = False
+
+    slot_b_weapon_id: int
+    slot_b_ammo_a_id: Optional[int] = None
+    slot_b_ammo_b_id: Optional[int] = None
+    slot_b_dual_wielding: bool = False
+
+    wl_status: WLStatusEnum
+
+    kills_total: int
+    kills: int
+    assists: int
+    deaths: int
+    bounty: int
+
+    playtime: timedelta
+    map_id: int
+    fights_places_ids: list[int]
 
 class FullMatchSchema(BaseModel):
     id: int
