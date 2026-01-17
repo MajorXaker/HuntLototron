@@ -74,3 +74,6 @@ class TestAnalyticsEndpoints:
 
         assert len(data["by_teammates"]) == 4
         assert len(data["by_team_compositions"]) == 3
+
+        assert data["by_teammates"][0]["total_matches"] == 24
+        assert data["by_team_compositions"][0]["total_matches"] == 10

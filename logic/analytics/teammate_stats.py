@@ -69,7 +69,7 @@ async def get_separate_teammates_stats(
             losses=tm.lose,
             flees=tm.flee,
             match_share=tm.matches_sum / matches_total,
-            total_matches=matches_total,
+            total_matches=tm.matches_sum,
             winrate=tm.win_ratio_percent,
         )
         for tm in unique_teammates
@@ -163,7 +163,7 @@ async def get_teammate_composition_stats(
             losses=tm.lose,
             flees=tm.flee,
             match_share=tm.matches_sum / matches_total,
-            total_matches=matches_total,
+            total_matches=tm.matches_sum,
             winrate=tm.win_ratio_percent,
         )
         for tm in combinations
