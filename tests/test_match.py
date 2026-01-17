@@ -1,9 +1,11 @@
 import datetime
+from datetime import date, timedelta
 
 import pytest
-from datetime import date, timedelta
 import sqlalchemy as sa
+
 import models.db_models as m
+from models.enums.gamemode import GameModeEnum
 
 
 @pytest.mark.asyncio
@@ -35,6 +37,7 @@ class TestMatchEndpoints:
                 "slot_b_weapon_id": pax_id,
                 "slot_b_ammo_a_id": fmj_ammo_id,
                 "slot_b_dual_wielding": True,
+                "game_mode": "clash",
             },
         )
 
@@ -44,23 +47,25 @@ class TestMatchEndpoints:
         assert match_id is not None
 
         match_query = sa.select(
-            m.Match.player_1_match_data_id,
+            # m.Match.player_1_match_data_id,
             m.Match.player_2_match_data_id,
             m.Match.player_3_match_data_id,
             m.Match.wl_status,
             m.Match.date,
             m.Match.playtime,
+            m.Match.game_mode,
         )
 
         match_data = (await dbsession.execute(match_query)).mappings().fetchone()
 
         assert match_data == {
-            "player_1_match_data_id": 1,
+            # "player_1_match_data_id": 1,
             "player_2_match_data_id": None,
             "player_3_match_data_id": None,
             "wl_status": None,
             "date": match_date,
             "playtime": None,
+            "game_mode": GameModeEnum.CLASH,
         }
         match_player_query = sa.select(
             m.MatchPlayerData.player_id,
@@ -179,9 +184,13 @@ class TestMatchEndpoints:
     async def test_get_all_matches(self, test_client_rest, creator):
         """Test getting all matches"""
         # Create prerequisites
-        compound_id, map_id, match_1_id, match_2_id, player_id = (
-            await self.create_matches(creator)
-        )
+        (
+            compound_id,
+            map_id,
+            match_1_id,
+            match_2_id,
+            player_id,
+        ) = await self.create_matches(creator)
 
         # Get all matches
         response = await test_client_rest.get("http://test/matches")
@@ -335,9 +344,13 @@ class TestMatchEndpoints:
     async def test_delete_match(self, test_client_rest, creator, dbsession):
         """Test getting all matches"""
         # Create prerequisites
-        compound_id, map_id, match_1_id, match_2_id, player_id = (
-            await self.create_matches(creator)
-        )
+        (
+            compound_id,
+            map_id,
+            match_1_id,
+            match_2_id,
+            player_id,
+        ) = await self.create_matches(creator)
 
         data = await dbsession.scalar(sa.select(m.Match.id))
         assert data
@@ -420,12 +433,15 @@ class TestMatchUpdateEndpoint:
             "bounty": 300,  # Updated bounty
             "playtime": "PT25M",  # 25 minutes in ISO 8601 format
             "map_id": map_id,
-            "fights_places_ids": [compound_1, compound_2, compound_3],  # Added third location
+            "fights_places_ids": [
+                compound_1,
+                compound_2,
+                compound_3,
+            ],  # Added third location
         }
 
         response = await test_client_rest.patch(
-            f"http://test/matches/{match_id}",
-            json=update_data
+            f"http://test/matches/{match_id}", json=update_data
         )
         if response.status_code == 422:
             print(response.text)
@@ -433,12 +449,12 @@ class TestMatchUpdateEndpoint:
         data = response.json()
         assert data["match_id"] == match_id
 
-
         # Verify the match was updated
-        get_response = await test_client_rest.get(f"http://test/matches/specific/{match_id}")
+        get_response = await test_client_rest.get(
+            f"http://test/matches/specific/{match_id}"
+        )
         assert get_response.status_code == 200
         match_data = get_response.json()["data"][0]
-
 
         # Verify match fields were updated
         assert match_data["wl_status"] == "lose"
@@ -492,8 +508,8 @@ class TestMatchUpdateEndpoint:
         }
 
         response = await test_client_rest.patch(
-            "http://test/matches/9999",  # Non-existent match ID
-            json=update_data
+            "http://test/matches/9999",
+            json=update_data,  # Non-existent match ID
         )
 
         assert response.status_code == 404

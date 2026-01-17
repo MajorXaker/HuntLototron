@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
 
-from config import settings
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, create_async_engine
 
-from fastapi import Depends
+from config import settings
 
 db_url = (
     f"postgresql+asyncpg://"

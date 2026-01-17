@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session_dep
 from models import db_models as m
-from models.schemas.ammo_type import AmmoTypeCreate, AmmoTypeUpdate, AmmoTypeResponse
+from models.schemas.ammo_type import AmmoTypeCreate, AmmoTypeResponse, AmmoTypeUpdate
 
 ammo_type_router = APIRouter(prefix="/ammo-types", tags=["Ammo Types"])
 

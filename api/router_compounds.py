@@ -4,10 +4,9 @@ import sqlalchemy as sa
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
 from db import get_session_dep
 from models import db_models as m
-from models.schemas.compound import CompoundCreate, CompoundUpdate, CompoundResponse
+from models.schemas.compound import CompoundCreate, CompoundResponse, CompoundUpdate
 
 compound_router = APIRouter(prefix="/compounds", tags=["Compounds"])
 

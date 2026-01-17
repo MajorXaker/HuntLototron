@@ -1,12 +1,12 @@
 import random
 
 import sqlalchemy as sa
+from fastapi import APIRouter
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.responses import JSONResponse, Response
+
 from config import settings
 from db import get_session_dep
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from fastapi import APIRouter
-from starlette.responses import JSONResponse, Response
 
 heartbeat_router = APIRouter()
 

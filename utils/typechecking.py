@@ -1,4 +1,5 @@
 from beartype import beartype
+
 from config import settings
 
 

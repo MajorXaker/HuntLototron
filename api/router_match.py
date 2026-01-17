@@ -1,7 +1,7 @@
 from typing import Annotated
 
 import sqlalchemy as sa
-from fastapi import APIRouter, status, Query, HTTPException
+from fastapi import APIRouter, HTTPException, Query, status
 from sqlalchemy.dialects.postgresql import aggregate_order_by
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,11 +9,12 @@ from db import get_session_dep
 from models import db_models as m
 from models.enums.api import OrderingEnum
 from models.schemas.match import (
-    ShortMatchResponseSchema,
     CreateMatchResultSchema,
-    GetMatchesSchema,
     FullMatchSchema,
-    NewMatchSchema, UpdateMatchSchema,
+    GetMatchesSchema,
+    NewMatchSchema,
+    ShortMatchResponseSchema,
+    UpdateMatchSchema,
 )
 
 match_router = APIRouter(prefix="/matches", tags=["Matches"])
@@ -48,6 +49,7 @@ async def create_new_match(
         sa.insert(m.Match)
         .values(
             {
+                m.Match.game_mode: new_match_data.game_mode,
                 m.Match.date: new_match_data.date,
                 m.Match.player_1_id: new_match_data.player_1_id,
                 m.Match.player_2_id: new_match_data.player_2_id,
@@ -180,7 +182,8 @@ async def _get_matches(
         build_player_data_json(player_2_data).label("player_2_data"),
         build_player_data_json(player_3_data).label("player_3_data"),
         compounds_subquery.c.compound_ids.label("fight_locations_ids"),
-        m.Match, sa.func.count().over().label("total_count")
+        m.Match,
+        sa.func.count().over().label("total_count"),
     ).select_from(
         sa.outerjoin(
             m.Match, player_1_data, m.Match.player_1_match_data_id == player_1_data.c.id
@@ -244,8 +247,6 @@ async def get_matches(
     offset: Annotated[int | None, Query(ge=0)] = 0,
     db: AsyncSession = get_session_dep,
 ):
-
-
     matches, total_count = await _get_matches(
         session=db,
         match_id=None,
@@ -312,6 +313,7 @@ async def remove_matches(
     )
     return ShortMatchResponseSchema(match_id=match_id)
 
+
 @match_router.patch(
     "/{match_id}",
     response_model=ShortMatchResponseSchema,
@@ -363,15 +365,19 @@ async def update_match(
         .values(match_player_update_data)
     )
 
-    compound_ids = (await db.scalars(
-        sa.select(m.M2MFightLocations.compound_id)
-        .where(m.M2MFightLocations.match_id == match_id)
-        .order_by(m.M2MFightLocations.fight_ordering.asc())
-    )).all()
+    compound_ids = (
+        await db.scalars(
+            sa.select(m.M2MFightLocations.compound_id)
+            .where(m.M2MFightLocations.match_id == match_id)
+            .order_by(m.M2MFightLocations.fight_ordering.asc())
+        )
+    ).all()
 
     if compound_ids != update_match_data.fights_places_ids:
         await db.execute(
-            sa.delete(m.M2MFightLocations).where(m.M2MFightLocations.match_id == match_id)
+            sa.delete(m.M2MFightLocations).where(
+                m.M2MFightLocations.match_id == match_id
+            )
         )
         fights_data = [
             {
@@ -382,6 +388,5 @@ async def update_match(
             for n, fight_location_id in enumerate(update_match_data.fights_places_ids)
         ]
         await db.execute(sa.insert(m.M2MFightLocations), fights_data)
-
 
     return ShortMatchResponseSchema(match_id=match_id)

@@ -4,6 +4,7 @@ from prometheus_fastapi_instrumentator import Instrumentator, metrics
 from starlette.responses import RedirectResponse
 
 from api.router_ammo_types import ammo_type_router
+from api.router_analytics import analytics_router
 from api.router_compounds import compound_router
 from api.router_maps import map_router
 from api.router_match import match_router
@@ -13,7 +14,6 @@ from api.router_weapons import weapons_router
 from api.service_endpoints import service_router
 from config import settings
 from heartbeat import heartbeat_router
-
 
 app = FastAPI(
     title=settings.APPNAME,
@@ -32,6 +32,7 @@ app.include_router(map_router)
 app.include_router(compound_router)
 app.include_router(player_router)
 app.include_router(service_router)
+app.include_router(analytics_router)
 
 metrics_instrumentator = Instrumentator(
     should_group_status_codes=False,

@@ -1,11 +1,11 @@
 # ruff:noqa: F401
 from enum import StrEnum
 
-from .sights_enum import SightsEnum
-from .meelee_modifier_enum import MeleeEnum
-from .magazine_modifier import MagazineEnum
 from .ammo_size import AmmoSizeEnum
+from .magazine_modifier import MagazineEnum
+from .meelee_modifier_enum import MeleeEnum
 from .muzzle_device_enum import MuzzleEnum
+from .sights_enum import SightsEnum
 from .weapon_size import WeaponSizeEnum
 
 # TODO semi avto and avto variants

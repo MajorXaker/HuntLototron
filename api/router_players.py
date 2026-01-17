@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db import get_session_dep
 from models import db_models as m
 from models.enums.player_status import PlayerStatusEnum
-from models.schemas.player import PlayerCreate, PlayerUpdate, PlayerResponse
+from models.schemas.player import PlayerCreate, PlayerResponse, PlayerUpdate
 
 player_router = APIRouter(prefix="/players", tags=["Players"])
 
@@ -17,7 +17,7 @@ async def get_players(
     skip: int = 0,
     limit: int = 100,
     include_disabled: bool = False,
-    db: AsyncSession = get_session_dep
+    db: AsyncSession = get_session_dep,
 ):
     """Get all players with pagination"""
     query = sa.select(m.Player).offset(skip).limit(limit)

@@ -1,6 +1,6 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from models.enums import weapon_modifiers as mod
 
@@ -131,7 +131,9 @@ class WeaponUpdate(BaseModel):
     muzzle: Optional[str] = mod.DefaultModsEnum.DEFAULT_MUZZLE
     magazine: Optional[str] = mod.DefaultModsEnum.DEFAULT_MAGAZINE
     weapon_size: Optional[str] = mod.DefaultModsEnum.DEFAULT_WEAPON_SIZE
-    ammo_size: Optional[mod.AmmoSizeEnum] = Field(description="Ammo size of the gun", default=None)
+    ammo_size: Optional[mod.AmmoSizeEnum] = Field(
+        description="Ammo size of the gun", default=None
+    )
 
     price: Optional[int] = None
     has_ammo_B: Optional[bool] = None

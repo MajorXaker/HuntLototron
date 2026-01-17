@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db import get_session_dep
 from models import db_models as m
-from models.schemas.weapon import WeaponResponse, WeaponCreate, WeaponUpdate
 from models.enums import weapon_modifiers as mod
+from models.schemas.weapon import WeaponCreate, WeaponResponse, WeaponUpdate
 
 weapons_router = APIRouter(prefix="/weapons", tags=["Weapons"])
 

@@ -9,6 +9,10 @@
     DATABASE_HOST = "localhost"
     DATABASE_ECHO_MODE = false
 
+    MAIN_CHARACTER_ID = 0
+    # this app is not build to use many users
+    # so we just hardcode myself in there
+
 
 [test]
     DATABASE_DB = "test-db"

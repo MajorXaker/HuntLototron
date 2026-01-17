@@ -3,10 +3,11 @@ import asyncio
 
 import asyncpg
 import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import create_async_engine
+
 from config import settings as s
 from db import db_url
 from models import db_models as m
-from sqlalchemy.ext.asyncio import create_async_engine
 
 psql_url = (
     f"postgresql://{s.DATABASE_USER}:{s.DATABASE_PASSWORD}@{s.DATABASE_HOST}:5432"
@@ -15,7 +16,13 @@ psql_url = (
 
 def check_test_db():
     if (
-        s.DATABASE_HOST not in ("localhost", "127.0.0.1", "postgres")
+        s.DATABASE_HOST
+        not in (
+            "localhost",
+            "127.0.0.1",
+            "postgres",
+            "192.168.100.17",
+        )
         or "amazonaws" in s.DATABASE_HOST
     ):
         raise Exception("Use local database only!")

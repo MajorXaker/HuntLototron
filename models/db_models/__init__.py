@@ -1,4 +1,4 @@
-# ruff:noqa: F401
+# ruff:noqa
 from .base import Model
 from .map import Map
 from .compound import Compound

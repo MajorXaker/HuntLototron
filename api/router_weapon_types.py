@@ -1,15 +1,15 @@
 from typing import List
 
+import sqlalchemy as sa
 from fastapi import APIRouter, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-import sqlalchemy as sa
 
 from db import get_session_dep
 from models import db_models as m
 from models.schemas.weapon_type import (
     WeaponTypeCreate,
-    WeaponTypeUpdate,
     WeaponTypeResponse,
+    WeaponTypeUpdate,
 )
 
 weapon_types_router = APIRouter(prefix="/weapon-types", tags=["Weapon Types"])

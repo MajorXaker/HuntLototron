@@ -131,7 +131,9 @@ class TestPlayersEndpoints:
         data = response.json()
         assert len(data) == 1
 
-        response = await test_client_rest.get("http://test/players?include_disabled=true")
+        response = await test_client_rest.get(
+            "http://test/players?include_disabled=true"
+        )
 
         assert response.status_code == 200
         data = response.json()

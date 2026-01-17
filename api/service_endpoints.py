@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+
 import models.enums.weapon_modifiers as mod
 
 service_router = APIRouter(prefix="/service", tags=["service"])

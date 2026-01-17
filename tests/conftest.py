@@ -1,13 +1,14 @@
 from typing import Any, AsyncGenerator
 
 import pytest_asyncio
-from config import settings as st
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import Engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
+
+from config import settings as st
 from db import get_session_dep
 from main import app
 from models import db_models as m
-from sqlalchemy import Engine
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from tests.creator import Creator
 
 db_url = (

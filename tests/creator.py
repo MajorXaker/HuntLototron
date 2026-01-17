@@ -1,9 +1,10 @@
+from datetime import date, timedelta
+
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import models.db_models as m
 import models.enums.weapon_modifiers as mod
-from datetime import date, timedelta
 
 
 class Creator:
@@ -11,6 +12,9 @@ class Creator:
 
     def __init__(self, session: AsyncSession):
         self.session = session
+
+        self.created_weapon_types_ids = {}
+        self.created_weapons_ids = {}
 
     async def create_map(self, name: str = "TestMap") -> int:
         """Create a test map and return its name (PK)"""
@@ -44,9 +48,13 @@ class Creator:
 
     async def create_weapon_type(self, name: str = "TestWeaponType") -> int:
         """Create a test weapon type and return its ID"""
-        return await self.session.scalar(
+        if name in self.created_weapon_types_ids:
+            return self.created_weapon_types_ids[name]
+        weapon_id = await self.session.scalar(
             sa.insert(m.WeaponType).values(name=name).returning(m.WeaponType.id)
         )
+        self.created_weapon_types_ids[name] = weapon_id
+        return weapon_id
 
     async def create_weapon(
         self,
@@ -62,8 +70,9 @@ class Creator:
         ammo_size: mod.AmmoSizeEnum = mod.AmmoSizeEnum.COMPACT,
         has_ammo_B: bool = False,
     ) -> int:
-        """Create a test weapon and return its ID"""
-        return await self.session.scalar(
+        if name in self.created_weapons_ids:
+            return self.created_weapons_ids[name]
+        weapon_id = await self.session.scalar(
             sa.insert(m.Weapon)
             .values(
                 name=name,
@@ -81,6 +90,8 @@ class Creator:
             )
             .returning(m.Weapon.id)
         )
+        self.created_weapons_ids[name] = weapon_id
+        return weapon_id
 
     async def create_ammo_type(self, name: str = "TestAmmo") -> int:
         """Create a test ammo type and return its ID"""
@@ -137,7 +148,7 @@ class Creator:
     async def create_match(
         self,
         player_1_id: int,
-        player_1_match_data_id: int,
+        player_1_match_data_id: int = None,
         wl_status: str = None,
         match_date: date = None,
         kills_total: int = 0,
@@ -154,6 +165,19 @@ class Creator:
             match_date = date.today()
         if playtime is None:
             playtime = timedelta(minutes=20)
+
+        if not player_1_match_data_id:
+            player_1_match_data_id = await self.create_match_player_data(
+                player_id=player_1_id,
+                slot_a_weapon_id=await self.create_weapon(
+                    name="boomstick",
+                    weapon_type_id=await self.create_weapon_type("pistol"),
+                ),
+                slot_b_weapon_id=await self.create_weapon(
+                    name="broomstick",
+                    weapon_type_id=await self.create_weapon_type("rifle"),
+                ),
+            )
 
         return await self.session.scalar(
             sa.insert(m.Match)

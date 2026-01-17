@@ -1,9 +1,10 @@
+from datetime import date, timedelta
 from typing import Optional
 
 from pydantic import BaseModel, model_validator
 
+from models.enums.gamemode import GameModeEnum
 from models.enums.wl_status import WLStatusEnum
-from datetime import date, timedelta
 
 
 class MatchPlayerSchema(BaseModel):
@@ -50,6 +51,9 @@ class NewMatchSchema(BaseModel):
     slot_b_ammo_b_id: Optional[int] = None
     slot_b_dual_wielding: bool = False
 
+    game_mode: Optional[GameModeEnum] = GameModeEnum.HUNT
+
+
 class UpdateMatchSchema(BaseModel):
     """We could add here some fields that would indicate that the field got changed,
     so it's necessary to include its data to the query. However, there are no plans to distribute this system
@@ -85,6 +89,7 @@ class UpdateMatchSchema(BaseModel):
     map_id: int
     fights_places_ids: list[int]
 
+
 class FullMatchSchema(BaseModel):
     id: int
     wl_status: Optional[WLStatusEnum] = None
@@ -106,10 +111,13 @@ class FullMatchSchema(BaseModel):
 
     fights_places_ids: Optional[list[int]]
 
+    game_mode: Optional[GameModeEnum] = GameModeEnum.HUNT
+
 
 class GetMatchesSchema(BaseModel):
     data: list[FullMatchSchema]
     total_results: int
+
 
 class ShortMatchResponseSchema(BaseModel):
     match_id: int
