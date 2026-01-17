@@ -14,15 +14,15 @@ async def get_separate_teammates_stats(
 
     # Build the three SELECT branches for UNION ALL
     player_2_select = sa.select(
-        m.Match.player_2_id.label("player_id"), m.Match.wl_status
+        m.Match.player_2_id.label("player_id"), m.Match.wl_status, m.Match.date
     ).where(m.Match.player_2_id.isnot(None), m.Match.wl_status.isnot(None))
 
     player_3_select = sa.select(
-        m.Match.player_3_id.label("player_id"), m.Match.wl_status
+        m.Match.player_3_id.label("player_id"), m.Match.wl_status, m.Match.date
     ).where(m.Match.player_3_id.isnot(None), m.Match.wl_status.isnot(None))
 
     solo_player_select = sa.select(
-        m.Match.player_1_id.label("player_id"), m.Match.wl_status
+        m.Match.player_1_id.label("player_id"), m.Match.wl_status, m.Match.date
     ).where(
         m.Match.player_2_id.is_(None),
         m.Match.player_3_id.is_(None),
@@ -53,6 +53,8 @@ async def get_separate_teammates_stats(
                 * 100,
                 3,
             ).label("win_ratio_percent"),
+            sa.func.min(player_matches.c.date).label("first_match_date"),
+            sa.func.max(player_matches.c.date).label("last_match_date"),
         )
         .select_from(player_matches.join(p1, player_matches.c.player_id == p1.c.id))
         .group_by(player_matches.c.player_id, p1.c.username)
@@ -68,9 +70,11 @@ async def get_separate_teammates_stats(
             wins=tm.win,
             losses=tm.lose,
             flees=tm.flee,
-            match_share=tm.matches_sum / matches_total,
+            match_share=(tm.matches_sum / matches_total) * 100,
             total_matches=tm.matches_sum,
             winrate=tm.win_ratio_percent,
+            first_match=tm.first_match_date,
+            last_match=tm.last_match_date,
         )
         for tm in unique_teammates
     ]
@@ -94,6 +98,7 @@ async def get_teammate_composition_stats(
                 else_=sa.func.greatest(m.Match.player_2_id, m.Match.player_3_id),
             ).label("player_b_id"),
             m.Match.wl_status,
+            m.Match.date,
         )
         .where(
             sa.or_(m.Match.player_2_id.isnot(None), m.Match.player_3_id.isnot(None)),
@@ -133,6 +138,8 @@ async def get_teammate_composition_stats(
                 * 100,
                 2,
             ).label("win_ratio_percent"),
+            sa.func.min(player_pairs_select.c.date).label("first_match_date"),
+            sa.func.max(player_pairs_select.c.date).label("last_match_date"),
         )
         .select_from(
             player_pairs_select.join(
@@ -162,9 +169,11 @@ async def get_teammate_composition_stats(
             wins=tm.win,
             losses=tm.lose,
             flees=tm.flee,
-            match_share=tm.matches_sum / matches_total,
+            match_share=(tm.matches_sum / matches_total) * 100,
             total_matches=tm.matches_sum,
             winrate=tm.win_ratio_percent,
+            first_match=tm.first_match_date,
+            last_match=tm.last_match_date,
         )
         for tm in combinations
     ]

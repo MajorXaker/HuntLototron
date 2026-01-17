@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional
 
 from pydantic import BaseModel
@@ -10,6 +11,8 @@ class BaseMatchStats(BaseModel):
     winrate: float
     match_share: float
     total_matches: int
+    first_match: date
+    last_match: date
 
 
 class TeammateStats(BaseMatchStats):

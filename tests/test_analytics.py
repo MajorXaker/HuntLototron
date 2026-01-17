@@ -31,7 +31,7 @@ class TestAnalyticsEndpoints:
             wl_status=self.wl_statuses_mapping[match_result],
         )
 
-    async def test_teammate_analytics_empty(self, test_client_rest, creator, dbsession):
+    async def test_teammate_analytics(self, test_client_rest, creator, dbsession):
         """Test analytics with no matches"""
 
         player_omega = await creator.create_player("Omega")
