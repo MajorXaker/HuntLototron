@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:python3.14-alpine
+FROM ghcr.io/astral-sh/uv:python3.13-alpine
 
 ENV WORKDIR_PATH /app
 ENV XDG_DATA_HOME=${WORKDIR_PATH}
