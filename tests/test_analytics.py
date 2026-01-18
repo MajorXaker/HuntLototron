@@ -2,6 +2,7 @@ from typing import Literal
 
 import pytest
 
+from models.enums.gamemode import GameModeEnum
 from models.enums.wl_status import WLStatusEnum
 from tests.creator import Creator
 
@@ -66,6 +67,22 @@ class TestAnalyticsEndpoints:
                 player_3_id=match[2],
             )
 
+        # 2 clash matches
+        await creator.create_match(
+            player_1_id=player_omega,
+            wl_status=WLStatusEnum.WIN,
+            player_2_id=A,
+            player_3_id=B,
+            game_mode=GameModeEnum.CLASH,
+        )
+        await creator.create_match(
+            player_1_id=player_omega,
+            wl_status=WLStatusEnum.LOSE,
+            player_2_id=A,
+            player_3_id=B,
+            game_mode=GameModeEnum.CLASH,
+        )
+
         response = await test_client_rest.get("/analytics/teammates")
         assert response.status_code == 200
         data = response.json()
@@ -77,3 +94,19 @@ class TestAnalyticsEndpoints:
 
         assert data["by_teammates"][0]["total_matches"] == 24
         assert data["by_team_compositions"][0]["total_matches"] == 10
+
+        response_clash = await test_client_rest.get(
+            "/analytics/teammates?game_mode=clash"
+        )
+
+        assert response_clash.status_code == 200
+        data = response_clash.json()
+
+        assert data["matches_total"] == 2
+
+        assert len(data["by_teammates"]) == 2
+        assert len(data["by_team_compositions"]) == 1
+
+        assert data["by_teammates"][0]["total_matches"] == 2
+        assert data["by_team_compositions"][0]["total_matches"] == 2
+        assert data["by_team_compositions"][0]["winrate"] == 50.0

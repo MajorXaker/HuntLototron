@@ -47,7 +47,6 @@ class TestMatchEndpoints:
         assert match_id is not None
 
         match_query = sa.select(
-            # m.Match.player_1_match_data_id,
             m.Match.player_2_match_data_id,
             m.Match.player_3_match_data_id,
             m.Match.wl_status,
@@ -59,7 +58,6 @@ class TestMatchEndpoints:
         match_data = (await dbsession.execute(match_query)).mappings().fetchone()
 
         assert match_data == {
-            # "player_1_match_data_id": 1,
             "player_2_match_data_id": None,
             "player_3_match_data_id": None,
             "wl_status": None,
@@ -267,6 +265,7 @@ class TestMatchEndpoints:
             kills_total=5,
             map_id=map_id,
             playtime=timedelta(minutes=15, seconds=44),
+            game_mode=GameModeEnum.HUNT,
         )
         match_2_id = await creator.create_match(
             match_date=date(2025, 1, 10),
@@ -275,6 +274,7 @@ class TestMatchEndpoints:
             kills_total=8,
             map_id=map_id,
             playtime=timedelta(minutes=20, seconds=1),
+            game_mode=GameModeEnum.CLASH,
         )
         await creator.create_fight_location(
             match_id=match_1_id,

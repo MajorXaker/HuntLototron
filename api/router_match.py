@@ -182,7 +182,7 @@ async def _get_matches(
         build_player_data_json(player_2_data).label("player_2_data"),
         build_player_data_json(player_3_data).label("player_3_data"),
         compounds_subquery.c.compound_ids.label("fight_locations_ids"),
-        m.Match,
+        m.Match.game_mode,
         sa.func.count().over().label("total_count"),
     ).select_from(
         sa.outerjoin(
@@ -226,6 +226,7 @@ async def _get_matches(
             player_1_data=match.player_1_data,
             player_2_data=match.player_2_data if match.player_2_data["id"] else None,
             player_3_data=match.player_3_data if match.player_3_data["id"] else None,
+            game_mode=match.game_mode,
         )
         for match in data
     ]

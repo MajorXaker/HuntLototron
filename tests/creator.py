@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 import models.db_models as m
 import models.enums.weapon_modifiers as mod
+from models.enums.gamemode import GameModeEnum
 
 
 class Creator:
@@ -158,6 +159,7 @@ class Creator:
         player_2_match_data_id: int = None,
         player_3_id: int = None,
         player_3_match_data_id: int = None,
+        game_mode: GameModeEnum = GameModeEnum.HUNT,
     ) -> int:
         """Create a match and return its ID"""
 
@@ -193,6 +195,7 @@ class Creator:
                 player_1_match_data_id=player_1_match_data_id,
                 player_2_match_data_id=player_2_match_data_id,
                 player_3_match_data_id=player_3_match_data_id,
+                game_mode=game_mode,
             )
             .returning(m.Match.id)
         )

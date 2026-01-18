@@ -13,6 +13,7 @@ class BaseMatchStats(BaseModel):
     total_matches: int
     first_match: date
     last_match: date
+    median_playtime_seconds: float
 
 
 class TeammateStats(BaseMatchStats):

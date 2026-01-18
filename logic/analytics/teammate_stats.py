@@ -3,10 +3,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import db_models as m
 from models.dto.teammate_stats import TeamCompositionStats, TeammateStats
+from models.enums.gamemode import GameModeEnum
 
 
 async def get_separate_teammates_stats(
-    session: AsyncSession, matches_total: int
+    session: AsyncSession,
+    matches_total: int,
+    game_mode: GameModeEnum = GameModeEnum.HUNT,
 ) -> list[TeammateStats]:
     # ---- general selects
     # Aliases for player joins
@@ -14,19 +17,37 @@ async def get_separate_teammates_stats(
 
     # Build the three SELECT branches for UNION ALL
     player_2_select = sa.select(
-        m.Match.player_2_id.label("player_id"), m.Match.wl_status, m.Match.date
-    ).where(m.Match.player_2_id.isnot(None), m.Match.wl_status.isnot(None))
+        m.Match.player_2_id.label("player_id"),
+        m.Match.wl_status,
+        m.Match.date,
+        m.Match.playtime,
+    ).where(
+        m.Match.player_2_id.isnot(None),
+        m.Match.wl_status.isnot(None),
+        m.Match.game_mode == game_mode,
+    )
 
     player_3_select = sa.select(
-        m.Match.player_3_id.label("player_id"), m.Match.wl_status, m.Match.date
-    ).where(m.Match.player_3_id.isnot(None), m.Match.wl_status.isnot(None))
+        m.Match.player_3_id.label("player_id"),
+        m.Match.wl_status,
+        m.Match.date,
+        m.Match.playtime,
+    ).where(
+        m.Match.player_3_id.isnot(None),
+        m.Match.wl_status.isnot(None),
+        m.Match.game_mode == game_mode,
+    )
 
     solo_player_select = sa.select(
-        m.Match.player_1_id.label("player_id"), m.Match.wl_status, m.Match.date
+        m.Match.player_1_id.label("player_id"),
+        m.Match.wl_status,
+        m.Match.date,
+        m.Match.playtime,
     ).where(
         m.Match.player_2_id.is_(None),
         m.Match.player_3_id.is_(None),
         m.Match.wl_status.isnot(None),
+        m.Match.game_mode == game_mode,
     )
 
     # Combine with UNION ALL
@@ -55,6 +76,9 @@ async def get_separate_teammates_stats(
             ).label("win_ratio_percent"),
             sa.func.min(player_matches.c.date).label("first_match_date"),
             sa.func.max(player_matches.c.date).label("last_match_date"),
+            sa.func.percentile_cont(0.5)
+            .within_group(player_matches.c.playtime)
+            .label("median_playtime"),
         )
         .select_from(player_matches.join(p1, player_matches.c.player_id == p1.c.id))
         .group_by(player_matches.c.player_id, p1.c.username)
@@ -75,13 +99,16 @@ async def get_separate_teammates_stats(
             winrate=tm.win_ratio_percent,
             first_match=tm.first_match_date,
             last_match=tm.last_match_date,
+            median_playtime_seconds=tm.median_playtime.seconds,
         )
         for tm in unique_teammates
     ]
 
 
 async def get_teammate_composition_stats(
-    session: AsyncSession, matches_total: int
+    session: AsyncSession,
+    matches_total: int,
+    game_mode: GameModeEnum = GameModeEnum.HUNT,
 ) -> list[TeamCompositionStats]:
     p1 = m.Player.__table__.alias("p1")
     p2 = m.Player.__table__.alias("p2")
@@ -99,6 +126,7 @@ async def get_teammate_composition_stats(
             ).label("player_b_id"),
             m.Match.wl_status,
             m.Match.date,
+            m.Match.playtime,
         )
         .where(
             sa.or_(m.Match.player_2_id.isnot(None), m.Match.player_3_id.isnot(None)),
@@ -107,6 +135,7 @@ async def get_teammate_composition_stats(
             sa.not_(
                 sa.and_(m.Match.player_2_id.is_(None), m.Match.player_3_id.is_(None))
             ),
+            m.Match.game_mode == game_mode,
         )
         .subquery("player_pairs")
     )
@@ -140,6 +169,9 @@ async def get_teammate_composition_stats(
             ).label("win_ratio_percent"),
             sa.func.min(player_pairs_select.c.date).label("first_match_date"),
             sa.func.max(player_pairs_select.c.date).label("last_match_date"),
+            sa.func.percentile_cont(0.5)
+            .within_group(player_pairs_select.c.playtime)
+            .label("median_playtime"),
         )
         .select_from(
             player_pairs_select.join(
@@ -174,6 +206,7 @@ async def get_teammate_composition_stats(
             winrate=tm.win_ratio_percent,
             first_match=tm.first_match_date,
             last_match=tm.last_match_date,
+            median_playtime_seconds=tm.median_playtime.seconds,
         )
         for tm in combinations
     ]
