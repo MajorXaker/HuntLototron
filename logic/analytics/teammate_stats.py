@@ -14,24 +14,26 @@ async def get_separate_teammates_stats(
     # ---- general selects
     # Aliases for player joins
     p1 = m.Player.__table__.alias("p1")
-    mpd2 = m.MatchPlayerData.__table__.alias("mpd2")
-    mpd3 = m.MatchPlayerData.__table__.alias("mpd3")
+    mpd_p1_for_p2 = m.MatchPlayerData.__table__.alias("mpd_p1_for_p2")
+    mpd_p1_for_p3 = m.MatchPlayerData.__table__.alias("mpd_p1_for_p3")
     mpd_solo = m.MatchPlayerData.__table__.alias("mpd_solo")
 
-    # Build the three SELECT branches for UNION ALL
+    # Build the three SELECT branches for UNION ALL.
+    # K/D/A always come from player_1's match_player_data — single-player mode.
     player_2_select = (
         sa.select(
             m.Match.player_2_id.label("player_id"),
             m.Match.wl_status,
             m.Match.date,
             m.Match.playtime,
-            sa.func.coalesce(mpd2.c.kills, 0).label("kills"),
-            sa.func.coalesce(mpd2.c.deaths, 0).label("deaths"),
-            sa.func.coalesce(mpd2.c.assists, 0).label("assists"),
+            sa.func.coalesce(mpd_p1_for_p2.c.kills, 0).label("kills"),
+            sa.func.coalesce(mpd_p1_for_p2.c.deaths, 0).label("deaths"),
+            sa.func.coalesce(mpd_p1_for_p2.c.assists, 0).label("assists"),
         )
         .select_from(
             m.Match.__table__.outerjoin(
-                mpd2, mpd2.c.id == m.Match.player_2_match_data_id
+                mpd_p1_for_p2,
+                mpd_p1_for_p2.c.id == m.Match.player_1_match_data_id,
             )
         )
         .where(
@@ -47,13 +49,14 @@ async def get_separate_teammates_stats(
             m.Match.wl_status,
             m.Match.date,
             m.Match.playtime,
-            sa.func.coalesce(mpd3.c.kills, 0).label("kills"),
-            sa.func.coalesce(mpd3.c.deaths, 0).label("deaths"),
-            sa.func.coalesce(mpd3.c.assists, 0).label("assists"),
+            sa.func.coalesce(mpd_p1_for_p3.c.kills, 0).label("kills"),
+            sa.func.coalesce(mpd_p1_for_p3.c.deaths, 0).label("deaths"),
+            sa.func.coalesce(mpd_p1_for_p3.c.assists, 0).label("assists"),
         )
         .select_from(
             m.Match.__table__.outerjoin(
-                mpd3, mpd3.c.id == m.Match.player_3_match_data_id
+                mpd_p1_for_p3,
+                mpd_p1_for_p3.c.id == m.Match.player_1_match_data_id,
             )
         )
         .where(
@@ -137,9 +140,9 @@ async def get_separate_teammates_stats(
             wins=tm.win,
             losses=tm.lose,
             flees=tm.flee,
-            match_share=(tm.matches_sum / matches_total) * 100
-            if matches_total
-            else 0.0,
+            match_share=(
+                (tm.matches_sum / matches_total) * 100 if matches_total else 0.0
+            ),
             total_matches=tm.matches_sum,
             winrate=tm.win_ratio_percent or 0.0,
             first_match=tm.first_match_date,
@@ -162,11 +165,10 @@ async def get_teammate_composition_stats(
 ) -> list[TeamCompositionStats]:
     p1 = m.Player.__table__.alias("p1")
     p2 = m.Player.__table__.alias("p2")
-    mpd2 = m.MatchPlayerData.__table__.alias("mpd2")
-    mpd3 = m.MatchPlayerData.__table__.alias("mpd3")
+    mpd_p1 = m.MatchPlayerData.__table__.alias("mpd_p1")
 
-    # Build subquery for player pairs - handles both full pairs and single teammates
-    # K/D/A summed across both teammates' match_player_data (excluding player_1)
+    # Build subquery for player pairs - handles both full pairs and single teammates.
+    # K/D/A always come from player_1's match_player_data — single-player mode.
     player_pairs_select = (
         sa.select(
             sa.case(
@@ -180,21 +182,14 @@ async def get_teammate_composition_stats(
             m.Match.wl_status,
             m.Match.date,
             m.Match.playtime,
-            (
-                sa.func.coalesce(mpd2.c.kills, 0) + sa.func.coalesce(mpd3.c.kills, 0)
-            ).label("kills"),
-            (
-                sa.func.coalesce(mpd2.c.deaths, 0) + sa.func.coalesce(mpd3.c.deaths, 0)
-            ).label("deaths"),
-            (
-                sa.func.coalesce(mpd2.c.assists, 0)
-                + sa.func.coalesce(mpd3.c.assists, 0)
-            ).label("assists"),
+            sa.func.coalesce(mpd_p1.c.kills, 0).label("kills"),
+            sa.func.coalesce(mpd_p1.c.deaths, 0).label("deaths"),
+            sa.func.coalesce(mpd_p1.c.assists, 0).label("assists"),
         )
         .select_from(
             m.Match.__table__.outerjoin(
-                mpd2, mpd2.c.id == m.Match.player_2_match_data_id
-            ).outerjoin(mpd3, mpd3.c.id == m.Match.player_3_match_data_id)
+                mpd_p1, mpd_p1.c.id == m.Match.player_1_match_data_id
+            )
         )
         .where(
             sa.or_(m.Match.player_2_id.isnot(None), m.Match.player_3_id.isnot(None)),
@@ -278,9 +273,9 @@ async def get_teammate_composition_stats(
             wins=tm.win,
             losses=tm.lose,
             flees=tm.flee,
-            match_share=(tm.matches_sum / matches_total) * 100
-            if matches_total
-            else 0.0,
+            match_share=(
+                (tm.matches_sum / matches_total) * 100 if matches_total else 0.0
+            ),
             total_matches=tm.matches_sum,
             winrate=tm.win_ratio_percent or 0.0,
             first_match=tm.first_match_date,

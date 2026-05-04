@@ -281,26 +281,31 @@ class TestAnalyticsEndpoints:
         assert by_id[None]["map_name"] is None
 
     async def test_teammate_kda(self, test_client_rest, creator, dbsession):
-        """Teammate KDA should be summed from teammate's own match_player_data."""
+        """Single-player mode: teammate KDA is player_1's KDA in matches with
+        that teammate. Teammate's own MPD K/D/A is ignored.
+        """
         player_omega = await creator.create_player("Omega")
         teammate = await creator.create_player("Teammate")
 
         rifle_t = await creator.create_weapon_type("rifle_kda")
         wpn = await creator.create_weapon("Wpn_kda", rifle_t)
 
-        async def mk(wl, k, d, a):
+        async def mk(wl, p1_k, p1_d, p1_a, tm_k, tm_d, tm_a):
             mpd_main = await creator.create_match_player_data(
                 player_id=player_omega,
                 slot_a_weapon_id=wpn,
                 slot_b_weapon_id=wpn,
+                kills=p1_k,
+                deaths=p1_d,
+                assists=p1_a,
             )
             mpd_t = await creator.create_match_player_data(
                 player_id=teammate,
                 slot_a_weapon_id=wpn,
                 slot_b_weapon_id=wpn,
-                kills=k,
-                deaths=d,
-                assists=a,
+                kills=tm_k,
+                deaths=tm_d,
+                assists=tm_a,
             )
             return await creator.create_match(
                 player_1_id=player_omega,
@@ -310,9 +315,10 @@ class TestAnalyticsEndpoints:
                 wl_status=wl,
             )
 
-        await mk(WLStatusEnum.WIN, 3, 0, 1)
-        await mk(WLStatusEnum.WIN, 2, 1, 0)
-        await mk(WLStatusEnum.LOSE, 0, 1, 2)
+        # player_1 KDA totals: (4, 2, 3); teammate KDA totals would be (5, 2, 3)
+        await mk(WLStatusEnum.WIN, p1_k=2, p1_d=1, p1_a=1, tm_k=3, tm_d=0, tm_a=1)
+        await mk(WLStatusEnum.WIN, p1_k=1, p1_d=0, p1_a=2, tm_k=2, tm_d=1, tm_a=0)
+        await mk(WLStatusEnum.LOSE, p1_k=1, p1_d=1, p1_a=0, tm_k=0, tm_d=1, tm_a=2)
 
         await dbsession.commit()
         response = await test_client_rest.get("/analytics/teammates")
@@ -320,7 +326,8 @@ class TestAnalyticsEndpoints:
         data = response.json()
 
         by_id = {t["teammate_id"]: t for t in data["by_teammates"]}
-        assert by_id[teammate]["kills"] == 5
+        # Player 1 stats are reported under the teammate row, not teammate's own
+        assert by_id[teammate]["kills"] == 4
         assert by_id[teammate]["deaths"] == 2
         assert by_id[teammate]["assists"] == 3
         assert by_id[teammate]["total_matches"] == 3

@@ -11,8 +11,8 @@ async def get_map_stats(
     matches_total: int,
     game_mode: GameModeEnum = GameModeEnum.HUNT,
 ) -> list[MapStats]:
-    """Aggregate stats per map. K/D/A are summed across all match_player_data
-    entries (team totals) for matches on each map.
+    """Aggregate stats per map. K/D/A are taken from player_1's match_player_data
+    only (single-player mode).
     """
 
     mpd = m.MatchPlayerData.__table__.alias("mpd")
@@ -24,54 +24,12 @@ async def get_map_stats(
             m.Match.wl_status,
             m.Match.date,
             m.Match.playtime,
-            (
-                sa.func.coalesce(
-                    sa.select(sa.func.sum(mpd.c.kills))
-                    .where(
-                        mpd.c.id.in_(
-                            [
-                                m.Match.player_1_match_data_id,
-                                m.Match.player_2_match_data_id,
-                                m.Match.player_3_match_data_id,
-                            ]
-                        )
-                    )
-                    .scalar_subquery(),
-                    0,
-                )
-            ).label("kills"),
-            (
-                sa.func.coalesce(
-                    sa.select(sa.func.sum(mpd.c.deaths))
-                    .where(
-                        mpd.c.id.in_(
-                            [
-                                m.Match.player_1_match_data_id,
-                                m.Match.player_2_match_data_id,
-                                m.Match.player_3_match_data_id,
-                            ]
-                        )
-                    )
-                    .scalar_subquery(),
-                    0,
-                )
-            ).label("deaths"),
-            (
-                sa.func.coalesce(
-                    sa.select(sa.func.sum(mpd.c.assists))
-                    .where(
-                        mpd.c.id.in_(
-                            [
-                                m.Match.player_1_match_data_id,
-                                m.Match.player_2_match_data_id,
-                                m.Match.player_3_match_data_id,
-                            ]
-                        )
-                    )
-                    .scalar_subquery(),
-                    0,
-                )
-            ).label("assists"),
+            sa.func.coalesce(mpd.c.kills, 0).label("kills"),
+            sa.func.coalesce(mpd.c.deaths, 0).label("deaths"),
+            sa.func.coalesce(mpd.c.assists, 0).label("assists"),
+        )
+        .select_from(
+            m.Match.__table__.outerjoin(mpd, mpd.c.id == m.Match.player_1_match_data_id)
         )
         .where(
             m.Match.wl_status.isnot(None),
@@ -122,9 +80,9 @@ async def get_map_stats(
             wins=row.win,
             losses=row.lose,
             flees=row.flee,
-            match_share=(row.total_matches / matches_total) * 100
-            if matches_total
-            else 0.0,
+            match_share=(
+                (row.total_matches / matches_total) * 100 if matches_total else 0.0
+            ),
             total_matches=row.total_matches,
             winrate=row.win_ratio_percent or 0.0,
             first_match=row.first_match_date,

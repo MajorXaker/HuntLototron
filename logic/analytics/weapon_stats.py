@@ -12,67 +12,27 @@ async def get_weapon_stats(
     game_mode: GameModeEnum = GameModeEnum.HUNT,
 ) -> list[WeaponStats]:
     """Aggregate stats per weapon: a match counts for a weapon if the weapon was
-    present in any player's slot_a or slot_b for that match. K/D/A are summed
-    across all match_player_data entries in those matches (team-level totals).
+    present in player_1's slot_a or slot_b for that match. K/D/A are taken from
+    player_1's match_player_data only (single-player mode).
     """
 
     mpd = m.MatchPlayerData.__table__.alias("mpd")
 
-    # Per-match aggregated K/D/A (sum across all 3 players) and match info
+    # Per-match player_1 K/D/A and match info
     match_kda = (
         sa.select(
             m.Match.id.label("match_id"),
             m.Match.wl_status,
             m.Match.date,
             m.Match.playtime,
-            (
-                sa.func.coalesce(
-                    sa.select(sa.func.sum(mpd.c.kills))
-                    .where(
-                        mpd.c.id.in_(
-                            [
-                                m.Match.player_1_match_data_id,
-                                m.Match.player_2_match_data_id,
-                                m.Match.player_3_match_data_id,
-                            ]
-                        )
-                    )
-                    .scalar_subquery(),
-                    0,
-                )
-            ).label("kills"),
-            (
-                sa.func.coalesce(
-                    sa.select(sa.func.sum(mpd.c.deaths))
-                    .where(
-                        mpd.c.id.in_(
-                            [
-                                m.Match.player_1_match_data_id,
-                                m.Match.player_2_match_data_id,
-                                m.Match.player_3_match_data_id,
-                            ]
-                        )
-                    )
-                    .scalar_subquery(),
-                    0,
-                )
-            ).label("deaths"),
-            (
-                sa.func.coalesce(
-                    sa.select(sa.func.sum(mpd.c.assists))
-                    .where(
-                        mpd.c.id.in_(
-                            [
-                                m.Match.player_1_match_data_id,
-                                m.Match.player_2_match_data_id,
-                                m.Match.player_3_match_data_id,
-                            ]
-                        )
-                    )
-                    .scalar_subquery(),
-                    0,
-                )
-            ).label("assists"),
+            sa.func.coalesce(mpd.c.kills, 0).label("kills"),
+            sa.func.coalesce(mpd.c.deaths, 0).label("deaths"),
+            sa.func.coalesce(mpd.c.assists, 0).label("assists"),
+            mpd.c.slot_a_weapon_id.label("slot_a_weapon_id"),
+            mpd.c.slot_b_weapon_id.label("slot_b_weapon_id"),
+        )
+        .select_from(
+            m.Match.__table__.outerjoin(mpd, mpd.c.id == m.Match.player_1_match_data_id)
         )
         .where(
             m.Match.wl_status.isnot(None),
@@ -81,50 +41,20 @@ async def get_weapon_stats(
         .subquery("match_kda")
     )
 
-    # match_id -> weapon_id presence (DISTINCT to count a match once per weapon)
-    mpd1 = m.MatchPlayerData.__table__.alias("mpd1")
-    weapon_presence = (
-        sa.select(
-            m.Match.id.label("match_id"),
-            mpd1.c.slot_a_weapon_id.label("weapon_id"),
-        )
-        .select_from(
-            m.Match.__table__.join(
-                mpd1,
-                mpd1.c.id.in_(
-                    [
-                        m.Match.player_1_match_data_id,
-                        m.Match.player_2_match_data_id,
-                        m.Match.player_3_match_data_id,
-                    ]
-                ),
-            )
-        )
-        .where(mpd1.c.slot_a_weapon_id.isnot(None))
-    )
+    # match_id -> weapon_id presence (only player_1's slots)
+    weapon_presence_a = sa.select(
+        match_kda.c.match_id.label("match_id"),
+        match_kda.c.slot_a_weapon_id.label("weapon_id"),
+    ).where(match_kda.c.slot_a_weapon_id.isnot(None))
 
-    mpd2 = m.MatchPlayerData.__table__.alias("mpd2")
-    weapon_presence_b = (
-        sa.select(
-            m.Match.id.label("match_id"),
-            mpd2.c.slot_b_weapon_id.label("weapon_id"),
-        )
-        .select_from(
-            m.Match.__table__.join(
-                mpd2,
-                mpd2.c.id.in_(
-                    [
-                        m.Match.player_1_match_data_id,
-                        m.Match.player_2_match_data_id,
-                        m.Match.player_3_match_data_id,
-                    ]
-                ),
-            )
-        )
-        .where(mpd2.c.slot_b_weapon_id.isnot(None))
-    )
+    weapon_presence_b = sa.select(
+        match_kda.c.match_id.label("match_id"),
+        match_kda.c.slot_b_weapon_id.label("weapon_id"),
+    ).where(match_kda.c.slot_b_weapon_id.isnot(None))
 
-    weapon_match = sa.union(weapon_presence, weapon_presence_b).subquery("weapon_match")
+    weapon_match = sa.union(weapon_presence_a, weapon_presence_b).subquery(
+        "weapon_match"
+    )
 
     # Join weapon-presence to match-level data
     joined = (
@@ -188,9 +118,9 @@ async def get_weapon_stats(
             wins=row.win,
             losses=row.lose,
             flees=row.flee,
-            match_share=(row.total_matches / matches_total) * 100
-            if matches_total
-            else 0.0,
+            match_share=(
+                (row.total_matches / matches_total) * 100 if matches_total else 0.0
+            ),
             total_matches=row.total_matches,
             winrate=row.win_ratio_percent or 0.0,
             first_match=row.first_match_date,
