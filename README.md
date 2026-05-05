@@ -7,9 +7,10 @@ teammates. Data lives in PostgreSQL; the schema is managed with Alembic.
 
 > Originally a Russian-language CLI roulette that picked random gun loadouts
 > ("can you prove you can do magic with two shotguns?"). It has since been
-> rewritten as a single-tenant FastAPI service backing a separate frontend.
-> The legacy Django apps (`HuntLototron/`, `roulette/`, `stats/`) are gone — only
-> their stale `.pyc` files lingered in git; they are removed in this commit.
+> rewritten as a single-tenant FastAPI service backing a separate frontend. 
+> Second iteration was a Django APP bundled with a frontend, that was meant to track 
+> and analyse matches. Later it was rewritten as a FastAPI service with a separate frontend
+> (currently using separate instance of appsmith).
 
 ## Tech stack
 
@@ -261,21 +262,6 @@ are scoped to the single tracked player (`MAIN_CHARACTER_ID`).
 `*Stats` DTOs (in `models/dto/teammate_stats.py`) include match counts, win/
 loss/flee splits, K/D/A and playtime aggregations.
 
-## Cleanup performed in this branch
-
-The following stale build artefacts were tracked in git and have been removed.
-They came from the old Django incarnation (`HuntLototron/`, `roulette/`,
-`stats/`) whose `.py` sources were deleted during the FastAPI migration —
-only the Python 3.8 bytecode caches were left behind:
-
-- `HuntLototron/__pycache__/*.cpython-38.pyc` — 10 files
-- `roulette/__pycache__/*.cpython-38.pyc` — 7 files
-- `stats/__pycache__/*.cpython-38.pyc` — 8 files
-
-Total: **25 `.pyc` files** removed, leaving the parent directories empty (and
-thus removed by git). `.gitignore` already contains `__pycache__/` and
-`*.py[cod]`, so future caches will not be re-committed; no `.gitignore` change
-was necessary.
 
 ## License
 
