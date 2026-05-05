@@ -31,28 +31,8 @@ def check_test_db():
 
 
 async def drop_everything(engine: Engine | AsyncEngine):
-    # db may resist dropping all due to internal relations to each other
-    # so we first locate all foreign keys and tables
-    # then we drop all constraints first
-    # and then all tables
-    from sqlalchemy.schema import DropConstraint, DropTable
-
-    tables = []
-    all_fkeys = []
-    for model in m.Model.metadata.sorted_tables:
-        tables.append(model.name)
-        for column in model.columns._all_columns:
-            if not column.foreign_keys:
-                continue
-            for foreign_key in column.foreign_keys:
-                all_fkeys.append(foreign_key)
-
     async with engine.begin() as con:
-        for fkey in all_fkeys:
-            con.execute(DropConstraint(fkey))
-
-        for table in tables:
-            con.execute(DropTable(table))
+        await con.run_sync(m.Model.metadata.drop_all)
 
 
 @pytest_asyncio.fixture(scope="function")
@@ -66,8 +46,8 @@ async def engine():
 
         yield e
     finally:
-        # contents of this function does not work outside of it
         await drop_everything(e)
+        await e.dispose()
 
 
 @pytest_asyncio.fixture(scope="function")

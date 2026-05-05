@@ -1,3 +1,4 @@
+from datetime import timedelta
 from typing import Literal
 
 import pytest
@@ -95,6 +96,12 @@ class TestAnalyticsEndpoints:
         assert data["by_teammates"][0]["total_matches"] == 24
         assert data["by_team_compositions"][0]["total_matches"] == 10
 
+        # New compound stats keys must be present and zero by default
+        first_tm = data["by_teammates"][0]
+        for key in ("kills", "deaths", "assists"):
+            assert key in first_tm
+            assert first_tm[key] == 0
+
         response_clash = await test_client_rest.get(
             "/analytics/teammates?game_mode=clash"
         )
@@ -110,3 +117,217 @@ class TestAnalyticsEndpoints:
         assert data["by_teammates"][0]["total_matches"] == 2
         assert data["by_team_compositions"][0]["total_matches"] == 2
         assert data["by_team_compositions"][0]["winrate"] == 50.0
+
+    async def test_weapon_analytics(self, test_client_rest, creator, dbsession):
+        """Each match has 2 weapons (slot_a + slot_b) for player_1.
+        Weapon should be aggregated whenever it was present in any slot.
+        """
+        player_1 = await creator.create_player("Solo")
+
+        rifle_t = await creator.create_weapon_type("rifle_wpn")
+        pistol_t = await creator.create_weapon_type("pistol_wpn")
+
+        winfield = await creator.create_weapon("Winfield_wpn", rifle_t)
+        sparks = await creator.create_weapon("Sparks_wpn", rifle_t)
+        pax = await creator.create_weapon("Pax_wpn", pistol_t)
+
+        # Helper to build a match with chosen weapons and wl_status + KDA
+        async def mk(slot_a, slot_b, wl, kills=0, deaths=0, assists=0):
+            mpd = await creator.create_match_player_data(
+                player_id=player_1,
+                slot_a_weapon_id=slot_a,
+                slot_b_weapon_id=slot_b,
+                kills=kills,
+                deaths=deaths,
+                assists=assists,
+            )
+            return await creator.create_match(
+                player_1_id=player_1,
+                player_1_match_data_id=mpd,
+                wl_status=wl,
+                playtime=timedelta(minutes=10),
+            )
+
+        # 3 wins with Winfield+Pax (winfield=3 matches, pax=3 matches)
+        for _ in range(3):
+            await mk(winfield, pax, WLStatusEnum.WIN, kills=2, deaths=0, assists=1)
+        # 1 loss with Sparks+Pax (sparks=1 match, pax=4 matches)
+        await mk(sparks, pax, WLStatusEnum.LOSE, kills=1, deaths=1, assists=0)
+        # 1 flee with Winfield+Sparks (winfield=4 matches, sparks=2 matches)
+        await mk(winfield, sparks, WLStatusEnum.FLEE, kills=0, deaths=0, assists=0)
+
+        # match without wl_status should be excluded
+        await mk(winfield, pax, None)
+
+        await dbsession.commit()
+
+        response = await test_client_rest.get("/analytics/weapons")
+        assert response.status_code == 200
+        data = response.json()
+
+        # 5 matches with wl_status set
+        assert data["matches_total"] == 5
+
+        weapons = {w["weapon_id"]: w for w in data["by_weapons"]}
+        assert weapons[winfield]["total_matches"] == 4  # 3 wins + 1 flee
+        assert weapons[winfield]["wins"] == 3
+        assert weapons[winfield]["flees"] == 1
+        assert weapons[winfield]["losses"] == 0
+        # match share denominator = matches_total
+        assert weapons[winfield]["match_share"] == pytest.approx(4 / 5 * 100)
+
+        assert weapons[sparks]["total_matches"] == 2  # 1 loss + 1 flee
+        assert weapons[sparks]["losses"] == 1
+        assert weapons[sparks]["flees"] == 1
+
+        assert weapons[pax]["total_matches"] == 4  # 3 wins + 1 loss
+        assert weapons[pax]["wins"] == 3
+        assert weapons[pax]["losses"] == 1
+        assert weapons[pax]["winrate"] == 75.0
+
+        # K/D/A summed over matches the weapon was in (team-level, single
+        # player here so equals player KDA)
+        # winfield: 3 wins (k=2,d=0,a=1) + 1 flee (0,0,0) = (6,0,3)
+        assert weapons[winfield]["kills"] == 6
+        assert weapons[winfield]["deaths"] == 0
+        assert weapons[winfield]["assists"] == 3
+
+        # pax: 3 wins (2,0,1) + 1 loss (1,1,0) = (7,1,3)
+        assert weapons[pax]["kills"] == 7
+        assert weapons[pax]["deaths"] == 1
+        assert weapons[pax]["assists"] == 3
+
+        # match length present
+        assert weapons[winfield]["median_playtime_seconds"] == 600
+
+    async def test_map_analytics(self, test_client_rest, creator, dbsession):
+        player_1 = await creator.create_player("Solo")
+        rifle_t = await creator.create_weapon_type("rifle_map")
+        pistol_t = await creator.create_weapon_type("pistol_map")
+        wpn_a = await creator.create_weapon("A_map", rifle_t)
+        wpn_b = await creator.create_weapon("B_map", pistol_t)
+
+        map_lawson = await creator.create_map("Lawson")
+        map_stillwater = await creator.create_map("Stillwater")
+
+        async def mk(map_id, wl, kills=0, deaths=0, assists=0):
+            mpd = await creator.create_match_player_data(
+                player_id=player_1,
+                slot_a_weapon_id=wpn_a,
+                slot_b_weapon_id=wpn_b,
+                kills=kills,
+                deaths=deaths,
+                assists=assists,
+            )
+            return await creator.create_match(
+                player_1_id=player_1,
+                player_1_match_data_id=mpd,
+                wl_status=wl,
+                map_id=map_id,
+                playtime=timedelta(minutes=15),
+            )
+
+        # 3 wins on Lawson, 1 loss on Lawson
+        for _ in range(3):
+            await mk(map_lawson, WLStatusEnum.WIN, kills=3, deaths=0, assists=1)
+        await mk(map_lawson, WLStatusEnum.LOSE, kills=1, deaths=1)
+
+        # 2 wins, 2 losses, 1 flee on Stillwater
+        for _ in range(2):
+            await mk(map_stillwater, WLStatusEnum.WIN, kills=2)
+        for _ in range(2):
+            await mk(map_stillwater, WLStatusEnum.LOSE, deaths=1)
+        await mk(map_stillwater, WLStatusEnum.FLEE)
+
+        # 1 match without map (map_id=None)
+        await mk(None, WLStatusEnum.LOSE, kills=0, deaths=1)
+
+        await dbsession.commit()
+
+        response = await test_client_rest.get("/analytics/maps")
+        assert response.status_code == 200
+        data = response.json()
+
+        # 4 + 5 + 1 = 10 matches with wl_status set
+        assert data["matches_total"] == 10
+        # Three groups: Lawson, Stillwater, NULL map
+        assert len(data["by_maps"]) == 3
+
+        by_id = {m["map_id"]: m for m in data["by_maps"]}
+
+        lawson = by_id[map_lawson]
+        assert lawson["map_name"] == "Lawson"
+        assert lawson["total_matches"] == 4
+        assert lawson["wins"] == 3
+        assert lawson["losses"] == 1
+        assert lawson["winrate"] == 75.0
+        assert lawson["match_share"] == pytest.approx(4 / 10 * 100)
+        # KDA: 3 wins (3,0,1) + 1 loss (1,1,0) = (10,1,3)
+        assert lawson["kills"] == 10
+        assert lawson["deaths"] == 1
+        assert lawson["assists"] == 3
+        assert lawson["median_playtime_seconds"] == 900
+
+        stillwater = by_id[map_stillwater]
+        assert stillwater["total_matches"] == 5
+        assert stillwater["wins"] == 2
+        assert stillwater["losses"] == 2
+        assert stillwater["flees"] == 1
+        assert stillwater["winrate"] == 40.0
+
+        # Null map bucket
+        assert None in by_id
+        assert by_id[None]["total_matches"] == 1
+        assert by_id[None]["map_name"] is None
+
+    async def test_teammate_kda(self, test_client_rest, creator, dbsession):
+        """Single-player mode: teammate KDA is player_1's KDA in matches with
+        that teammate. Teammate's own MPD K/D/A is ignored.
+        """
+        player_omega = await creator.create_player("Omega")
+        teammate = await creator.create_player("Teammate")
+
+        rifle_t = await creator.create_weapon_type("rifle_kda")
+        wpn = await creator.create_weapon("Wpn_kda", rifle_t)
+
+        async def mk(wl, p1_k, p1_d, p1_a, tm_k, tm_d, tm_a):
+            mpd_main = await creator.create_match_player_data(
+                player_id=player_omega,
+                slot_a_weapon_id=wpn,
+                slot_b_weapon_id=wpn,
+                kills=p1_k,
+                deaths=p1_d,
+                assists=p1_a,
+            )
+            mpd_t = await creator.create_match_player_data(
+                player_id=teammate,
+                slot_a_weapon_id=wpn,
+                slot_b_weapon_id=wpn,
+                kills=tm_k,
+                deaths=tm_d,
+                assists=tm_a,
+            )
+            return await creator.create_match(
+                player_1_id=player_omega,
+                player_1_match_data_id=mpd_main,
+                player_2_id=teammate,
+                player_2_match_data_id=mpd_t,
+                wl_status=wl,
+            )
+
+        # player_1 KDA totals: (4, 2, 3); teammate KDA totals would be (5, 2, 3)
+        await mk(WLStatusEnum.WIN, p1_k=2, p1_d=1, p1_a=1, tm_k=3, tm_d=0, tm_a=1)
+        await mk(WLStatusEnum.WIN, p1_k=1, p1_d=0, p1_a=2, tm_k=2, tm_d=1, tm_a=0)
+        await mk(WLStatusEnum.LOSE, p1_k=1, p1_d=1, p1_a=0, tm_k=0, tm_d=1, tm_a=2)
+
+        await dbsession.commit()
+        response = await test_client_rest.get("/analytics/teammates")
+        assert response.status_code == 200
+        data = response.json()
+
+        by_id = {t["teammate_id"]: t for t in data["by_teammates"]}
+        # Player 1 stats are reported under the teammate row, not teammate's own
+        assert by_id[teammate]["kills"] == 4
+        assert by_id[teammate]["deaths"] == 2
+        assert by_id[teammate]["assists"] == 3
+        assert by_id[teammate]["total_matches"] == 3
